@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pacha Viva — muestra de identidad provisional</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..700&family=Figtree:wght@400;500;600;700&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../../resources/css/tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Figtree', system-ui, sans-serif;
+    padding: 32px 24px 80px;
+  }
+  h1 { font-family: 'Fraunces', Georgia, serif; font-size: 34px; margin: 0 0 4px; }
+  .lede { color: var(--text-muted); margin: 0 0 40px; max-width: 60ch; }
+  h2 { font-family: 'Fraunces', Georgia, serif; font-size: 22px; margin: 0 0 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+  section { margin-bottom: 56px; }
+
+  /* --- rampa --- */
+  .ramp { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; }
+  .swatch { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--card); }
+  .swatch__color { height: 64px; }
+  .swatch__meta { padding: 8px 10px; font-size: 12px; line-height: 1.5; }
+  .swatch__meta code { display: block; font-size: 11px; color: var(--text-muted); word-break: break-all; }
+
+  /* --- logo sobre fondos --- */
+  .logo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .logo-card { border-radius: 10px; padding: 32px 24px; display: flex; align-items: center; justify-content: center; min-height: 140px; }
+  .logo-card--light { background: var(--card); border: 1px solid var(--border); }
+  .logo-card--brand900 { background: var(--brand-900); }
+  .logo-card--photo {
+    background:
+      linear-gradient(rgba(10, 20, 15, .55), rgba(10, 20, 15, .55)),
+      linear-gradient(135deg, #2b2f28 0%, #14201a 60%, #0a0f0c 100%);
+    color: #fff;
+  }
+  .logo-card svg { height: 56px; width: auto; max-width: 100%; }
+  .logo-card--photo svg { color: #fff; }
+  .logo-card figcaption { font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 8px; }
+  .logo-card--photo + figcaption, .logo-card--brand900 + figcaption { color: var(--text-muted); }
+  figure { margin: 0; }
+
+  /* --- tamaños --- */
+  .size-row { display: flex; align-items: flex-end; gap: 32px; flex-wrap: wrap; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 24px; }
+  .size-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .size-item svg { display: block; }
+  .size-item span { font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+  /* --- tipografía --- */
+  .type-row { padding: 20px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 12px; }
+  .type-row .label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); margin-bottom: 8px; }
+  .type-display { font-family: 'Fraunces', Georgia, serif; font-size: 40px; font-weight: 600; }
+  .type-sans { font-family: 'Figtree', system-ui, sans-serif; font-size: 18px; }
+  .type-script { font-family: 'Caveat', cursive; font-size: 32px; color: var(--brand-text); }
+
+  /* --- contraste --- */
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  th { color: var(--text-muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .pill--pass { background: #e3f3ea; color: var(--brand-700); }
+  .pill--fail { background: #fbe9e7; color: var(--danger); }
+  #contrast-report td[data-sample] div { padding: 6px 10px; border-radius: 6px; display: inline-block; }
+</style>
+</head>
+<body>
+
+<h1>Pacha Viva — identidad provisional</h1>
+<p class="lede">Lote 0. Referencia visual de tokens de color, logotipo y tipografía.
+Nada de esto está aprobado por la clienta todavía.</p>
+
+<section id="ramp-section">
+  <h2>Rampa de color (<code>--brand-h: 155</code>)</h2>
+  <div class="ramp" id="ramp"></div>
+</section>
+
+<section>
+  <h2>Contraste WCAG (medido, no estimado)</h2>
+  <table id="contrast-report">
+    <thead>
+      <tr><th>Par</th><th>Muestra</th><th>Ratio</th><th>AA (&ge;4.5:1)</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Logotipo — 5 variantes sobre 3 fondos</h2>
+  <div class="logo-grid">
+    <figure>
+      <div class="logo-card logo-card--light">
+        <img src="logo.svg" alt="Pacha Viva, logo horizontal">
+      </div>
+      <figcaption>logo.svg — sobre claro</figcaption>
+    </figure>
+    <figure>
+      <div class="logo-card logo-card--light">
+        <img src="logo-vertical.svg" alt="Pacha Viva, logo vertical" style="height:110px">
+      </div>
+      <figcaption>logo-vertical.svg — sobre claro</figcaption>
+    </figure>
+    <figure>
+      <div class="logo-card logo-card--brand900">
+        <img src="logo.svg" alt="Pacha Viva, logo horizontal" style="filter:brightness(0) invert(1)">
+      </div>
+      <figcaption>logo.svg — sobre --brand-900 (invertido)</figcaption>
+    </figure>
+    <figure>
+      <div class="logo-card logo-card--photo">
+        <svg-inline data-src="logo-mono.svg"></svg-inline>
+      </div>
+      <figcaption>logo-mono.svg — negativo sobre foto simulada</figcaption>
+    </figure>
+    <figure>
+      <div class="logo-card logo-card--light">
+        <img src="simbolo.svg" alt="Símbolo Pacha Viva" style="height:56px;width:56px">
+      </div>
+      <figcaption>simbolo.svg — sobre claro</figcaption>
+    </figure>
+    <figure>
+      <div class="logo-card logo-card--photo">
+        <svg-inline data-src="simbolo.svg" style="color:#fff"></svg-inline>
+      </div>
+      <figcaption>simbolo.svg — negativo sobre foto simulada</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section>
+  <h2>Logotipo a 24 / 40 / 64 px de alto</h2>
+  <div class="size-row">
+    <div class="size-item">
+      <img src="logo.svg" alt="Pacha Viva a 24px" style="height:24px">
+      <span>24px</span>
+    </div>
+    <div class="size-item">
+      <img src="logo.svg" alt="Pacha Viva a 40px" style="height:40px">
+      <span>40px</span>
+    </div>
+    <div class="size-item">
+      <img src="logo.svg" alt="Pacha Viva a 64px" style="height:64px">
+      <span>64px</span>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Tipografía en sus 3 roles</h2>
+  <div class="type-row">
+    <div class="label">display — Fraunces (titulares)</div>
+    <div class="type-display">Ande, selva y costa en un solo viaje</div>
+  </div>
+  <div class="type-row">
+    <div class="label">sans — Figtree (texto e interfaz)</div>
+    <div class="type-sans">Reservá tu próxima ruta con guías locales certificados por MINCETUR.</div>
+  </div>
+  <div class="type-row">
+    <div class="label">script — Caveat (acentos, uso puntual)</div>
+    <div class="type-script">hecho por manos peruanas</div>
+  </div>
+</section>
+
+<script>
+// Convierte los <svg-inline data-src> en SVG real inyectado inline, para que
+// currentColor (logo-mono.svg) herede el `color` del contenedor.
+document.querySelectorAll('svg-inline').forEach(async el => {
+  const res = await fetch(el.dataset.src);
+  const text = await res.text();
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = text;
+  const svg = wrapper.querySelector('svg');
+  svg.style.height = el.style.height || '56px';
+  svg.style.width = 'auto';
+  if (el.style.color) svg.style.color = el.style.color;
+  el.replaceWith(svg);
+});
+
+function relLuminance(rgb) {
+  const [r, g, b] = rgb.map(c => {
+    c /= 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+function parseColor(str) {
+  const m = str.match(/rgba?\(([^)]+)\)/);
+  if (!m) return null;
+  return m[1].split(',').slice(0, 3).map(n => parseFloat(n));
+}
+
+function contrast(c1, c2) {
+  const L1 = relLuminance(c1), L2 = relLuminance(c2);
+  const lighter = Math.max(L1, L2), darker = Math.min(L1, L2);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+function computedVar(name, el = document.documentElement) {
+  return getComputedStyle(el).getPropertyValue(name).trim();
+}
+
+// --- Rampa: pinta cada stop y muestra su valor HSL calculado ---
+const stops = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
+const rampEl = document.getElementById('ramp');
+const probe = document.createElement('div');
+probe.style.position = 'absolute';
+probe.style.visibility = 'hidden';
+document.body.appendChild(probe);
+
+stops.forEach(stop => {
+  const varName = `--brand-${stop}`;
+  probe.style.background = `var(${varName})`;
+  const resolved = getComputedStyle(probe).backgroundColor;
+  const card = document.createElement('div');
+  card.className = 'swatch';
+  card.innerHTML = `
+    <div class="swatch__color" style="background:var(${varName})"></div>
+    <div class="swatch__meta">
+      <strong>${varName}</strong>
+      <code>${resolved}</code>
+    </div>`;
+  rampEl.appendChild(card);
+});
+
+// --- Contraste real, leído del navegador con getComputedStyle ---
+function addRow(tbody, label, fg, bg, sampleStyle) {
+  const rgbFg = parseColor(fg), rgbBg = parseColor(bg);
+  const ratio = contrast(rgbFg, rgbBg);
+  const pass = ratio >= 4.5;
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td>${label}</td>
+    <td data-sample><div style="${sampleStyle}">Aa</div></td>
+    <td>${ratio.toFixed(2)}:1</td>
+    <td><span class="pill ${pass ? 'pill--pass' : 'pill--fail'}">${pass ? 'PASA' : 'FALLA'}</span></td>`;
+  tbody.appendChild(tr);
+  return { label, ratio, pass };
+}
+
+const tbody = document.querySelector('#contrast-report tbody');
+
+probe.style.background = 'var(--brand-text)';
+const brandText = getComputedStyle(probe).backgroundColor;
+probe.style.background = 'var(--ground)';
+const ground = getComputedStyle(probe).backgroundColor;
+probe.style.background = 'var(--surface)';
+const surface = getComputedStyle(probe).backgroundColor;
+probe.style.background = 'var(--on-action)';
+const onAction = getComputedStyle(probe).backgroundColor;
+probe.style.background = 'var(--action)';
+const action = getComputedStyle(probe).backgroundColor;
+probe.style.background = 'var(--brand-100)';
+const brand100 = getComputedStyle(probe).backgroundColor;
+
+const results = [];
+results.push(addRow(tbody, '--brand-text sobre --ground', brandText, ground,
+  `color:${brandText};background:${ground}`));
+results.push(addRow(tbody, '--brand-text sobre --surface', brandText, surface,
+  `color:${brandText};background:${surface}`));
+results.push(addRow(tbody, '--on-action sobre --action', onAction, action,
+  `color:${onAction};background:${action}`));
+// Chequeo adversarial: este par NO debe pasar AA. Si el checker lo marcara
+// "PASA", el checker mismo estaría roto.
+results.push(addRow(tbody, 'ADVERSARIAL — blanco sobre --brand-100 (debe FALLAR)', 'rgb(255,255,255)', brand100,
+  `color:#fff;background:${brand100}`));
+
+window.__contrastResults = results;
+</script>
+
+</body>
+</html>

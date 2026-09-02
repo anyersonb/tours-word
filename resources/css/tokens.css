@@ -1,0 +1,60 @@
+/**
+ * Pacha Viva — tokens de color (única fuente de verdad).
+ *
+ * REGLA DURA: ningún componente escribe nunca un hexadecimal ni un
+ * --brand-N directo. Solo se consumen los tokens SEMÁNTICOS de abajo
+ * (--action, --brand-text, --bg, --text, --border, etc). Si algo necesita
+ * un color que no existe todavía como token semántico, el token falta:
+ * se crea aquí, no se hardcodea en el componente.
+ *
+ * Identidad provisional (lote 0) — la clienta aún no aprobó nada.
+ */
+
+:root {
+  /* Cambiar estos dos números reviste el sitio completo */
+  --brand-h: 155; /* 12 = terracota · 205 = azul · 32 = ocre */
+  --brand-s: 1;   /* multiplicador de saturación global */
+
+  /* Rampa 50 → 900. Saturación/luminosidad fijas del mockup, no tocar. */
+  --brand-50:  hsl(var(--brand-h) calc(28% * var(--brand-s)) 95%);
+  --brand-100: hsl(var(--brand-h) calc(32% * var(--brand-s)) 88%);
+  --brand-200: hsl(var(--brand-h) calc(30% * var(--brand-s)) 76%);
+  --brand-300: hsl(var(--brand-h) calc(28% * var(--brand-s)) 62%);
+  --brand-400: hsl(var(--brand-h) calc(34% * var(--brand-s)) 47%);
+  --brand-500: hsl(var(--brand-h) calc(47% * var(--brand-s)) 34%);
+  --brand-600: hsl(var(--brand-h) calc(59% * var(--brand-s)) 26%);
+  --brand-700: hsl(var(--brand-h) calc(62% * var(--brand-s)) 20%);
+  --brand-800: hsl(var(--brand-h) calc(64% * var(--brand-s)) 15%);
+  --brand-900: hsl(var(--brand-h) calc(62% * var(--brand-s)) 10%);
+
+  /* Neutrales */
+  --ground:    #f4f6f3;
+  --surface:   #fff;
+  --surface-2: #eef1ee;
+  --line:      #dbe2dc;
+  --line-soft: #e7ebe7;
+  --ink:       #14201a;
+  --ink-2:     #3d4a42;
+  --ink-3:     #6c7972;
+
+  /* Semánticos de estado */
+  --amber:   #c9821f;
+  --danger:  #ab3a30;
+  --info:    #2c6fa8;
+
+  /* Semánticos de marca: es lo ÚNICO que consumen los componentes */
+  --action:       var(--brand-600);
+  --action-hover: var(--brand-700);
+  --on-action:    #fff;
+  --brand-text:   var(--brand-700); /* mínimo AA sobre --ground y --surface */
+
+  /* Semánticos de superficie y borde, sobre los neutrales */
+  --bg:          var(--ground);
+  --card:        var(--surface);
+  --card-2:      var(--surface-2);
+  --border:      var(--line);
+  --border-soft: var(--line-soft);
+  --text:        var(--ink);
+  --text-2:      var(--ink-2);
+  --text-muted:  var(--ink-3);
+}
