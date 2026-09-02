@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Pacha Viva">
+  <title>Símbolo Pacha Viva — dirección textil andina</title>
+  <g fill="var(--action, #1b6949)">
+    <polygon points="24,20 28,24 24,28 20,24"/>
+  </g>
+  <g fill="none" stroke="var(--action, #1b6949)" stroke-width="4" stroke-linejoin="round">
+    <polygon points="24,14 34,24 24,34 14,24"/>
+    <polygon points="24,6 42,24 24,42 6,24"/>
+  </g>
+</svg>

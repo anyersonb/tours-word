@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pacha Viva — comparativa de símbolo (4 direcciones)</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="../../../../resources/css/tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, sans-serif;
+    padding: 32px 24px 96px;
+  }
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  .lede { color: var(--text-muted); margin: 0 0 40px; max-width: 70ch; }
+  .direction { margin-bottom: 64px; border-top: 1px solid var(--border); padding-top: 24px; }
+  .direction h2 { font-size: 20px; margin: 0 0 4px; }
+  .direction .idea { color: var(--text-2); margin: 0 0 20px; max-width: 70ch; }
+  .kind-label { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); margin: 20px 0 8px; }
+  .bg-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .bg-cell { border-radius: 10px; padding: 16px; display: flex; align-items: center; justify-content: space-around; gap: 12px; flex-wrap: wrap; }
+  .bg-cell--light { background: var(--card); border: 1px solid var(--border); }
+  .bg-cell--brand900 { background: var(--brand-900); }
+  .bg-cell--photo {
+    background:
+      linear-gradient(rgba(10, 20, 15, .55), rgba(10, 20, 15, .55)),
+      linear-gradient(135deg, #2b2f28 0%, #14201a 60%, #0a0f0c 100%);
+  }
+  .bg-cell--brand900 img, .bg-cell--photo img { filter: brightness(0) invert(1); }
+  .size-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .size-item .lockup { display: flex; align-items: center; gap: 8px; }
+  .size-item span { font-size: 10px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+  .bg-cell--brand900 span, .bg-cell--photo span { color: rgba(255,255,255,.6); }
+  .bg-caption { text-align: center; font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<h1>Pacha Viva — comparativa de símbolo</h1>
+<p class="lede">Cuatro direcciones a comparar. <strong>A es el símbolo actual</strong> (barras
+ascendentes), copiado sin modificar para que la comparación sea justa. B, C y D son
+alternativas nuevas. Todas: geometría abstracta, una sola tinta, funcionan en negativo
+sobre foto oscura (fila inferior de cada bloque, simulada con degradado).</p>
+
+<section class="direction">
+  <h2>A — actual: barras ascendentes</h2>
+  <p class="idea">Cuatro barras verticales de altura creciente. Referencia de partida: el
+  problema a resolver es que se lee como gráfico de crecimiento (fintech/analítica).</p>
+  <div class="kind-label">Símbolo solo</div>
+  <div class="bg-row">
+    <div class="bg-cell bg-cell--light">
+      <div class="size-item"><img src="simbolo-a.svg" style="height:24px" alt=""><span>24px</span></div>
+      <div class="size-item"><img src="simbolo-a.svg" style="height:40px" alt=""><span>40px</span></div>
+      <div class="size-item"><img src="simbolo-a.svg" style="height:64px" alt=""><span>64px</span></div>
+    </div>
+    <div class="bg-cell bg-cell--brand900">
+      <div class="size-item"><img src="simbolo-a.svg" style="height:24px" alt=""><span>24px</span></div>
+      <div class="size-item"><img src="simbolo-a.svg" style="height:40px" alt=""><span>40px</span></div>
+      <div class="size-item"><img src="simbolo-a.svg" style="height:64px" alt=""><span>64px</span></div>
+    </div>
+    <div class="bg-cell bg-cell--photo">
+      <div class="size-item"><img src="simbolo-a.svg" style="height:24px" alt=""><span>24px</span></div>
+      <div class="size-item"><img src="simbolo-a.svg" style="height:40px" alt=""><span>40px</span></div>
+      <div class="size-item"><img src="simbolo-a.svg" style="height:64px" alt=""><span>64px</span></div>
+    </div>
+  </div>
+  <div class="kind-label">Lock-up con wordmark</div>
+  <div class="bg-row">
+    <div class="bg-cell bg-cell--light">
+      <div class="size-item"><div class="lockup"><img src="simbolo-a.svg" style="height:24px" alt=""><img src="wordmark-solo.svg" style="height:16px" alt=""></div><span>24px</span></div>
+      <div class="size-item"><div class="lockup"><img src="simbolo-a.svg" style="height:40px" alt=""><img src="wordmark-solo.svg" style="height:27px" alt=""></div><span>40px</span></div>
+      <div class="size-item"><div class="lockup"><img src="simbolo-a.svg" style="height:64px" alt=""><img src="wordmark-solo.svg" style="height:43px" alt=""></div><span>64px</span></div>
+    </div>
+    <div class="bg-cell bg-cell--brand900">
+      <div class="size-item"><div class="lockup"><img src="simbolo-a.svg" style="height:24px" alt=""><img src="wordmark-solo.svg" style="height:16px" alt=""></div><span>24px</span></div>
+      <div class="size-item"><div class="lockup"><img src="simbolo-a.svg" style="height:40px" alt=""><img src="wordmark-solo.svg" style="height:27px" alt=""></div><span>40px</span></div>
+      <div class="size-item"><div class="lockup"><img src="simbolo-a.svg" style="height:64px" alt=""><img src="wordmark-solo.svg" style="height:43px" alt=""></div><span>64px</span></div>
+    </div>
+    <div class="bg-cell bg-cell--photo">
+      <div class="size-item"><div class="lockup"><img src="simbolo-a.svg" style="height:24px" alt=""><img src="wordmark-solo.svg" style="height:16px" alt=""></div><span>24px</span></div>
+      <div class="size-item"><div class="lockup"><img src="simbolo-a.svg" style="height:40px" alt=""><img src="wordmark-solo.svg" style="height:27px" alt=""></div><span>40px</span></div>
+      <div class="size-item"><div class="lockup"><img src="simbolo-a.svg" style="height:64px" alt=""><img src="wordmark-solo.svg" style="height:43px" alt=""></div><span>64px</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="direction">
+  <h2>B — ciclo / pacha</h2>
+  <p class="idea">Dos anillos concéntricos incompletos, girados en sentidos opuestos: la
+  idea de tierra-tiempo como forma cíclica, sin manecillas ni referencia a reloj.</p>
+  <div class="kind-label">Símbolo solo</div>
+  <div class="bg-row">
+    <div class="bg-cell bg-cell--light">
+      <div class="size-item"><img src="simbolo-b.svg" style="height:24px" alt=""><span>24px</span></div>
+      <div class="size-item"><img src="simbolo-b.svg" style="height:40px" alt=""><span>40px</span></div>
+      <div class="size-item"><img src="simbolo-b.svg" style="height:64px" alt=""><span>64px</span></div>
+    </div>
+    <div class="bg-cell bg-cell--brand900">
+      <div class="size-item"><img src="simbolo-b.svg" style="height:24px" alt=""><span>24px</span></div>
+      <div class="size-item"><img src="simbolo-b.svg" style="height:40px" alt=""><span>40px</span></div>
+      <div class="size-item"><img src="simbolo-b.svg" style="height:64px" alt=""><span>64px</span></div>
+    </div>
+    <div class="bg-cell bg-cell--photo">
+      <div class="size-item"><img src="simbolo-b.svg" style="height:24px" alt=""><span>24px</span></div>
+      <div class="size-item"><img src="simbolo-b.svg" style="height:40px" alt=""><span>40px</span></div>
+      <div class="size-item"><img src="simbolo-b.svg" style="height:64px" alt=""><span>64px</span></div>
+    </div>
+  </div>
+  <div class="kind-label">Lock-up con wordmark</div>
+  <div class="bg-row">
+    <div class="bg-cell bg-cell--light">
+      <div class="size-item"><div class="lockup"><img src="simbolo-b.svg" style="height:24px" alt=""><img src="wordmark-solo.svg" style="height:16px" alt=""></div><span>24px</span></div>
+      <div class="size-item"><div class="lockup"><img src="simbolo-b.svg" style="height:40px" alt=""><img src="wordmark-solo.svg" style="height:27px" alt=""></div><span>40px</span></div>
+      <div class="size-item"><div class="lockup"><img src="simbolo-b.svg" style="height:64px" alt=""><img src="wordmark-solo.svg" style="height:43px" alt=""></div><span>64px</span></div>
+    </div>
+    <div class="bg-cell bg-cell--brand900">
+      <div class="size-item"><div class="lockup"><img src="simbolo-b.svg" style="height:24px" alt=""><img src="wordmark-solo.svg" style="height:16px" alt=""></div><span>24px</span></div>
+      <div class="size-item"><div class="lockup"><img src="simbolo-b.svg" style="height:40px" alt=""><img src="wordmark-solo.svg" style="height:27px" alt=""></div><span>40px</span></div>
+      <div class="size-item"><div class="lockup"><img src="simbolo-b.svg" style="height:64px" alt=""><img src="wordmark-solo.svg" style="height:43px" alt=""></div><span>64px</span></div>
+    </div>
+    <div class="bg-cell bg-cell--photo">
+      <div class="size-item"><div class="lockup"><img src="simbolo-b.svg" style="height:24px" alt=""><img src="wordmark-solo.svg" style="height:16px" alt=""></div><span>24px</span></div>
+      <div class="size-item"><div class="lockup"><img src="simbolo-b.svg" style="height:40px" alt=""><img src="wordmark-solo.svg" style="height:27px" alt=""></div><span>40px</span></div>
+      <div class="size-item"><div class="lockup"><img src="simbolo-b.svg" style="height:64px" alt=""><img src="wordmark-solo.svg" style="height:43px" alt=""></div><span>64px</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="direction">
+  <h2>C — geometría textil andina</h2>
+  <p class="idea">Rombos concéntricos escalonados en repetición modular, sin usar la
+  chakana literal (cruz de brazos iguales): abstracción propia sobre la idea de rombo
+  textil, muy común en tejido andino en general.</p>
+  <div class="kind-label">Símbolo solo</div>
+  <div class="bg-row">
+    <div class="bg-cell bg-cell--light">
+      <div class="size-item"><img src="simbolo-c.svg" style="height:24px" alt=""><span>24px</span></div>
+      <div class="size-item"><img src="simbolo-c.svg" style="height:40px" alt=""><span>40px</span></div>
+      <div class="size-item"><img src="simbolo-c.svg" style="height:64px" alt=""><span>64px</span></div>
+    </div>
+    <div class="bg-cell bg-cell--brand900">
+      <div class="size-item"><img src="simbolo-c.svg" style="height:24px" alt=""><span>24px</span></div>
+      <div class="size-item"><img src="simbolo-c.svg" style="height:40px" alt=""><span>40px</span></div>
+      <div class="size-item"><img src="simbolo-c.svg" style="height:64px" alt=""><span>64px</span></div>
+    </div>
+    <div class="bg-cell bg-cell--photo">
+      <div class="size-item"><img src="simbolo-c.svg" style="height:24px" alt=""><span>24px</span></div>
+      <div class="size-item"><img src="simbolo-c.svg" style="height:40px" alt=""><span>40px</span></div>
+      <div class="size-item"><img src="simbolo-c.svg" style="height:64px" alt=""><span>64px</span></div>
+    </div>
+  </div>
+  <div class="kind-label">Lock-up con wordmark</div>
+  <div class="bg-row">
+    <div class="bg-cell bg-cell--light">
+      <div class="size-item"><div class="lockup"><img src="simbolo-c.svg" style="height:24px" alt=""><img src="wordmark-solo.svg" style="height:16px" alt=""></div><span>24px</span></div>
+      <div class="size-item"><div class="lockup"><img src="simbolo-c.svg" style="height:40px" alt=""><img src="wordmark-solo.svg" style="height:27px" alt=""></div><span>40px</span></div>
+      <div class="size-item"><div class="lockup"><img src="simbolo-c.svg" style="height:64px" alt=""><img src="wordmark-solo.svg" style="height:43px" alt=""></div><span>64px</span></div>
+    </div>
+    <div class="bg-cell bg-cell--brand900">
+      <div class="size-item"><div class="lockup"><img src="simbolo-c.svg" style="height:24px" alt=""><img src="wordmark-solo.svg" style="height:16px" alt=""></div><span>24px</span></div>
+      <div class="size-item"><div class="lockup"><img src="simbolo-c.svg" style="height:40px" alt=""><img src="wordmark-solo.svg" style="height:27px" alt=""></div><span>40px</span></div>
+      <div class="size-item"><div class="lockup"><img src="simbolo-c.svg" style="height:64px" alt=""><img src="wordmark-solo.svg" style="height:43px" alt=""></div><span>64px</span></div>
+    </div>
+    <div class="bg-cell bg-cell--photo">
+      <div class="size-item"><div class="lockup"><img src="simbolo-c.svg" style="height:24px" alt=""><img src="wordmark-solo.svg" style="height:16px" alt=""></div><span>24px</span></div>
+      <div class="size-item"><div class="lockup"><img src="simbolo-c.svg" style="height:40px" alt=""><img src="wordmark-solo.svg" style="height:27px" alt=""></div><span>40px</span></div>
+      <div class="size-item"><div class="lockup"><img src="simbolo-c.svg" style="height:64px" alt=""><img src="wordmark-solo.svg" style="height:43px" alt=""></div><span>64px</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="direction">
+  <h2>D — monograma P·V</h2>
+  <p class="idea">Dos diagonales gruesas que forman una V, con un aro superpuesto en la
+  diagonal derecha que evoca el ojo de la P: iniciales construidas con geometría, no
+  con una fuente.</p>
+  <div class="kind-label">Símbolo solo</div>
+  <div class="bg-row">
+    <div class="bg-cell bg-cell--light">
+      <div class="size-item"><img src="simbolo-d.svg" style="height:24px" alt=""><span>24px</span></div>
+      <div class="size-item"><img src="simbolo-d.svg" style="height:40px" alt=""><span>40px</span></div>
+      <div class="size-item"><img src="simbolo-d.svg" style="height:64px" alt=""><span>64px</span></div>
+    </div>
+    <div class="bg-cell bg-cell--brand900">
+      <div class="size-item"><img src="simbolo-d.svg" style="height:24px" alt=""><span>24px</span></div>
+      <div class="size-item"><img src="simbolo-d.svg" style="height:40px" alt=""><span>40px</span></div>
+      <div class="size-item"><img src="simbolo-d.svg" style="height:64px" alt=""><span>64px</span></div>
+    </div>
+    <div class="bg-cell bg-cell--photo">
+      <div class="size-item"><img src="simbolo-d.svg" style="height:24px" alt=""><span>24px</span></div>
+      <div class="size-item"><img src="simbolo-d.svg" style="height:40px" alt=""><span>40px</span></div>
+      <div class="size-item"><img src="simbolo-d.svg" style="height:64px" alt=""><span>64px</span></div>
+    </div>
+  </div>
+  <div class="kind-label">Lock-up con wordmark</div>
+  <div class="bg-row">
+    <div class="bg-cell bg-cell--light">
+      <div class="size-item"><div class="lockup"><img src="simbolo-d.svg" style="height:24px" alt=""><img src="wordmark-solo.svg" style="height:16px" alt=""></div><span>24px</span></div>
+      <div class="size-item"><div class="lockup"><img src="simbolo-d.svg" style="height:40px" alt=""><img src="wordmark-solo.svg" style="height:27px" alt=""></div><span>40px</span></div>
+      <div class="size-item"><div class="lockup"><img src="simbolo-d.svg" style="height:64px" alt=""><img src="wordmark-solo.svg" style="height:43px" alt=""></div><span>64px</span></div>
+    </div>
+    <div class="bg-cell bg-cell--brand900">
+      <div class="size-item"><div class="lockup"><img src="simbolo-d.svg" style="height:24px" alt=""><img src="wordmark-solo.svg" style="height:16px" alt=""></div><span>24px</span></div>
+      <div class="size-item"><div class="lockup"><img src="simbolo-d.svg" style="height:40px" alt=""><img src="wordmark-solo.svg" style="height:27px" alt=""></div><span>40px</span></div>
+      <div class="size-item"><div class="lockup"><img src="simbolo-d.svg" style="height:64px" alt=""><img src="wordmark-solo.svg" style="height:43px" alt=""></div><span>64px</span></div>
+    </div>
+    <div class="bg-cell bg-cell--photo">
+      <div class="size-item"><div class="lockup"><img src="simbolo-d.svg" style="height:24px" alt=""><img src="wordmark-solo.svg" style="height:16px" alt=""></div><span>24px</span></div>
+      <div class="size-item"><div class="lockup"><img src="simbolo-d.svg" style="height:40px" alt=""><img src="wordmark-solo.svg" style="height:27px" alt=""></div><span>40px</span></div>
+      <div class="size-item"><div class="lockup"><img src="simbolo-d.svg" style="height:64px" alt=""><img src="wordmark-solo.svg" style="height:43px" alt=""></div><span>64px</span></div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

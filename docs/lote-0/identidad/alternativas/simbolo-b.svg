@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Pacha Viva">
+  <title>Símbolo Pacha Viva — dirección ciclo/pacha</title>
+  <g fill="none" stroke="var(--action, #1b6949)" stroke-linecap="round">
+    <circle cx="24" cy="24" r="17" stroke-width="7" stroke-dasharray="80.1 26.7" transform="rotate(-45 24 24)"/>
+    <circle cx="24" cy="24" r="8" stroke-width="6" stroke-dasharray="37.7 12.6" transform="rotate(135 24 24)"/>
+  </g>
+</svg>

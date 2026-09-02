@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Pacha Viva">
+  <title>Símbolo Pacha Viva — dirección monograma P·V</title>
+  <g fill="none" stroke="var(--action, #1b6949)" stroke-width="7" stroke-linecap="round">
+    <path d="M12 8 L24 40"/>
+    <path d="M36 8 L24 40"/>
+  </g>
+  <circle cx="32" cy="15" r="7" fill="none" stroke="var(--action, #1b6949)" stroke-width="6"/>
+</svg>
