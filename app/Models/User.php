@@ -18,12 +18,26 @@ class User extends Authenticatable implements FilamentUser
     /**
      * The attributes that are mass assignable.
      *
+     * `is_admin` is deliberately excluded and explicitly guarded below: it is
+     * the only gate for canAccessPanel(). Not exploitable today (no
+     * registration route, no UserResource — see
+     * docs/lote-2/seguridad-2026-09-01.md, M-2), but it must stay off any
+     * fillable/fill()/create() path so the first `User::create($request->
+     * validated())` added in a later batch can't escalate privilege. Assign
+     * it only explicitly: `$user->is_admin = true; $user->save();`.
+     *
      * @var list<string>
      */
     protected $fillable = [
         'name',
         'email',
         'password',
+    ];
+
+    /**
+     * @var list<string>
+     */
+    protected $guarded = [
         'is_admin',
     ];
 

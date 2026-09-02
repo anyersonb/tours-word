@@ -11,8 +11,10 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\Alignment;
 use Filament\Support\Icons\Heroicon;
 
 /**
@@ -59,10 +61,22 @@ class Configuracion extends Page implements HasForms
                             ->required()
                             ->helperText('Ejemplo: si 1 USD equivale a S/ 3.75, escribe 3.75.'),
                     ]),
+                // Filament 4 has no `<x-filament-panels::form.actions>` Blade
+                // component (that was v3). Actions are a first-class Schema
+                // component instead — placing it inside this same schema
+                // renders the submit button inside the <form wire:submit="save">
+                // from the view, which is all `Action::submit()` needs: it
+                // just outputs <button type="submit">.
+                Actions::make($this->getFormActions())
+                    ->alignment(Alignment::Start)
+                    ->key('form-actions'),
             ])
             ->statePath('data');
     }
 
+    /**
+     * @return array<Action>
+     */
     protected function getFormActions(): array
     {
         return [

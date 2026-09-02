@@ -117,6 +117,16 @@ class TourForm
                             ->numeric()
                             ->required()
                             ->default(0)
+                            // Column is unsignedInteger, max 4294967295 cents.
+                            // Without these the form lets -150 or 99999999
+                            // through and MySQL throws SQLSTATE[22003] → 500
+                            // instead of a validation message (audit B-1).
+                            ->minValue(0)
+                            ->maxValue(42949672)
+                            ->validationMessages([
+                                'min' => 'El precio no puede ser negativo.',
+                                'max' => 'El precio no puede superar S/ 42,949,672.',
+                            ])
                             ->formatStateUsing(fn (?int $state) => $state === null ? null : Money::pen($state)->decimal())
                             ->dehydrateStateUsing(fn ($state) => Money::parseToCents($state)),
                         TextInput::make('price_usd_cents')
@@ -125,6 +135,12 @@ class TourForm
                             ->numeric()
                             ->required()
                             ->default(0)
+                            ->minValue(0)
+                            ->maxValue(42949672)
+                            ->validationMessages([
+                                'min' => 'El precio no puede ser negativo.',
+                                'max' => 'El precio no puede superar US$ 42,949,672.',
+                            ])
                             ->formatStateUsing(fn (?int $state) => $state === null ? null : Money::usd($state)->decimal())
                             ->dehydrateStateUsing(fn ($state) => Money::parseToCents($state)),
                     ]),
@@ -146,9 +162,32 @@ class TourForm
                             ->schema([
                                 FileUpload::make('path')
                                     ->label('Imagen')
-                                    ->image()
+                                    // ->image() only adds `mimetypes:image/*`,
+                                    // which accepts image/svg+xml (inline
+                                    // <script>). A closed whitelist of the
+                                    // three formats the site actually serves
+                                    // is what the security audit
+                                    // (docs/lote-2/seguridad-2026-09-01.md,
+                                    // M-1) asked for.
+                                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                    ->maxSize(4096)
                                     ->disk('public')
                                     ->directory('tours')
+                                    // The extension on disk must come from the
+                                    // MIME type Laravel detects on the server
+                                    // (finfo over the real file bytes), never
+                                    // from the client-supplied original
+                                    // extension: that's how a GIF polyglot
+                                    // renamed evil.pht or evil.html got served
+                                    // from the same origin as a script.
+                                    ->getUploadedFileNameForStorageUsing(
+                                        fn ($file) => Str::ulid().'.'.match ($file->getMimeType()) {
+                                            'image/jpeg' => 'jpg',
+                                            'image/png' => 'png',
+                                            'image/webp' => 'webp',
+                                            default => 'bin',
+                                        }
+                                    )
                                     ->required(),
                                 ...collect(config('cms.active_locales'))
                                     ->map(fn (string $locale) => TextInput::make("alt.{$locale}")
@@ -162,6 +201,7 @@ class TourForm
                             ->orderColumn('order')
                             ->addActionLabel('Agregar imagen')
                             ->defaultItems(0)
+                            ->maxItems(20)
                             ->collapsible()
                             ->columns(1),
                     ]),

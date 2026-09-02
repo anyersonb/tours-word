@@ -10,6 +10,7 @@ use App\Models\TourSlugHistory;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\TestCase;
 
 class TourCatalogTest extends TestCase
@@ -114,5 +115,18 @@ class TourCatalogTest extends TestCase
         $this->assertFalse(Tour::slugTaken('es', 'mi-tour', $tour->id));
         $this->assertTrue(Tour::slugTaken('es', 'mi-tour'));
         $this->assertTrue(Tour::slugTaken('es', 'mi-tour', $tour->id + 999));
+    }
+
+    /**
+     * Hardening from B-0 (docs/lote-2/seguridad-2026-09-01.md): not SQL
+     * injection today because $locale always comes from
+     * config('cms.active_locales'), but the day it comes from the request
+     * this must reject anything outside the configured locale whitelist.
+     */
+    public function test_slug_taken_rejects_a_locale_outside_the_whitelist(): void
+    {
+        $this->expectException(HttpException::class);
+
+        Tour::slugTaken('es" OR "1"="1', 'mi-tour');
     }
 }
