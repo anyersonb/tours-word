@@ -9,3 +9,14 @@
 *.pdf binary
 *.woff binary
 *.woff2 binary
+
+# Añadidos por Laravel 12 (lote 2), fusionados sin pisar la regla eol=lf de arriba
+*.blade.php diff=html
+*.css diff=css
+*.html diff=html
+*.md diff=markdown
+*.php diff=php
+
+/.github export-ignore
+CHANGELOG.md export-ignore
+.styleci.yml export-ignore

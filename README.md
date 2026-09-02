@@ -13,9 +13,9 @@ provisional): todavía no hay aplicación, solo los entregables de arranque.
 
 | Lote | Qué entrega | Estado |
 |---|---|---|
-| 0 | Identidad provisional, nombres con dominio libre, checklist a la clienta | **en curso** |
-| 1 | Sistema de diseño + Home/Nosotros/Contacto en staging noindex | pendiente |
-| 2 | Laravel 12 limpio, contrato de datos, CMS de catálogo | pendiente |
+| 0 | Identidad provisional, nombres con dominio libre, checklist a la clienta | en curso |
+| 1 | Sistema de diseño + Home/Nosotros/Contacto en staging noindex | bloqueado (faltan mockups) |
+| 2 | Laravel 12 limpio, contrato de datos, CMS de catálogo | **listo, sin desplegar** — ver `docs/lote-2/` |
 | 3 | Resto de pantallas públicas | pendiente |
 | 4 | Reservas y cobro (PEN + USD) | pendiente |
 | 5 | SEO, EN/PT y salida a producción | pendiente |
