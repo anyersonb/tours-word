@@ -16,6 +16,13 @@ Marca de trabajo: AnyersonDev. Idioma de los entregables: español.
   cableado en vistas. **ABIERTO**: cómo se fija el tipo de cambio (valor editable en el CMS vs.
   API). El lote 4 debe probar el cobro en **las dos** monedas.
 
+- **Nombre**: **Pacha Viva** (elegido por Anyerson el 01/09/2026; reemplaza a "Peru Local",
+  cuyo .com esta registrado). Dominios: `pachaviva.com` (exacto, libre al 01/09) y
+  `pachavivaperu.com` como defensivo. PENDIENTE antes de comprar: busqueda de marca en INDECOPI,
+  verificacion de .pe en NIC.pe a mano, usuarios de redes, y aprobacion de la clienta.
+- **Tipo de cambio PEN/USD**: **valor fijo editable en el CMS** (Configuracion), no API. El precio
+  en USD no debe cambiar solo debajo de una reserva en curso.
+
 ## Reglas del proyecto (salen de incidentes reales, no de teoría)
 
 1. Un campo del CMS no está listo hasta que el front lo lee **y** su caché se invalida sin
