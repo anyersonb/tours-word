@@ -35,18 +35,37 @@
   --line-soft: #e7ebe7;
   --ink:       #14201a;
   --ink-2:     #3d4a42;
-  --ink-3:     #6c7972;
+  --ink-3:     #647069; /* corregido lote 1/B10: era #6c7972 (4.19:1 sobre --ground, FALLA AA). Ahora 4.76:1 sobre --ground y 5.17:1 sobre --surface — medido con la fórmula WCAG. */
 
   /* Semánticos de estado */
-  --amber:   #c9821f;
-  --danger:  #ab3a30;
-  --info:    #2c6fa8;
+  --amber:      #c9821f; /* SOLO ícono/relleno decorativo: 3.14:1 sobre --surface, NO sirve como color de texto (falla AA) */
+  --amber-text: #93590c; /* variante oscura para cuando el ámbar es TEXTO: 5.71:1 sobre --surface, 5.26:1 sobre --ground */
+  --danger:     #ab3a30; /* 6.21:1 sobre --surface */
+  --info:       #2c6fa8; /* 5.32:1 con texto blanco encima */
+
+  /*
+   * Acentos de catálogo (lote 1, A8): fuera del hue 155 de marca a propósito
+   * (badges "MÁS VENDIDO"/"RECOMENDADO" de los mockups; el naranja y el azul
+   * NO deben derivarse de --brand-h). El sistema admite exactamente 4 —
+   * no agregar un quinto sin volver a medir contraste:
+   *   1. --accent-green  (= --action)     -> badge "NATURALEZA"
+   *   2. --accent-amber  (= --amber-text) -> badge "CERTIFICADOS POR MINCETUR"
+   *   3. --accent-orange (nuevo, abajo)   -> badge "MÁS VENDIDO"
+   *   4. --accent-blue   (= --info)       -> badge "RECOMENDADO"
+   * Medido con texto blanco encima (uso: pastilla sólida sobre foto):
+   * --accent-orange = 5.18:1, --accent-blue = 5.32:1. Ambos pasan AA normal.
+   */
+  --accent-orange: #c2410c;
+  --accent-green:  var(--action);
+  --accent-amber:  var(--amber-text);
+  --accent-blue:   var(--info);
+  --on-accent:     #fff; /* texto sobre cualquier pastilla --accent-* sólida */
 
   /* Semánticos de marca: es lo ÚNICO que consumen los componentes */
   --action:       var(--brand-600);
   --action-hover: var(--brand-700);
-  --on-action:    #fff;
-  --brand-text:   var(--brand-700); /* mínimo AA sobre --ground y --surface */
+  --on-action:    #fff; /* 6.64:1 sobre --action, 9.04:1 sobre --action-hover */
+  --brand-text:   var(--brand-700); /* 8.32:1 sobre --ground, 9.04:1 sobre --surface — medido */
 
   /* Semánticos de superficie y borde, sobre los neutrales */
   --bg:          var(--ground);
@@ -56,5 +75,8 @@
   --border-soft: var(--line-soft);
   --text:        var(--ink);
   --text-2:      var(--ink-2);
+  /* --text-muted: corregido en el lote 1 (B10). Ahora PASA AA de texto
+   * normal en las dos superficies: 4.76:1 sobre --ground, 5.17:1 sobre
+   * --surface. Ya no hace falta reservarlo a texto grande/iconografía. */
   --text-muted:  var(--ink-3);
 }

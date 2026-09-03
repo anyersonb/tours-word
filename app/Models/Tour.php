@@ -86,6 +86,20 @@ class Tour extends Model
                 }
             }
         });
+
+        // tour_images.tour_id has cascadeOnDelete() at the DB level (see
+        // database/migrations/..._create_tour_images_table.php): MySQL
+        // deletes those rows directly when a Tour is deleted, without
+        // loading Eloquent models or firing any event. TourImage's own
+        // DeletesStoredFileOnDelete hook (its "deleting" event) never runs
+        // for a cascaded delete, so the image files would be orphaned in
+        // storage if we didn't clean them up here, before the cascade
+        // removes the rows.
+        static::deleting(function (Tour $tour): void {
+            foreach ($tour->images as $image) {
+                $image->deleteStoredFile();
+            }
+        });
     }
 
     /**
@@ -123,6 +137,11 @@ class Tour extends Model
     public function scopePublished(Builder $query): Builder
     {
         return $query->where('is_published', true);
+    }
+
+    public function scopeFeatured(Builder $query): Builder
+    {
+        return $query->where('is_featured', true);
     }
 
     public function scopeOrdered(Builder $query): Builder

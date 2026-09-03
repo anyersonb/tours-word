@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Experiences\Schemas;
 
+use App\Filament\Support\SecureImageUpload;
 use App\Filament\Support\TranslatableTabs;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -16,6 +18,13 @@ class ExperienceForm
     {
         return $schema
             ->components([
+                Section::make('Imagen de portada')
+                    ->schema([
+                        SecureImageUpload::configure(
+                            FileUpload::make('cover_image_path')->label('Imagen'),
+                            'experiences'
+                        ),
+                    ]),
                 TranslatableTabs::make(fn (string $locale) => [
                     TextInput::make("name.{$locale}")
                         ->label('Nombre')
@@ -35,6 +44,8 @@ class ExperienceForm
                     Textarea::make("description.{$locale}")
                         ->label('Descripción')
                         ->rows(3),
+                    TextInput::make("cover_image_alt.{$locale}")
+                        ->label('Texto alternativo de la imagen'),
                 ]),
                 Section::make('Publicación')
                     ->columns(2)

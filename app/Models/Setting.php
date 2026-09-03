@@ -50,13 +50,23 @@ class Setting extends Model
 
     /**
      * Create or update a setting and bust its cache entry.
+     *
+     * A null $value is stored as a real NULL, never as an empty string or a
+     * cast zero. This matters for optional numeric settings (the Home/
+     * Nosotros stats): a stat the client hasn't provided yet must read back
+     * as null, never as a publishable 0.
      */
     public static function set(string $key, mixed $value, string $type = 'string', ?string $group = null): self
     {
         $setting = static::query()->updateOrCreate(
             ['key' => $key],
             [
-                'value' => is_bool($value) ? ($value ? '1' : '0') : (is_array($value) ? json_encode($value) : (string) $value),
+                'value' => match (true) {
+                    is_null($value) => null,
+                    is_bool($value) => $value ? '1' : '0',
+                    is_array($value) => json_encode($value),
+                    default => (string) $value,
+                },
                 'type' => $type,
                 'group' => $group,
             ]
@@ -75,6 +85,10 @@ class Setting extends Model
 
     private function castValue(): mixed
     {
+        if ($this->value === null) {
+            return null;
+        }
+
         return match ($this->type) {
             'integer' => (int) $this->value,
             'float' => (float) $this->value,

@@ -1,2 +1,9 @@
 User-agent: *
-Disallow:
+Disallow: /admin
+
+# El dominio de abajo debe coincidir con APP_URL del .env de este entorno.
+# Este archivo es ESTATICO (Laravel no lo genera): a diferencia de
+# /sitemap.xml, hay que editarlo a mano cada vez que cambie el dominio
+# (ej. al pasar de staging a producción), o el rastreador recibe una URL
+# inservible (S-04, docs/lote-1/seo-2026-09-02.md).
+Sitemap: http://127.0.0.1:8000/sitemap.xml

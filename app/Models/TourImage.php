@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\DeletesStoredFileOnDelete;
 use Database\Factories\TourImageFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +13,7 @@ use Spatie\Translatable\HasTranslations;
 class TourImage extends Model
 {
     /** @use HasFactory<TourImageFactory> */
-    use HasFactory, HasTranslations;
+    use DeletesStoredFileOnDelete, HasFactory, HasTranslations;
 
     protected $fillable = [
         'tour_id',
@@ -45,5 +46,10 @@ class TourImage extends Model
     public function url(): string
     {
         return Storage::disk('public')->url($this->path);
+    }
+
+    protected function storedFileAttribute(): string
+    {
+        return 'path';
     }
 }

@@ -41,7 +41,17 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
+            // Relative URL a propósito (lote 1, ronda 2, Defecto Alto del
+            // CRO / S-04 del SEO): Destination/Experience::coverImageUrl(),
+            // TeamMember::photoUrl() y TourImage::url() resuelven todas por
+            // este disco. Armarla desde env('APP_URL') hacía que cualquier
+            // imagen del CMS se rompiera en silencio en cuanto APP_URL
+            // apuntara a un host que no resuelve (medido: ERR_NAME_NOT_RESOLVED,
+            // naturalWidth 0) -- y seguiría rompiendo con cualquier futuro
+            // desajuste www/no-www. "/storage" nunca es absoluta, así que el
+            // navegador siempre la resuelve contra el host real que sirvió
+            // la página.
+            'url' => '/storage',
             'visibility' => 'public',
             'throw' => false,
             'report' => false,

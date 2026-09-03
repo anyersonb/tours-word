@@ -1,11 +1,101 @@
 @import 'tailwindcss';
 
+/*
+ * Cadena de assets — qué manda sobre qué (detalle en docs/lote-1/00-sistema-diseno.md):
+ *
+ * 1. resources/css/tokens.css es la ÚNICA fuente de color: rampa HSL derivada
+ *    de --brand-h y los semánticos (--action, --brand-text, --ground...).
+ * 2. Este archivo (app.css) es la ÚNICA fuente de la cadena Tailwind: el
+ *    @theme de abajo MAPEA esos tokens a --color-* / --font-* de Tailwind 4
+ *    para que existan utilidades como bg-brand-600, text-action, font-display.
+ * 3. tailwind.config.js YA NO EXISTE (se eliminó en el lote 1). Tailwind 4
+ *    con @tailwindcss/vite es CSS-first: un tailwind.config.js sin @config
+ *    en la CSS simplemente no se lee, y tenerlo vivo junto a un @theme aquí
+ *    habría dejado dos fuentes de verdad compitiendo. Se optó por @theme
+ *    (nativo de v4) en vez de declarar @config para no arrastrar el formato
+ *    JS de v3 sin necesidad.
+ */
+@import './tokens.css';
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
+
+/*
+ * La rampa completa de marca (bg-brand-50..900, con sus variantes text-/
+ * border-) se construye con interpolación PHP en la guía de estilos
+ * (`bg-brand-{{ $stop }}`), así que el escáner estático de Tailwind no
+ * puede verla como texto literal. Se declara explícita para que exista
+ * igual — comprobado: sin esto, `npm run build` solo generaba bg-brand-50
+ * (la única variante escrita en algún otro archivo como string literal).
+ */
+@source inline("{bg,text,border}-brand-{50,100,200,300,400,500,600,700,800,900}");
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    /* Tipografía de marca (A2). Instrument Sans del esqueleto queda fuera. */
+    --font-sans: 'Figtree', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-display: 'Fraunces', ui-serif, Georgia, 'Times New Roman', serif;
+    --font-script: 'Caveat', cursive;
+
+    /* Rampa de marca -> utilidades bg-brand-*, text-brand-*, border-brand-* */
+    --color-brand-50: var(--brand-50);
+    --color-brand-100: var(--brand-100);
+    --color-brand-200: var(--brand-200);
+    --color-brand-300: var(--brand-300);
+    --color-brand-400: var(--brand-400);
+    --color-brand-500: var(--brand-500);
+    --color-brand-600: var(--brand-600);
+    --color-brand-700: var(--brand-700);
+    --color-brand-800: var(--brand-800);
+    --color-brand-900: var(--brand-900);
+
+    /* Semánticos de marca y superficie -> bg-action, text-brand-text, bg-ground... */
+    --color-action: var(--action);
+    --color-action-hover: var(--action-hover);
+    --color-on-action: var(--on-action);
+    --color-brand-text: var(--brand-text);
+    --color-ground: var(--ground);
+    --color-surface: var(--surface);
+    --color-surface-2: var(--surface-2);
+    --color-line: var(--border);
+    --color-line-soft: var(--border-soft);
+    --color-ink: var(--ink);
+    --color-ink-2: var(--ink-2);
+    --color-ink-3: var(--ink-3);
+    --color-text: var(--text);
+    --color-text-2: var(--text-2);
+    --color-text-muted: var(--text-muted);
+
+    /* Estado y acentos de catálogo (A8) -> bg-amber-text, bg-accent-orange... */
+    --color-amber: var(--amber);
+    --color-amber-text: var(--amber-text);
+    --color-danger: var(--danger);
+    --color-info: var(--info);
+    --color-accent-green: var(--accent-green);
+    --color-accent-amber: var(--accent-amber);
+    --color-accent-orange: var(--accent-orange);
+    --color-accent-blue: var(--accent-blue);
+    --color-on-accent: var(--on-accent);
+}
+
+@layer base {
+    body {
+        background-color: var(--bg);
+        color: var(--text);
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: var(--font-display);
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--action);
+        outline-offset: 2px;
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
 }
