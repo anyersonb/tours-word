@@ -37,35 +37,40 @@
         docs/lote-1/00-sistema-diseno.md §2 — no hace falta velo.
     --}}
     <section class="overflow-hidden bg-surface">
-        <div class="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
+        <div class="shell pt-6">
             <x-ui.breadcrumbs :items="[
                 ['label' => __('site.nosotros.breadcrumb.home'), 'href' => route('home')],
                 ['label' => __('site.nosotros.breadcrumb.current')],
             ]" />
         </div>
 
-        <div class="mx-auto grid max-w-7xl gap-10 px-4 pb-24 pt-8 sm:px-6 sm:pb-20 lg:grid-cols-2 lg:items-center lg:gap-12 lg:px-8 lg:pb-24">
+        <div class="shell grid gap-10 pb-24 pt-8 sm:pb-20 lg:grid-cols-2 lg:items-center lg:gap-14 lg:pb-24">
             <div>
-                <h1 class="font-display text-3xl font-semibold leading-[1.15] text-ink sm:text-4xl lg:text-5xl">
+                <h1 class="font-display text-h1 font-semibold text-ink">
                     {{ __('site.nosotros.hero.title') }}
                 </h1>
 
-                <p class="mt-3 text-lg font-semibold text-brand-text">
+                <p class="mt-4 text-lead font-semibold text-brand-text">
                     {{ __('site.nosotros.hero.tagline') }}
                 </p>
 
-                <p class="mt-4 max-w-xl text-base text-text-2 sm:text-lg">
+                <p class="mt-4 max-w-xl text-lead text-text-2">
                     {{ __('site.nosotros.hero.description') }}
                 </p>
             </div>
 
-            <div class="aspect-[4/5] w-full overflow-hidden rounded-3xl bg-surface-2 sm:aspect-[16/9] lg:aspect-[4/5]">
-                <img
-                    src="{{ PlaceholderImage::svg(1000, 1250, 'Foto de equipo (pendiente)', '1b6949') }}"
-                    alt="{{ __('site.nosotros.hero.photo_alt') }}"
-                    width="1000" height="1250"
-                    class="h-full w-full object-cover"
-                >
+            {{-- Foto real (banco, temporal). El recorte no esta cableado:
+                 object-position tolera que la clienta cambie el archivo. --}}
+            <div class="photo aspect-[4/5] w-full rounded-panel shadow-e3 sm:aspect-[16/9] lg:aspect-[4/3]">
+                <x-ui.picture
+                    src="{{ asset('images/site/nosotros-grupo-viajeros.jpg') }}"
+                    :alt="__('site.nosotros.hero.photo_alt')"
+                    sizes="(min-width: 1024px) 36rem, 92vw"
+                    loading="eager"
+                    fetchpriority="high"
+                    decoding="sync"
+                    position="center 35%"
+                />
             </div>
         </div>
     </section>
@@ -90,8 +95,8 @@
 
     {{-- ============ NUESTRO PROPÓSITO ============ --}}
     <section class="bg-surface">
-        <div class="mx-auto max-w-7xl px-4 pb-12 pt-16 sm:px-6 sm:pb-16 sm:pt-14 lg:px-8 lg:pb-20 lg:pt-16">
-            <div class="grid gap-10 lg:grid-cols-2 lg:items-center">
+        <div class="shell section">
+            <div class="grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-14">
                 <div>
                     <x-ui.section-title as="h2">{{ __('site.nosotros.purpose.title') }}</x-ui.section-title>
 
@@ -102,18 +107,18 @@
                         {{ __('site.nosotros.purpose.paragraph_2') }}
                     </p>
 
-                    <p class="mt-6 font-script text-3xl text-brand-text sm:text-4xl">
+                    <p class="mt-7 font-script text-3xl text-brand-text sm:text-4xl">
                         {{ __('site.nosotros.purpose.signature') }} &#9825;
                     </p>
                 </div>
 
-                <div class="aspect-[4/3] w-full overflow-hidden rounded-3xl bg-surface-2">
-                    <img
-                        src="{{ PlaceholderImage::svg(900, 675, 'Foto de propósito (pendiente)', '2c6fa8') }}"
-                        alt="{{ __('site.nosotros.purpose.photo_alt') }}"
-                        width="900" height="675" loading="lazy"
-                        class="h-full w-full object-cover"
-                    >
+                <div class="photo aspect-[4/3] w-full rounded-panel shadow-e3">
+                    <x-ui.picture
+                        src="{{ asset('images/site/nosotros-viajeros-ruta.jpg') }}"
+                        :alt="__('site.nosotros.purpose.photo_alt')"
+                        sizes="(min-width: 1024px) 34rem, 92vw"
+                        position="center 45%"
+                    />
                 </div>
             </div>
         </div>
@@ -122,8 +127,8 @@
     {{-- ============ NUESTROS VALORES ============ --}}
     {{-- D3: sección sobre --ground (fondo pálido), no --surface; medido
          antes de fijar el color de texto (ver docs). --}}
-    <section class="bg-ground">
-        <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+    <section class="weave bg-sand">
+        <div class="shell section">
             <x-ui.section-title as="h2">{{ __('site.nosotros.values.title') }}</x-ui.section-title>
 
             <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -148,9 +153,9 @@
     --}}
     @if($teamMembers->isNotEmpty())
         <section class="bg-surface">
-            <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+            <div class="shell section">
                 <x-ui.section-title as="h2">{{ __('site.nosotros.team.title') }}</x-ui.section-title>
-                <p class="-mt-4 mb-8 max-w-2xl text-sm text-text-2 sm:text-base">
+                <p class="-mt-4 mb-8 max-w-2xl text-base text-text-2">
                     {{ __('site.nosotros.team.description') }}
                 </p>
 
@@ -192,31 +197,32 @@
     @endif
 
     {{-- ============ BANDA DE CTA ============ --}}
-    <section class="bg-surface">
-        <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-            <div class="grid overflow-hidden rounded-3xl border border-line bg-ground lg:grid-cols-2">
-                <div class="aspect-[16/9] lg:aspect-auto">
-                    <img
-                        src="{{ PlaceholderImage::svg(700, 600, 'Foto de CTA (pendiente)', '135338') }}"
-                        alt="{{ __('site.nosotros.cta.photo_alt') }}"
-                        width="700" height="600" loading="lazy"
-                        class="h-full w-full object-cover"
-                    >
-                </div>
-                <div class="relative flex flex-col justify-center gap-4 p-8 sm:p-10">
-                    <h2 class="font-display text-2xl font-semibold text-ink sm:text-3xl">
+    <section class="relative isolate overflow-hidden bg-ink-surface">
+        <div class="photo scrim-band absolute inset-0">
+            <x-ui.picture
+                src="{{ asset('images/site/hero-valle-sagrado-panoramica.jpg') }}"
+                :alt="__('site.nosotros.cta.photo_alt')"
+                sizes="100vw"
+                position="center 60%"
+            />
+        </div>
+        <div class="shell section relative z-10">
+            <div class="grid lg:grid-cols-2">
+                <div class="relative flex flex-col justify-center gap-4">
+                    <h2 class="font-display text-h2 font-semibold text-white">
                         {{ __('site.nosotros.cta.title') }}
                     </h2>
-                    <p class="text-text-2">{{ __('site.nosotros.cta.description') }}</p>
+                    <p class="max-w-lg text-lead text-on-dark-2">{{ __('site.nosotros.cta.description') }}</p>
 
-                    <div class="mt-2">
-                        <x-ui.button href="{{ Route::has('tours.index') ? route('tours.index') : '#' }}">
-                            {{ __('site.nosotros.cta.button') }} &rarr;
-                        </x-ui.button>
+                    <div class="mt-3">
+                        <a href="{{ Route::has('tours.index') ? route('tours.index') : '#' }}" class="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-base font-medium text-ink transition-colors hover:bg-brand-100">
+                            {{ __('site.nosotros.cta.button') }}
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                        </a>
                     </div>
 
                     {{-- Avioncito + línea de puntos: decorativo, aria-hidden. --}}
-                    <svg viewBox="0 0 160 90" class="pointer-events-none absolute bottom-4 right-4 hidden h-16 w-28 text-action/50 sm:block" aria-hidden="true">
+                    <svg viewBox="0 0 160 90" class="pointer-events-none absolute bottom-0 right-0 hidden h-16 w-28 text-white/40 sm:block" aria-hidden="true">
                         <path d="M8 78c50 4 60-42 148-58" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="1 8" stroke-linecap="round"/>
                         <path d="m142 12-14 4 6 6 4 10 8-20-4 0Z" fill="currentColor"/>
                     </svg>

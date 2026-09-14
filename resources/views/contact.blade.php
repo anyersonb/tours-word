@@ -70,23 +70,23 @@
         Home, no hace falta velo.
     --}}
     <section class="overflow-hidden bg-surface">
-        <div class="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
+        <div class="shell pt-6">
             <x-ui.breadcrumbs :items="[
                 ['label' => __('site.contacto.breadcrumb.home'), 'href' => route('home')],
                 ['label' => __('site.contacto.breadcrumb.current')],
             ]" />
         </div>
 
-        <div class="mx-auto grid max-w-7xl gap-10 px-4 py-10 sm:px-6 lg:grid-cols-2 lg:items-center lg:gap-12 lg:px-8 lg:py-16">
+        <div class="shell section grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-14">
             <div>
                 <x-ui.eyebrow class="mb-5">{{ __('site.contacto.hero.eyebrow') }}</x-ui.eyebrow>
 
-                <h1 class="font-display text-3xl font-semibold leading-[1.15] text-ink sm:text-4xl lg:text-5xl">
+                <h1 class="font-display text-h1 font-semibold text-ink">
                     {{ __('site.contacto.hero.title_before') }}
                     <span class="text-brand-text">{{ __('site.contacto.hero.title_highlight') }}</span>
                 </h1>
 
-                <p class="mt-4 max-w-xl text-base text-text-2 sm:text-lg">
+                <p class="mt-4 max-w-xl text-lead text-text-2">
                     {{ __('site.contacto.hero.subtitle') }}
                 </p>
 
@@ -101,22 +101,27 @@
                 </div>
             </div>
 
-            <div class="aspect-[4/5] w-full overflow-hidden rounded-3xl bg-surface-2 sm:aspect-[16/9] lg:aspect-[4/5]">
-                <img
-                    src="{{ PlaceholderImage::svg(1000, 1250, 'Foto de contacto (pendiente)', '1b6949') }}"
-                    alt="{{ __('site.contacto.hero.photo_alt') }}"
-                    width="1000" height="1250"
-                    class="h-full w-full object-cover"
-                >
+            {{-- Foto real (banco, temporal). Sin recorte cableado:
+                 object-position tolera que la clienta cambie el archivo. --}}
+            <div class="photo aspect-[4/5] w-full rounded-panel shadow-e3 sm:aspect-[16/9] lg:aspect-[4/3]">
+                <x-ui.picture
+                    src="{{ asset('images/site/hero-cordillera-rio.jpg') }}"
+                    :alt="__('site.contacto.hero.photo_alt')"
+                    sizes="(min-width: 1024px) 34rem, 92vw"
+                    loading="eager"
+                    fetchpriority="high"
+                    decoding="sync"
+                    position="center 50%"
+                />
             </div>
         </div>
     </section>
 
     {{-- ============ FORMULARIO + INFORMACIÓN DE CONTACTO ============ --}}
-    <section class="bg-ground">
-        <div class="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 lg:grid-cols-[3fr_2fr] lg:px-8 lg:py-16">
+    <section class="weave bg-sand">
+        <div class="shell section grid gap-8 lg:grid-cols-[3fr_2fr]">
 
-            <div class="rounded-3xl border border-line bg-surface p-6 shadow-sm sm:p-8">
+            <div class="rounded-panel border border-line bg-surface p-6 shadow-e2 sm:p-8">
                 <x-ui.section-title as="h2">{{ __('site.contacto.form.title') }}</x-ui.section-title>
                 <p class="-mt-4 mb-6 text-sm text-text-2">{{ __('site.contacto.form.description') }}</p>
 
@@ -239,7 +244,7 @@
                 </form>
             </div>
 
-            <div class="rounded-3xl border border-line bg-surface p-6 shadow-sm sm:p-8">
+            <div class="rounded-panel border border-line bg-surface p-6 shadow-e2 sm:p-8 lg:sticky lg:top-24 lg:self-start">
                 <x-ui.section-title as="h2">{{ __('site.contacto.info.title') }}</x-ui.section-title>
 
                 @if($hasAnyContactInfo)
@@ -282,7 +287,7 @@
                         </x-ui.contact-info-card>
                     </div>
                 @else
-                    <p class="text-sm text-text-2">{{ __('site.contacto.info.empty') }}</p>
+                    <x-ui.empty-state class="border-0 bg-transparent px-0 py-6">{{ __('site.contacto.info.empty') }}</x-ui.empty-state>
                 @endif
             </div>
         </div>
@@ -290,7 +295,7 @@
 
     {{-- ============ PREGUNTAS FRECUENTES + DÓNDE ESTAMOS ============ --}}
     <section class="bg-surface">
-        <div class="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:px-8 lg:py-16">
+        <div class="shell section grid gap-12 lg:grid-cols-2 lg:gap-14">
             <div>
                 <x-ui.section-title as="h2">{{ __('site.contacto.faq.title') }}</x-ui.section-title>
 
@@ -331,14 +336,14 @@
                     coordenadas inventadas. Ver docs/lote-1/00-sistema-diseno.md
                     §C3 para qué falta para activar un mapa embebido real.
                 --}}
-                <div class="flex aspect-[4/3] items-center justify-center rounded-3xl border border-dashed border-line bg-surface-2 text-text-muted">
+                <div class="weave flex aspect-[4/3] items-center justify-center rounded-panel border border-dashed border-line bg-sand text-text-muted">
                     <div class="flex flex-col items-center gap-2 px-6 text-center">
                         {!! $iconPinLarge !!}
                         <span class="text-xs">{{ __('site.contacto.map.placeholder_alt') }}</span>
                     </div>
                 </div>
 
-                <div class="mt-4 flex flex-col gap-4 rounded-2xl border border-line bg-surface p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div class="mt-4 flex flex-col gap-4 rounded-card border border-line bg-surface p-5 shadow-e1 sm:flex-row sm:items-center sm:justify-between">
                     @if($mapsUrl)
                         <div class="flex items-start gap-3">
                             <span class="mt-0.5 text-action" aria-hidden="true">{!! $iconPin !!}</span>
