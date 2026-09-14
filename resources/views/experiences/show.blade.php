@@ -1,6 +1,8 @@
 @php
     use App\Support\PlaceholderImage;
 @endphp
+{{-- noindex se queda puesto mientras el contenido sea de MUESTRA (seeder
+     DemoTourSeeder); se quita cuando la clienta cargue experiencias reales. --}}
 <x-layout title="{{ $experience['name'] }}" description="{{ $experience['description'] }}" :noindex="true">
 
     {{-- ============ MIGAS DE PAN + GALERÍA + DESCRIPCIÓN ============ --}}

@@ -28,8 +28,11 @@ class DemoTourSeeder extends Seeder
         $cusco = Destination::query()->where('slug->es', 'cusco')->first()
             ?? Destination::create(['name' => ['es' => 'Cusco'], 'slug' => ['es' => 'cusco'], 'is_published' => true, 'order' => 1]);
 
+        $valleSagrado = Destination::query()->where('slug->es', 'valle-sagrado')->first()
+            ?? Destination::create(['name' => ['es' => 'Valle Sagrado'], 'slug' => ['es' => 'valle-sagrado'], 'is_published' => true, 'order' => 2]);
+
         $arequipa = Destination::query()->where('slug->es', 'arequipa')->first()
-            ?? Destination::create(['name' => ['es' => 'Arequipa'], 'slug' => ['es' => 'arequipa'], 'is_published' => true, 'order' => 2]);
+            ?? Destination::create(['name' => ['es' => 'Arequipa'], 'slug' => ['es' => 'arequipa'], 'is_published' => true, 'order' => 3]);
 
         $trekking = Experience::query()->where('slug->es', 'trekking')->first()
             ?? Experience::create(['name' => ['es' => 'Trekking'], 'slug' => ['es' => 'trekking'], 'is_published' => true, 'order' => 1]);
@@ -52,6 +55,10 @@ class DemoTourSeeder extends Seeder
                 'meeting_point' => ['es' => 'Plaza de Armas, Cusco (punto de muestra)'],
                 'inclusions' => ['es' => ['Guía profesional (muestra)', 'Alimentación (muestra)']],
                 'exclusions' => ['es' => ['Propinas (muestra)']],
+                'itinerary' => ['es' => [
+                    ['title' => 'Día 1 (muestra)', 'description' => 'Contenido de muestra para probar el itinerario. Este texto NO fue provisto por la clienta.'],
+                    ['title' => 'Día 2 (muestra)', 'description' => 'Contenido de muestra para probar el itinerario. Este texto NO fue provisto por la clienta.'],
+                ]],
                 'price_pen_cents' => 350000,
                 'price_usd_cents' => 9500,
                 'is_featured' => true,
@@ -74,6 +81,9 @@ class DemoTourSeeder extends Seeder
                 'meeting_point' => ['es' => 'Plaza de Armas, Arequipa (punto de muestra)'],
                 'inclusions' => ['es' => ['Degustación (muestra)']],
                 'exclusions' => ['es' => ['Bebidas alcohólicas (muestra)']],
+                // Sin "itinerary" a propósito: ejercita en datos reales (no
+                // solo en tests) el caso "la clienta aún no llenó esto" que
+                // tours/show.blade.php debe poder renderizar sin romperse.
                 'price_pen_cents' => 12000,
                 'price_usd_cents' => 3200,
                 'is_featured' => false,
@@ -83,5 +93,31 @@ class DemoTourSeeder extends Seeder
                 'meta_description' => ['es' => 'Ficha de muestra, contenido pendiente de la clienta.'],
             ]);
         $tourTwo->experiences()->syncWithoutDetaching([$gastronomia->id]);
+
+        $tourThree = Tour::query()->where('slug->es', 'muestra-tour-valle-sagrado')->first()
+            ?? Tour::create([
+                'destination_id' => $valleSagrado->id,
+                'title' => ['es' => '[MUESTRA] Tour Valle Sagrado'],
+                'slug' => ['es' => 'muestra-tour-valle-sagrado'],
+                'summary' => ['es' => 'Tour de muestra: recorrido por Pisac y Ollantaytambo.'],
+                'description' => ['es' => 'Contenido de muestra para probar el catálogo. Este texto NO fue provisto por la clienta.'],
+                'duration_label' => ['es' => '1 día'],
+                'difficulty' => TourDifficulty::Facil,
+                'meeting_point' => ['es' => 'Hotel en Cusco, recojo (punto de muestra)'],
+                'inclusions' => ['es' => ['Transporte turístico (muestra)', 'Guía profesional (muestra)']],
+                'exclusions' => ['es' => ['Almuerzo (muestra)']],
+                'itinerary' => ['es' => [
+                    ['title' => 'Pisac (muestra)', 'description' => 'Contenido de muestra para probar el itinerario. Este texto NO fue provisto por la clienta.'],
+                    ['title' => 'Ollantaytambo (muestra)', 'description' => 'Contenido de muestra para probar el itinerario. Este texto NO fue provisto por la clienta.'],
+                ]],
+                'price_pen_cents' => 45000,
+                'price_usd_cents' => 12000,
+                'is_featured' => false,
+                'is_published' => true,
+                'order' => 3,
+                'meta_title' => ['es' => '[MUESTRA] Tour Valle Sagrado | Pacha Viva'],
+                'meta_description' => ['es' => 'Ficha de muestra, contenido pendiente de la clienta.'],
+            ]);
+        $tourThree->experiences()->syncWithoutDetaching([$cultura->id]);
     }
 }

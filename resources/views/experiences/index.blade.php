@@ -10,6 +10,8 @@
     ];
     $defaultExperienceIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15 9-2 6-6 2 2-6 6-2Z"/></svg>';
 @endphp
+{{-- noindex se queda puesto mientras el contenido sea de MUESTRA (seeder
+     DemoTourSeeder); se quita cuando la clienta cargue experiencias reales. --}}
 <x-layout
     title="{{ __('site.experiences.index.meta.title') }}"
     description="{{ __('site.experiences.index.meta.description') }}"

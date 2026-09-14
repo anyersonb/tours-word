@@ -15,6 +15,8 @@
     $iconGauge = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><path d="m12 14 3-5"/><circle cx="12" cy="14" r="1"/><path d="M4 15a8 8 0 1 1 16 0"/></svg>';
     $iconPin = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>';
 @endphp
+{{-- noindex se queda puesto mientras el contenido sea de MUESTRA (seeder
+     DemoTourSeeder); se quita cuando la clienta cargue tours reales. --}}
 <x-layout title="{{ $tour['title'] }}" description="{{ $tour['summary'] }}" :noindex="true">
 
     {{-- ============ MIGAS DE PAN + GALERÍA + PRECIO/CTA ============ --}}
@@ -51,7 +53,13 @@
                     @if($tour['difficulty'])
                         <span class="inline-flex items-center gap-1.5">
                             {!! $iconGauge !!}
-                            <strong class="font-medium text-ink">{{ __('site.tours.show.difficulty_label') }}:</strong> {{ __('tours.difficulty.'.$tour['difficulty']) }}
+                            {{-- $tour['difficulty'] is App\Enums\TourDifficulty (Tour::$casts), never a
+                                 plain string: PHP forbids enums from declaring __toString(), and the
+                                 model-level cast can't be swapped for a plain string either without
+                                 breaking ToursTable's typed `fn (?TourDifficulty $state)` column
+                                 closure. ->value is the one line this ficha touches for hueco #3
+                                 (see the lote report, objetivo 2). --}}
+                            <strong class="font-medium text-ink">{{ __('site.tours.show.difficulty_label') }}:</strong> {{ __('tours.difficulty.'.$tour['difficulty']->value) }}
                         </span>
                     @endif
                 </div>

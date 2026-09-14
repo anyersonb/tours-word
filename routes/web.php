@@ -1,10 +1,10 @@
 <?php
 
 use App\Http\Controllers\ContactMessageController;
+use App\Http\Controllers\DestinationController;
+use App\Http\Controllers\ExperienceController;
 use App\Http\Controllers\SitemapController;
-use App\Support\CatalogFixtures;
-use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
+use App\Http\Controllers\TourController;
 use Illuminate\Support\Facades\Route;
 
 // Prefijo de idioma en TODAS las URLs, incluido español (lote 1 ronda 2,
@@ -66,104 +66,22 @@ Route::prefix('{locale}')
         })->name('about');
 
         // ============================================================
-        // MAQUETA — lote 3. Sustituir por controladores reales.
-        //
-        // Catálogo y ficha de tours/destinos/experiencias. Decisión de
-        // Anyerson: este lote es maquetación pura, el backend viene
-        // después. Los datos de ejemplo salen de App\Support\
-        // CatalogFixtures (fuente única, ver esa clase) — estas rutas
-        // SOLO leen ese array en memoria, nunca la base de datos, aunque
-        // los modelos reales (Tour/Destination/Experience) ya existen
-        // desde el lote 2. El contrato de datos exacto que cada vista
-        // espera recibir está en el reporte del lote 3.
+        // Catálogo y ficha de tours/destinos/experiencias (lote 1,
+        // etapa/pantallas). Backend real: App\Http\Controllers\
+        // {Tour,Destination,Experience}Controller, contra Tour/Destination/
+        // Experience (Eloquent). Reemplaza la maqueta del lote 3
+        // (App\Support\CatalogFixtures, ya borrada). Las 6 vistas no se
+        // tocaron: leen sus datos por ArrayAccess, que un modelo Eloquent
+        // satisface igual que el array de la maqueta (ver el docblock de
+        // TourController para el detalle de binding de {locale}).
         // ============================================================
 
-        Route::get('/tours', function (Request $request) {
-            $destinationSlug = $request->query('destino');
-            $experienceSlug = $request->query('experiencia');
+        Route::get('/tours', [TourController::class, 'index'])->name('tours.index');
+        Route::get('/tours/{slug}', [TourController::class, 'show'])->name('tours.show');
 
-            $tours = array_values(array_filter(CatalogFixtures::tours(), function (array $tour) use ($destinationSlug, $experienceSlug) {
-                if ($destinationSlug && ($tour['destination']['slug'] ?? null) !== $destinationSlug) {
-                    return false;
-                }
+        Route::get('/destinos', [DestinationController::class, 'index'])->name('destinations.index');
+        Route::get('/destinos/{slug}', [DestinationController::class, 'show'])->name('destinations.show');
 
-                if ($experienceSlug && ! collect($tour['experiences'])->contains('slug', $experienceSlug)) {
-                    return false;
-                }
-
-                return true;
-            }));
-
-            $perPage = 6;
-            $page = LengthAwarePaginator::resolveCurrentPage();
-            $paginator = new LengthAwarePaginator(
-                array_slice($tours, ($page - 1) * $perPage, $perPage),
-                count($tours),
-                $perPage,
-                $page,
-                [
-                    'path' => LengthAwarePaginator::resolveCurrentPath(),
-                    'query' => $request->query(),
-                ]
-            );
-
-            return view('tours.index', [
-                'tours' => $paginator,
-                'destinationOptions' => CatalogFixtures::destinations(),
-                'experienceOptions' => CatalogFixtures::experiences(),
-                'filters' => [
-                    'destino' => $destinationSlug,
-                    'experiencia' => $experienceSlug,
-                ],
-            ]);
-        })->name('tours.index');
-
-        // NOTA: el closure recibe TODOS los parámetros de la ruta por
-        // posición (locale, luego slug) — Laravel no los empareja por
-        // nombre para closures con parámetros escalares (ver
-        // Illuminate\Routing\ResolvesRouteDependencies::resolveMethodDependencies).
-        // Omitir $locale aquí hace que $slug reciba 'es' por error: costó
-        // una ronda de depuración detectarlo (los 3 index sin {slug}
-        // funcionaban bien porque solo tienen un parámetro tipado Request).
-        Route::get('/tours/{slug}', function (string $locale, string $slug) {
-            $tour = CatalogFixtures::tour($slug);
-
-            abort_unless($tour, 404);
-
-            return view('tours.show', ['tour' => $tour]);
-        })->name('tours.show');
-
-        Route::get('/destinos', function () {
-            return view('destinations.index', [
-                'destinations' => CatalogFixtures::destinations(),
-            ]);
-        })->name('destinations.index');
-
-        Route::get('/destinos/{slug}', function (string $locale, string $slug) {
-            $destination = CatalogFixtures::destination($slug);
-
-            abort_unless($destination, 404);
-
-            return view('destinations.show', [
-                'destination' => $destination,
-                'relatedTours' => CatalogFixtures::toursByDestination($slug),
-            ]);
-        })->name('destinations.show');
-
-        Route::get('/experiencias', function () {
-            return view('experiences.index', [
-                'experiences' => CatalogFixtures::experiences(),
-            ]);
-        })->name('experiences.index');
-
-        Route::get('/experiencias/{slug}', function (string $locale, string $slug) {
-            $experience = CatalogFixtures::experience($slug);
-
-            abort_unless($experience, 404);
-
-            return view('experiences.show', [
-                'experience' => $experience,
-                'relatedTours' => CatalogFixtures::toursByExperience($slug),
-            ]);
-        })->name('experiences.show');
+        Route::get('/experiencias', [ExperienceController::class, 'index'])->name('experiences.index');
+        Route::get('/experiencias/{slug}', [ExperienceController::class, 'show'])->name('experiences.show');
     });

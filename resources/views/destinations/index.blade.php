@@ -1,6 +1,8 @@
 @php
     use App\Support\PlaceholderImage;
 @endphp
+{{-- noindex se queda puesto mientras el contenido sea de MUESTRA (seeder
+     DemoTourSeeder); se quita cuando la clienta cargue destinos reales. --}}
 <x-layout
     title="{{ __('site.destinations.index.meta.title') }}"
     description="{{ __('site.destinations.index.meta.description') }}"
