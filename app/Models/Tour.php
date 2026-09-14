@@ -29,6 +29,7 @@ class Tour extends Model
         'meeting_point',
         'inclusions',
         'exclusions',
+        'itinerary',
         'price_pen_cents',
         'price_usd_cents',
         'is_featured',
@@ -47,6 +48,11 @@ class Tour extends Model
         'difficulty' => TourDifficulty::class,
         'inclusions' => 'array',
         'exclusions' => 'array',
+        // Same pattern as inclusions/exclusions: translatable JSON array,
+        // cast to 'array' so property/array access returns a plain PHP
+        // array of {title, description} steps for the current locale (see
+        // the add_itinerary_to_tours_table migration).
+        'itinerary' => 'array',
     ];
 
     /**
@@ -61,6 +67,7 @@ class Tour extends Model
         'meeting_point',
         'inclusions',
         'exclusions',
+        'itinerary',
         'meta_title',
         'meta_description',
     ];

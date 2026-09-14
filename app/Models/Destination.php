@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\DeletesStoredFileOnDelete;
 use Database\Factories\DestinationFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -14,6 +15,21 @@ class Destination extends Model
 {
     /** @use HasFactory<DestinationFactory> */
     use DeletesStoredFileOnDelete, HasFactory, HasTranslations;
+
+    protected static function booted(): void
+    {
+        // destination_images.destination_id has cascadeOnDelete() at the DB
+        // level (see the create_destination_images_table migration): MySQL
+        // deletes those rows directly when a Destination is deleted,
+        // without loading Eloquent models or firing any event, so
+        // DestinationImage's own DeletesStoredFileOnDelete hook never runs
+        // for them. Same reasoning and same fix as Tour::booted().
+        static::deleting(function (Destination $destination): void {
+            foreach ($destination->gallery as $image) {
+                $image->deleteStoredFile();
+            }
+        });
+    }
 
     protected $fillable = [
         'name',
@@ -41,6 +57,29 @@ class Destination extends Model
     public function tours(): HasMany
     {
         return $this->hasMany(Tour::class);
+    }
+
+    /**
+     * Ordered gallery, mirroring Tour::images(). Named "gallery" (not
+     * "images") to match the key the public views expect -- see
+     * resources/views/destinations/{index,show}.blade.php and the
+     * DestinationImage docblock.
+     *
+     * @return HasMany<DestinationImage, $this>
+     */
+    public function gallery(): HasMany
+    {
+        return $this->hasMany(DestinationImage::class)->orderBy('order');
+    }
+
+    public function scopePublished(Builder $query): Builder
+    {
+        return $query->where('is_published', true);
+    }
+
+    public function scopeOrdered(Builder $query): Builder
+    {
+        return $query->orderBy('order');
     }
 
     /**

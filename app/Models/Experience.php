@@ -4,9 +4,11 @@ namespace App\Models;
 
 use App\Models\Concerns\DeletesStoredFileOnDelete;
 use Database\Factories\ExperienceFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Translatable\HasTranslations;
 
@@ -14,6 +16,18 @@ class Experience extends Model
 {
     /** @use HasFactory<ExperienceFactory> */
     use DeletesStoredFileOnDelete, HasFactory, HasTranslations;
+
+    protected static function booted(): void
+    {
+        // Same reasoning as Destination::booted() / Tour::booted():
+        // experience_images.experience_id cascades at the DB level, which
+        // never fires Eloquent's "deleting" event for the child rows.
+        static::deleting(function (Experience $experience): void {
+            foreach ($experience->gallery as $image) {
+                $image->deleteStoredFile();
+            }
+        });
+    }
 
     protected $fillable = [
         'name',
@@ -41,6 +55,24 @@ class Experience extends Model
     public function tours(): BelongsToMany
     {
         return $this->belongsToMany(Tour::class);
+    }
+
+    /**
+     * @return HasMany<ExperienceImage, $this>
+     */
+    public function gallery(): HasMany
+    {
+        return $this->hasMany(ExperienceImage::class)->orderBy('order');
+    }
+
+    public function scopePublished(Builder $query): Builder
+    {
+        return $query->where('is_published', true);
+    }
+
+    public function scopeOrdered(Builder $query): Builder
+    {
+        return $query->orderBy('order');
     }
 
     /**

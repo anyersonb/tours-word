@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Destinations\Schemas;
 use App\Filament\Support\SecureImageUpload;
 use App\Filament\Support\TranslatableTabs;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -47,6 +48,32 @@ class DestinationForm
                     TextInput::make("cover_image_alt.{$locale}")
                         ->label('Texto alternativo de la imagen'),
                 ]),
+                Section::make('Galería')
+                    ->schema([
+                        Repeater::make('gallery')
+                            ->relationship('gallery')
+                            ->label('')
+                            ->schema([
+                                SecureImageUpload::configure(
+                                    FileUpload::make('path')->label('Imagen')->required(),
+                                    'destinations'
+                                ),
+                                ...collect(config('cms.active_locales'))
+                                    ->map(fn (string $locale) => TextInput::make("alt.{$locale}")
+                                        ->label("Texto alternativo ({$locale})"))
+                                    ->all(),
+                                TextInput::make('order')
+                                    ->label('Orden')
+                                    ->numeric()
+                                    ->default(0),
+                            ])
+                            ->orderColumn('order')
+                            ->addActionLabel('Agregar imagen')
+                            ->defaultItems(0)
+                            ->maxItems(20)
+                            ->collapsible()
+                            ->columns(1),
+                    ]),
                 Section::make('Publicación')
                     ->columns(2)
                     ->schema([

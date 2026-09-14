@@ -99,6 +99,30 @@ class TourForm
                         ->label('Qué incluye'),
                     TagsInput::make("exclusions.{$locale}")
                         ->label('Qué no incluye'),
+                    // Structured (title + description) unlike
+                    // inclusions/exclusions, so it needs a Repeater instead
+                    // of a TagsInput -- same translatable-JSON-array dot
+                    // path mechanism ("itinerary.{$locale}"), Spatie's
+                    // HasTranslations::attributesToArray() exposes it as
+                    // itinerary => [locale => [items...]] for the form to
+                    // fill from, and Model::fill() re-assembles it back on
+                    // save (see App\Models\Tour).
+                    Repeater::make("itinerary.{$locale}")
+                        ->label('Itinerario')
+                        ->schema([
+                            TextInput::make('title')
+                                ->label('Título del día')
+                                ->required()
+                                ->maxLength(160),
+                            Textarea::make('description')
+                                ->label('Descripción')
+                                ->rows(2)
+                                ->required(),
+                        ])
+                        ->addActionLabel('Agregar día')
+                        ->defaultItems(0)
+                        ->collapsible()
+                        ->columns(1),
                     TextInput::make("meta_title.{$locale}")
                         ->label('Meta título (SEO)')
                         ->maxLength(160),

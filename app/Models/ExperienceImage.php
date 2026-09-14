@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\DeletesStoredFileOnDelete;
-use Database\Factories\TourImageFactory;
+use Database\Factories\ExperienceImageFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,13 +11,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Translatable\HasTranslations;
 
-class TourImage extends Model
+/**
+ * Mirrors App\Models\TourImage exactly (see that class and the
+ * create_experience_images_table migration for the full rationale).
+ */
+class ExperienceImage extends Model
 {
-    /** @use HasFactory<TourImageFactory> */
+    /** @use HasFactory<ExperienceImageFactory> */
     use DeletesStoredFileOnDelete, HasFactory, HasTranslations;
 
     protected $fillable = [
-        'tour_id',
+        'experience_id',
         'path',
         'alt',
         'order',
@@ -33,31 +37,18 @@ class TourImage extends Model
     public array $translatable = ['alt'];
 
     /**
-     * @return BelongsTo<Tour, $this>
+     * @return BelongsTo<Experience, $this>
      */
-    public function tour(): BelongsTo
+    public function experience(): BelongsTo
     {
-        return $this->belongsTo(Tour::class);
+        return $this->belongsTo(Experience::class);
     }
 
-    /**
-     * Public URL for the image, resolved through the "public" disk. Views/
-     * Resources must use this accessor — never build the URL by hand.
-     */
     public function url(): string
     {
         return Storage::disk('public')->url($this->path);
     }
 
-    /**
-     * Computed "src" accessor so a TourImage read through array access
-     * (Tour::images() items, consumed by the public catalog views via
-     * $tour['images'][0]['src']) exposes the same {src, alt} shape the
-     * views were built against (see App\Support\CatalogFixtures, the
-     * maqueta this replaces). An Attribute-based accessor is checked before
-     * any cast in Eloquent's getAttribute(), so this works whether the
-     * image is accessed as $image->src or $image['src'].
-     */
     protected function src(): Attribute
     {
         return Attribute::make(get: fn () => $this->url());
