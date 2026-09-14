@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Destination;
 use App\Models\Experience;
+use App\Models\Tour;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -63,6 +64,28 @@ class StructuredDataTest extends TestCase
 
         $this->assertSame('BreadcrumbList', $schema['@type']);
         $this->assertSame('Experiencia Schema', $schema['itemListElement'][2]['name']);
+    }
+
+    /**
+     * Defecto 1 (cierre lote SEO, 2026-09-14): la ficha de tour era la unica
+     * de las 3 fichas de catalogo sin BreadcrumbList -- mismo control que ya
+     * cubre destino/experiencia.
+     */
+    public function test_a_tour_show_page_includes_a_valid_breadcrumblist_schema(): void
+    {
+        $tour = Tour::factory()->create(['slug' => ['es' => 'tour-schema'], 'title' => ['es' => 'Tour Schema']]);
+        $slug = $tour->getTranslation('slug', 'es', false);
+
+        $response = $this->get(route('tours.show', ['locale' => 'es', 'slug' => $slug]));
+        $response->assertOk();
+
+        $schema = $this->firstJsonLdBlock($response->getContent());
+
+        $this->assertSame('BreadcrumbList', $schema['@type']);
+        $this->assertCount(3, $schema['itemListElement']);
+        $this->assertSame('Tour Schema', $schema['itemListElement'][2]['name']);
+        $this->assertArrayNotHasKey('item', $schema['itemListElement'][2]);
+        $this->assertArrayHasKey('item', $schema['itemListElement'][0]);
     }
 
     public function test_the_contact_page_includes_a_valid_faqpage_schema_with_the_five_real_questions(): void
@@ -129,6 +152,40 @@ class StructuredDataTest extends TestCase
         $decoded = json_decode($jsonRaw, true);
         $this->assertNotNull($decoded, 'el bloque JSON-LD debe seguir siendo JSON valido tras el escapado');
         $this->assertSame($maliciousName, $decoded['itemListElement'][2]['name']);
+    }
+
+    /**
+     * Mismo control que arriba, ahora para el tour -- confirma que el fix
+     * del Defecto 1 (BreadcrumbList en tours/show) no reintroduce el riesgo:
+     * un titulo de tour que trae comillas/cierre de <script> tampoco puede
+     * romper fuera del bloque JSON-LD.
+     */
+    public function test_a_malicious_tour_title_cannot_break_out_of_the_jsonld_script_block(): void
+    {
+        $maliciousTitle = '</script><img src=x onerror="alert(1)">"\'&';
+
+        $tour = Tour::factory()->create([
+            'slug' => ['es' => 'tour-malicioso'],
+            'title' => ['es' => $maliciousTitle],
+        ]);
+        $slug = $tour->getTranslation('slug', 'es', false);
+
+        $response = $this->get(route('tours.show', ['locale' => 'es', 'slug' => $slug]));
+        $response->assertOk();
+
+        $html = $response->getContent();
+
+        preg_match('/<script type="application\/ld\+json">(.*?)<\/script>/s', $html, $matches);
+        $this->assertNotEmpty($matches, 'debe existir el bloque JSON-LD');
+
+        $jsonRaw = $matches[1];
+
+        $this->assertStringNotContainsString('</script', $jsonRaw);
+        $this->assertStringNotContainsString('<img', $jsonRaw);
+
+        $decoded = json_decode($jsonRaw, true);
+        $this->assertNotNull($decoded, 'el bloque JSON-LD debe seguir siendo JSON valido tras el escapado');
+        $this->assertSame($maliciousTitle, $decoded['itemListElement'][2]['name']);
     }
 
     /**

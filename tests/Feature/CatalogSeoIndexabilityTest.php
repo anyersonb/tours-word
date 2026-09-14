@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Destination;
 use App\Models\Experience;
+use App\Models\Tour;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -96,6 +97,84 @@ class CatalogSeoIndexabilityTest extends TestCase
         $es = $this->get('/es/experiencias/trekking-solo-espanol');
         $es->assertOk();
         $es->assertDontSee('hreflang="en"', false);
+    }
+
+    /**
+     * Defecto 1 (cierre lote SEO, 2026-09-14): la ficha de tour quedo atras
+     * del resto del catalogo -- no tenia hreflang. Mismo control que el
+     * equivalente de destino de arriba, y ademas el regresivo real del bug
+     * que este mecanismo destapo: "slug" es columna traducible (distinto en
+     * cada locale), asi que sin hreflangUrls por-slug el alterno "en"
+     * hubiera reusado el slug ESPAÑOL de la request actual (ver
+     * feedback_hreflang_slug_por_locale en la memoria del equipo).
+     */
+    public function test_a_tour_with_a_real_english_translation_is_indexable_under_english_with_reciprocal_hreflang(): void
+    {
+        config(['cms.catalog_demo_content' => false]);
+
+        Tour::factory()->create([
+            'slug' => ['es' => 'camino-inca-bilingue', 'en' => 'inca-trail-bilingual'],
+            'title' => ['es' => 'Camino Inca', 'en' => 'Inca Trail'],
+            'summary' => ['es' => 'Resumen en español.', 'en' => 'Summary in English.'],
+            'description' => ['es' => 'Descripción en español.', 'en' => 'Description in English.'],
+        ]);
+
+        $esUrl = route('tours.show', ['locale' => 'es', 'slug' => 'camino-inca-bilingue']);
+        $enUrl = route('tours.show', ['locale' => 'en', 'slug' => 'inca-trail-bilingual']);
+
+        $es = $this->get($esUrl);
+        $en = $this->get($enUrl);
+
+        $es->assertOk();
+        $en->assertOk();
+
+        foreach ([$es, $en] as $response) {
+            $response->assertDontSee('noindex', false);
+            $response->assertSee('hreflang="es" href="'.$esUrl.'"', false);
+            $response->assertSee('hreflang="en" href="'.$enUrl.'"', false);
+            // Regresion directa del bug: el alterno "en" NUNCA debe apuntar
+            // al slug español reutilizado.
+            $response->assertDontSee('hreflang="en" href="'.route('tours.show', ['locale' => 'en', 'slug' => 'camino-inca-bilingue']).'"', false);
+        }
+    }
+
+    public function test_a_tour_without_english_translation_is_noindex_with_no_english_alternate(): void
+    {
+        config(['cms.catalog_demo_content' => false]);
+
+        Tour::factory()->create([
+            'slug' => ['es' => 'camino-inca-solo-espanol'],
+            'title' => ['es' => 'Camino Inca Solo Español'],
+        ]);
+
+        $en = $this->get('/en/tours/camino-inca-solo-espanol');
+        $en->assertOk();
+        $en->assertSee('<meta name="robots" content="noindex, nofollow">', false);
+        $en->assertDontSee('hreflang=', false);
+
+        $es = $this->get('/es/tours/camino-inca-solo-espanol');
+        $es->assertOk();
+        $es->assertDontSee('noindex', false);
+        $es->assertDontSee('hreflang="en"', false);
+    }
+
+    /**
+     * Control: mismo mandato de "las dos razones se combinan con OR" que ya
+     * cubre Destination/Experience, ahora tambien para Tour.
+     */
+    public function test_a_fully_translated_tour_is_still_noindex_while_the_catalog_is_demo_content(): void
+    {
+        $this->assertTrue(config('cms.catalog_demo_content'), 'este test depende del valor por defecto (produccion); si cambio, revisar el resto de la suite');
+
+        Tour::factory()->create([
+            'slug' => ['es' => 'camino-inca-bilingue-pero-muestra', 'en' => 'inca-trail-bilingual-but-demo'],
+            'title' => ['es' => 'Camino Inca', 'en' => 'Inca Trail'],
+        ]);
+
+        $response = $this->get('/en/tours/inca-trail-bilingual-but-demo');
+
+        $response->assertOk();
+        $response->assertSee('<meta name="robots" content="noindex, nofollow">', false);
     }
 
     /**

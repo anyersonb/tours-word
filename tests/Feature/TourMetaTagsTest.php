@@ -35,6 +35,47 @@ class TourMetaTagsTest extends TestCase
         $response->assertDontSee('<title>Camino Inca clasico', false);
     }
 
+    /**
+     * Fix 2 (cierre lote SEO, 2026-09-14): el meta_title que escribe la
+     * clienta ya trae su propia marca -- x-layout no debe componerle
+     * " · {app.name}" encima. Antes del fix, un tour con meta_title
+     * "... | Pacha Viva" salia como "... | Pacha Viva · Pacha Viva" en el
+     * <title> (medido en produccion, ver el reporte del lote).
+     */
+    public function test_the_title_tag_does_not_duplicate_the_site_name_when_meta_title_already_includes_it(): void
+    {
+        $tour = Tour::factory()->create([
+            'title' => ['es' => 'Camino Inca clasico'],
+            'meta_title' => ['es' => '[MUESTRA] Camino Inca 4 dias | '.config('app.name')],
+        ]);
+        $slug = $tour->getTranslation('slug', 'es', false);
+
+        $response = $this->get(route('tours.show', ['locale' => 'es', 'slug' => $slug]));
+
+        $response->assertOk();
+        $response->assertSee('<title>[MUESTRA] Camino Inca 4 dias | '.config('app.name').'</title>', false);
+        $response->assertDontSee(config('app.name').' · '.config('app.name'), false);
+    }
+
+    /**
+     * Control positivo del fix anterior: cuando SI cae al respaldo (titulo
+     * del tour, sin meta_title), x-layout debe seguir componiendo el sufijo
+     * de marca -- "titleLiteral" solo aplica al camino de meta_title propio.
+     */
+    public function test_the_title_still_appends_the_site_name_when_falling_back_to_the_tour_title(): void
+    {
+        $tour = Tour::factory()->create([
+            'title' => ['es' => 'Tour Valle Sagrado completo'],
+            'meta_title' => ['es' => ''],
+        ]);
+        $slug = $tour->getTranslation('slug', 'es', false);
+
+        $response = $this->get(route('tours.show', ['locale' => 'es', 'slug' => $slug]));
+
+        $response->assertOk();
+        $response->assertSee('<title>Tour Valle Sagrado completo · '.config('app.name').'</title>', false);
+    }
+
     public function test_the_description_meta_uses_meta_description_when_it_has_its_own_content(): void
     {
         $tour = Tour::factory()->create([

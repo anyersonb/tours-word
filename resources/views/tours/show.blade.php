@@ -8,13 +8,27 @@
     // meta_title/meta_description vacío ($tour['meta_title'] === '' cuando
     // el tour no tiene ese campo traducido, o nunca se completó) cae al
     // título/resumen, nunca un <title> vacío.
+    //
+    // Fix 2 (cierre lote SEO, 2026-09-14): "titleLiteral" es true solo
+    // cuando la clienta SI escribio meta_title -- ese texto ya trae su
+    // propia marca ("... | Pacha Viva") y x-layout no debe componerlo con
+    // "· Pacha Viva" encima (duplicado real, medido en produccion:
+    // "[MUESTRA] Camino Inca 4 días | Pacha Viva · Pacha Viva"). Cuando cae
+    // al respaldo (titulo del tour), x-layout SI compone, igual que antes.
     $metaTitle = filled($tour['meta_title'] ?? null) ? $tour['meta_title'] : $tour['title'];
+    $titleLiteral = filled($tour['meta_title'] ?? null);
     $metaDescription = filled($tour['meta_description'] ?? null) ? $tour['meta_description'] : $tour['summary'];
 
     $galleryImages = collect($tour['images'])->map(fn ($image) => ['src' => $image['src'], 'alt' => $image['alt']])->all();
     if (empty($galleryImages)) {
         $galleryImages = [['src' => PlaceholderImage::svg(1200, 800, $tour['title'], '2c6fa8'), 'alt' => $tour['title']]];
     }
+
+    $breadcrumbItems = [
+        ['label' => __('site.tours.index.breadcrumb.home'), 'href' => route('home')],
+        ['label' => __('site.tours.show.breadcrumb_index'), 'href' => route('tours.index')],
+        ['label' => $tour['title']],
+    ];
 
     // Íconos: mismo lenguaje visual (stroke-width 2, viewBox 24x24) que el
     // resto del sitio (home/nosotros/contacto), para no introducir un
@@ -25,18 +39,42 @@
     $iconGauge = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><path d="m12 14 3-5"/><circle cx="12" cy="14" r="1"/><path d="M4 15a8 8 0 1 1 16 0"/></svg>';
     $iconPin = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>';
 @endphp
-{{-- noindex se queda puesto mientras el contenido sea de MUESTRA (seeder
-     DemoTourSeeder); se quita cuando la clienta cargue tours reales. --}}
-<x-layout title="{{ $metaTitle }}" description="{{ $metaDescription }}" :noindex="true">
+{{-- Defecto 1 (cierre lote SEO, 2026-09-14): la ficha de tour era la unica
+     de las 3 fichas de catalogo sin BreadcrumbList/hreflang/noindex por
+     fallback -- se le aplica exactamente el mismo patron ya validado en
+     destinations/show.blade.php y experiences/show.blade.php. "noindex"
+     combina el motivo MUESTRA (config('cms.catalog_demo_content')) con el
+     fallback de contenido por locale (un tour sin traduccion al ingles no
+     debe indexarse en "/en/"). "hreflangUrls" evita el bug de reusar el
+     slug del locale actual para todos los alternates (slug es columna
+     traducible) -- ver el comentario de "hreflangUrls" en
+     components/layout.blade.php. --}}
+@php
+    $noindex = config('cms.catalog_demo_content') || $contentFallbackLocale !== null;
+    $translatedLocales = $tour->getTranslatedLocales('title');
+
+    $hreflangUrls = collect($translatedLocales)
+        ->mapWithKeys(fn ($loc) => [$loc => route('tours.show', [
+            'locale' => \App\Support\Locale::toSegment($loc),
+            'slug' => $tour->getTranslation('slug', $loc, false),
+        ])])
+        ->all();
+@endphp
+<x-layout
+    title="{{ $metaTitle }}"
+    :title-literal="$titleLiteral"
+    :description="$metaDescription"
+    :noindex="$noindex"
+    :translated-locales="$translatedLocales"
+    :hreflang-urls="$hreflangUrls"
+>
 
     {{-- ============ MIGAS DE PAN + GALERÍA + PRECIO/CTA ============ --}}
+    <x-seo.breadcrumb-jsonld :items="$breadcrumbItems" />
+
     <section class="bg-surface">
         <div class="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
-            <x-ui.breadcrumbs :items="[
-                ['label' => __('site.tours.index.breadcrumb.home'), 'href' => route('home')],
-                ['label' => __('site.tours.show.breadcrumb_index'), 'href' => route('tours.index')],
-                ['label' => $tour['title']],
-            ]" />
+            <x-ui.breadcrumbs :items="$breadcrumbItems" />
         </div>
 
         <div class="mx-auto grid max-w-7xl gap-10 px-4 py-8 sm:px-6 lg:grid-cols-[3fr_2fr] lg:items-start lg:px-8 lg:py-12">
