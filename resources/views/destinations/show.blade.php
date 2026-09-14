@@ -18,8 +18,14 @@
         <div class="mx-auto max-w-5xl px-4 pb-10 pt-6 sm:px-6 lg:px-8">
             <x-ui.gallery :images="$destination['gallery']" :label="__('site.ui.gallery.nav_label', ['title' => $destination['name']])" />
 
-            <h1 class="mt-6 font-display text-3xl font-semibold text-ink sm:text-4xl">{{ $destination['name'] }}</h1>
-            <p class="mt-4 max-w-3xl text-base text-text-2 sm:text-lg">{{ $destination['description'] }}</p>
+            {{-- Objetivo 2 (lote i18n): lang="es" honesto cuando este
+                 destino todavia no tiene su traduccion al locale de la URL
+                 -- ver ResolvesBySlugByLocale. --}}
+            @php($fallbackLangAttr = $contentFallbackLocale ? str_replace('_', '-', $contentFallbackLocale) : null)
+
+            <h1 class="mt-6 font-display text-3xl font-semibold text-ink sm:text-4xl" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>{{ $destination['name'] }}</h1>
+            <x-ui.content-fallback-notice :locale="$contentFallbackLocale" />
+            <p class="mt-4 max-w-3xl text-base text-text-2 sm:text-lg" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>{{ $destination['description'] }}</p>
         </div>
     </section>
 

@@ -64,14 +64,19 @@ class TourController extends Controller
 
     public function show(string $locale, string $slug): View|RedirectResponse
     {
-        $tour = Tour::query()
-            ->published()
-            ->where("slug->{$locale}", $slug)
-            ->with(['destination', 'experiences', 'images'])
-            ->first();
+        // Objetivo 2 (lote i18n): si no hay slug->{$locale}, cae al slug del
+        // locale de respaldo (config('app.fallback_locale')) para que
+        // "/en/tours/<slug-es>" resuelva en vez de dar 404. Ver el docblock
+        // de ResolvesBySlugByLocale para el porque completo.
+        $tour = Tour::findBySlugForLocale($locale, $slug, ['destination', 'experiences', 'images']);
 
         if ($tour) {
-            return view('tours.show', ['tour' => $tour]);
+            return view('tours.show', [
+                'tour' => $tour,
+                'contentFallbackLocale' => $tour->isContentFallbackFor($locale, 'title')
+                    ? (string) config('app.fallback_locale')
+                    : null,
+            ]);
         }
 
         return $this->redirectFromHistory($locale, $slug);

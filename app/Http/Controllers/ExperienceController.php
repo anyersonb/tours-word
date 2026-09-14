@@ -27,16 +27,17 @@ class ExperienceController extends Controller
 
     public function show(string $locale, string $slug): View
     {
-        $experience = Experience::query()
-            ->published()
-            ->where("slug->{$locale}", $slug)
-            ->with('gallery')
-            ->first();
+        // Objetivo 2 (lote i18n): mismo fallback de slug que TourController
+        // -- ver ResolvesBySlugByLocale.
+        $experience = Experience::findBySlugForLocale($locale, $slug, 'gallery');
 
         abort_unless($experience, 404);
 
         return view('experiences.show', [
             'experience' => $experience,
+            'contentFallbackLocale' => $experience->isContentFallbackFor($locale, 'name')
+                ? (string) config('app.fallback_locale')
+                : null,
             'relatedTours' => Tour::query()
                 ->published()
                 ->ordered()

@@ -33,7 +33,16 @@
             <div>
                 <x-ui.gallery :images="$galleryImages" :label="__('site.ui.gallery.nav_label', ['title' => $tour['title']])" />
 
-                <h1 class="mt-6 font-display text-3xl font-semibold text-ink sm:text-4xl">{{ $tour['title'] }}</h1>
+                {{-- Objetivo 2 (lote i18n): lang="es" honesto en cada bloque
+                     de contenido de catalogo cuando este tour todavia no
+                     tiene su traduccion al locale de la URL -- nunca se
+                     finge que este texto esta en el idioma de la pagina.
+                     Ver ResolvesBySlugByLocale y el aviso de abajo. --}}
+                @php($fallbackLangAttr = $contentFallbackLocale ? str_replace('_', '-', $contentFallbackLocale) : null)
+
+                <h1 class="mt-6 font-display text-3xl font-semibold text-ink sm:text-4xl" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>{{ $tour['title'] }}</h1>
+
+                <x-ui.content-fallback-notice :locale="$contentFallbackLocale" />
 
                 @if($tour['destination'])
                     <a href="{{ route('destinations.show', $tour['destination']['slug']) }}" class="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-brand-text hover:underline">
@@ -41,7 +50,7 @@
                     </a>
                 @endif
 
-                <p class="mt-4 text-base text-text-2 sm:text-lg">{{ $tour['summary'] }}</p>
+                <p class="mt-4 text-base text-text-2 sm:text-lg" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>{{ $tour['summary'] }}</p>
 
                 <div class="mt-5 flex flex-wrap gap-x-6 gap-y-3 text-sm text-text-2">
                     @if($tour['duration_label'])
@@ -64,7 +73,7 @@
                     @endif
                 </div>
 
-                <div class="mt-8 max-w-2xl text-base leading-relaxed text-text-2">
+                <div class="mt-8 max-w-2xl text-base leading-relaxed text-text-2" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>
                     {{ $tour['description'] }}
                 </div>
             </div>

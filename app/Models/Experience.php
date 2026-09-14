@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\DeletesStoredFileOnDelete;
+use App\Models\Concerns\ResolvesBySlugByLocale;
 use Database\Factories\ExperienceFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,7 +16,7 @@ use Spatie\Translatable\HasTranslations;
 class Experience extends Model
 {
     /** @use HasFactory<ExperienceFactory> */
-    use DeletesStoredFileOnDelete, HasFactory, HasTranslations;
+    use DeletesStoredFileOnDelete, HasFactory, HasTranslations, ResolvesBySlugByLocale;
 
     protected static function booted(): void
     {

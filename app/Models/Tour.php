@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\TourDifficulty;
+use App\Models\Concerns\ResolvesBySlugByLocale;
 use App\Support\Money;
 use Database\Factories\TourFactory;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,7 +17,7 @@ use Spatie\Translatable\HasTranslations;
 class Tour extends Model
 {
     /** @use HasFactory<TourFactory> */
-    use HasFactory, HasTranslations;
+    use HasFactory, HasTranslations, ResolvesBySlugByLocale;
 
     protected $fillable = [
         'destination_id',

@@ -26,16 +26,17 @@ class DestinationController extends Controller
 
     public function show(string $locale, string $slug): View
     {
-        $destination = Destination::query()
-            ->published()
-            ->where("slug->{$locale}", $slug)
-            ->with('gallery')
-            ->first();
+        // Objetivo 2 (lote i18n): mismo fallback de slug que TourController
+        // -- ver ResolvesBySlugByLocale.
+        $destination = Destination::findBySlugForLocale($locale, $slug, 'gallery');
 
         abort_unless($destination, 404);
 
         return view('destinations.show', [
             'destination' => $destination,
+            'contentFallbackLocale' => $destination->isContentFallbackFor($locale, 'name')
+                ? (string) config('app.fallback_locale')
+                : null,
             'relatedTours' => Tour::query()
                 ->published()
                 ->ordered()

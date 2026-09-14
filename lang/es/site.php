@@ -42,6 +42,12 @@ return [
             'cta' => 'Ver tour',
             'price_prefix' => 'Desde',
         ],
+
+        // Objetivo 2 (lote i18n, 2026-09-14): fallback honesto del contenido
+        // de catálogo cuando la ficha (tour/destino/experiencia) no tiene
+        // todavía su traducción a :language -- nunca se finge que el
+        // contenido está en ese idioma. Ver ResolvesBySlugByLocale.
+        'content_fallback_notice' => 'Este contenido todavía no está traducido al :language — se muestra la versión original.',
     ],
 
     'nav' => [

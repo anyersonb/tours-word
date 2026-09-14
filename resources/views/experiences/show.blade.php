@@ -18,8 +18,14 @@
         <div class="mx-auto max-w-5xl px-4 pb-10 pt-6 sm:px-6 lg:px-8">
             <x-ui.gallery :images="$experience['gallery']" :label="__('site.ui.gallery.nav_label', ['title' => $experience['name']])" />
 
-            <h1 class="mt-6 font-display text-3xl font-semibold text-ink sm:text-4xl">{{ $experience['name'] }}</h1>
-            <p class="mt-4 max-w-3xl text-base text-text-2 sm:text-lg">{{ $experience['description'] }}</p>
+            {{-- Objetivo 2 (lote i18n): lang="es" honesto cuando esta
+                 experiencia todavia no tiene su traduccion al locale de la
+                 URL -- ver ResolvesBySlugByLocale. --}}
+            @php($fallbackLangAttr = $contentFallbackLocale ? str_replace('_', '-', $contentFallbackLocale) : null)
+
+            <h1 class="mt-6 font-display text-3xl font-semibold text-ink sm:text-4xl" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>{{ $experience['name'] }}</h1>
+            <x-ui.content-fallback-notice :locale="$contentFallbackLocale" />
+            <p class="mt-4 max-w-3xl text-base text-text-2 sm:text-lg" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>{{ $experience['description'] }}</p>
         </div>
     </section>
 
