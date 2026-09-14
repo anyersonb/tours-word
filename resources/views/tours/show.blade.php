@@ -1,4 +1,5 @@
 @php
+    use App\Support\Html\RichTextSanitizer;
     use App\Support\PlaceholderImage;
 
     // Objetivo (lote i18n, 2026-09-14): Tour::meta_title/meta_description ya
@@ -121,8 +122,15 @@
                     @endif
                 </div>
 
+                {{-- Defecto 1 (auditoria cliente, 2026-09-14): "description"
+                     se edita con Filament\Forms\Components\RichEditor (ver
+                     TourForm) -- es HTML de la clienta, no texto plano.
+                     {{ }} lo escapaba y mostraba los tags "&lt;p&gt;" en
+                     pantalla; App\Support\Html\RichTextSanitizer lo limpia
+                     (whitelist exacta de la toolbar del editor) antes de
+                     imprimirlo con {!! !!}. --}}
                 <div class="mt-8 max-w-2xl text-base leading-relaxed text-text-2" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>
-                    {{ $tour['description'] }}
+                    {!! RichTextSanitizer::sanitize($tour['description']) !!}
                 </div>
             </div>
 
@@ -150,15 +158,36 @@
         </div>
     </section>
 
+    {{--
+        Defecto 2 (auditoria cliente, 2026-09-14): itinerary/inclusions/
+        exclusions son columnas JSON traducibles -- a diferencia de title/
+        summary (string), un valor "[]" para este locale cuenta como
+        "traducido" para Spatie a menos que Tour::filterTranslations() lo
+        trate como vacio (ver ese metodo). Con el fix, isContentFallbackFor()
+        ya distingue esto POR CAMPO: title/summary pueden estar en ingles
+        real mientras itinerary/inclusions/exclusions caen al español -- no
+        se puede reusar $contentFallbackLocale (calculado solo sobre
+        "title") para estas tres secciones, cada una necesita su propio
+        aviso y su propio lang="" honesto.
+    --}}
+    @php($itineraryLangAttr = $itineraryFallbackLocale ? str_replace('_', '-', $itineraryFallbackLocale) : null)
+    @php($inclusionsLangAttr = $inclusionsFallbackLocale ? str_replace('_', '-', $inclusionsFallbackLocale) : null)
+    @php($exclusionsLangAttr = $exclusionsFallbackLocale ? str_replace('_', '-', $exclusionsFallbackLocale) : null)
+
     {{-- ============ ITINERARIO ============ --}}
     @if(!empty($tour['itinerary']))
         <section class="bg-ground">
             <div class="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
                 <x-ui.section-title as="h2">{{ __('site.tours.show.itinerary_title') }}</x-ui.section-title>
 
-                <div>
+                <x-ui.content-fallback-notice :locale="$itineraryFallbackLocale" />
+
+                <div @if($itineraryLangAttr) lang="{{ $itineraryLangAttr }}" @endif>
                     @foreach($tour['itinerary'] as $day)
-                        <x-ui.faq-item :question="$day['title']">{{ $day['description'] }}</x-ui.faq-item>
+                        {{-- Mismo criterio que "description" arriba: HTML de
+                             la clienta (RichEditor), saneado antes de
+                             imprimirse. --}}
+                        <x-ui.faq-item :question="$day['title']">{!! RichTextSanitizer::sanitize($day['description']) !!}</x-ui.faq-item>
                     @endforeach
                 </div>
             </div>
@@ -170,8 +199,9 @@
         <section class="bg-surface">
             <div class="mx-auto grid max-w-4xl gap-8 px-4 py-12 sm:grid-cols-2 sm:px-6 lg:px-8">
                 @if(!empty($tour['inclusions']))
-                    <div>
+                    <div @if($inclusionsLangAttr) lang="{{ $inclusionsLangAttr }}" @endif>
                         <h2 class="font-display text-xl font-semibold text-ink">{{ __('site.tours.show.inclusions_title') }}</h2>
+                        <x-ui.content-fallback-notice :locale="$inclusionsFallbackLocale" />
                         <ul class="mt-4 flex flex-col gap-3">
                             @foreach($tour['inclusions'] as $item)
                                 <li class="flex items-start gap-2 text-sm text-text-2">{!! $iconCheck !!}<span>{{ $item }}</span></li>
@@ -181,8 +211,9 @@
                 @endif
 
                 @if(!empty($tour['exclusions']))
-                    <div>
+                    <div @if($exclusionsLangAttr) lang="{{ $exclusionsLangAttr }}" @endif>
                         <h2 class="font-display text-xl font-semibold text-ink">{{ __('site.tours.show.exclusions_title') }}</h2>
+                        <x-ui.content-fallback-notice :locale="$exclusionsFallbackLocale" />
                         <ul class="mt-4 flex flex-col gap-3">
                             @foreach($tour['exclusions'] as $item)
                                 <li class="flex items-start gap-2 text-sm text-text-2">{!! $iconX !!}<span>{{ $item }}</span></li>

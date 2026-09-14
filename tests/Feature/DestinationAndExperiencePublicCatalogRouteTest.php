@@ -316,4 +316,46 @@ class DestinationAndExperiencePublicCatalogRouteTest extends TestCase
             'The destinations catalog must not issue extra queries per destination/image (N+1 regression).'
         );
     }
+
+    /**
+     * Defecto 1 (auditoria cliente, 2026-09-14, decision documentada en
+     * App\Support\Html\RichTextSanitizer): a diferencia de Tour::description
+     * (RichEditor -> HTML saneado), Destination/Experience::description NO
+     * se convierte a HTML porque este mismo campo dobla como respaldo de
+     * "meta description" cuando la clienta no llena el meta_description
+     * dedicado (ver el $metaDescription de destinations/show.blade.php) --
+     * un <meta name="description"> nunca puede contener markup. Por eso
+     * sigue siendo un Textarea de texto plano en el panel
+     * (DestinationForm/ExperienceForm) y la ficha sigue escapandolo con
+     * {{ }}. Este test fija esa decision: si alguien lo migra a RichEditor
+     * sin resolver el respaldo de meta description, este test debe
+     * romperse antes de que el markup se filtre a un <meta> tag.
+     */
+    public function test_a_destinations_description_with_markup_is_shown_as_plain_text_not_rendered_html(): void
+    {
+        $destination = Destination::factory()->create([
+            'slug' => ['es' => 'destino-descripcion-plana'],
+            'description' => ['es' => '<b>Cusco</b> es la capital historica del imperio incaico.'],
+        ]);
+
+        $response = $this->get('/es/destinos/destino-descripcion-plana');
+
+        $response->assertOk();
+        $response->assertSee('&lt;b&gt;Cusco&lt;/b&gt;', false);
+        $response->assertDontSee('<b>Cusco</b>', false);
+    }
+
+    public function test_an_experiences_description_with_markup_is_shown_as_plain_text_not_rendered_html(): void
+    {
+        $experience = Experience::factory()->create([
+            'slug' => ['es' => 'experiencia-descripcion-plana'],
+            'description' => ['es' => '<b>Trekking</b> por los Andes peruanos.'],
+        ]);
+
+        $response = $this->get('/es/experiencias/experiencia-descripcion-plana');
+
+        $response->assertOk();
+        $response->assertSee('&lt;b&gt;Trekking&lt;/b&gt;', false);
+        $response->assertDontSee('<b>Trekking</b>', false);
+    }
 }

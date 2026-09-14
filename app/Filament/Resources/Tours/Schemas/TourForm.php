@@ -84,8 +84,23 @@ class TourForm
                         ->label('Resumen')
                         ->rows(2)
                         ->maxLength(300),
+                    // Defecto 1 (auditoria cliente, 2026-09-14): la toolbar
+                    // completa por defecto de RichEditor incluye tablas,
+                    // adjuntar archivos (imagenes embebidas) y alineacion --
+                    // mucha mas superficie de la que
+                    // App\Support\Html\RichTextSanitizer sanea. Se restringe
+                    // aqui a exactamente lo que el sanitizador permite: si
+                    // se agrega un boton, hay que agregar su etiqueta/
+                    // atributo alla tambien, o el formato de la clienta se
+                    // pierde en silencio en el sitio publico.
                     RichEditor::make("description.{$locale}")
-                        ->label('Descripción'),
+                        ->label('Descripción')
+                        ->toolbarButtons([
+                            ['bold', 'italic', 'underline', 'strike', 'link'],
+                            ['h2', 'h3'],
+                            ['blockquote', 'bulletList', 'orderedList'],
+                            ['undo', 'redo'],
+                        ]),
                     TextInput::make("duration_label.{$locale}")
                         ->label('Duración')
                         ->placeholder('Ej: 4 días / 3 noches'),
@@ -115,9 +130,21 @@ class TourForm
                                 ->label('Título del día')
                                 ->required()
                                 ->maxLength(160),
-                            Textarea::make('description')
+                            // Defecto 1 (auditoria cliente, 2026-09-14):
+                            // mismo criterio y misma toolbar restringida que
+                            // description.{locale} arriba -- contenido
+                            // narrativo puro (un dia del itinerario), sin
+                            // ningun rol de respaldo de meta description,
+                            // asi que no hay razon para tratarlo distinto de
+                            // la descripcion del tour.
+                            RichEditor::make('description')
                                 ->label('Descripción')
-                                ->rows(2)
+                                ->toolbarButtons([
+                                    ['bold', 'italic', 'underline', 'strike', 'link'],
+                                    ['h2', 'h3'],
+                                    ['blockquote', 'bulletList', 'orderedList'],
+                                    ['undo', 'redo'],
+                                ])
                                 ->required(),
                         ])
                         ->addActionLabel('Agregar día')
@@ -125,10 +152,10 @@ class TourForm
                         ->collapsible()
                         ->columns(1),
                     TextInput::make("meta_title.{$locale}")
-                        ->label('Meta título (SEO)')
+                        ->label('Título que aparece en Google')
                         ->maxLength(160),
                     Textarea::make("meta_description.{$locale}")
-                        ->label('Meta descripción (SEO)')
+                        ->label('Descripción que aparece en Google')
                         ->rows(2)
                         ->maxLength(320),
                 ]),

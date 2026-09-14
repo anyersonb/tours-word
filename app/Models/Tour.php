@@ -18,7 +18,9 @@ use Spatie\Translatable\HasTranslations;
 class Tour extends Model
 {
     /** @use HasFactory<TourFactory> */
-    use HasFactory, HasTranslations, HasUniqueSlugPerLocale, ResolvesBySlugByLocale;
+    use HasFactory, HasTranslations, HasUniqueSlugPerLocale, ResolvesBySlugByLocale {
+        HasTranslations::filterTranslations as private baseFilterTranslations;
+    }
 
     protected $fillable = [
         'destination_id',
@@ -109,6 +111,35 @@ class Tour extends Model
                 $image->deleteStoredFile();
             }
         });
+    }
+
+    /**
+     * Defecto 2 (auditoria cliente, 2026-09-14): Spatie's own
+     * filterTranslations() (see HasTranslations) only treats null and ''
+     * as "no translation yet" -- an empty array counts as a REAL
+     * translation. That is correct for a plain string attribute (title,
+     * summary), but itinerary/inclusions/exclusions are attributes cast to
+     * `array` and edited through Filament's TranslatableTabs: saving the
+     * form ALWAYS submits a value for every active-locale tab, even the
+     * one the user never opened -- an untouched Repeater/TagsInput
+     * dehydrates to `[]`, not to a missing key. Once that `[]` is
+     * persisted, Spatie's own fallback (normalizeLocale(), used by
+     * getTranslation()/getTranslatedLocales()/isContentFallbackFor()) sees
+     * the locale as "translated" and never falls back to
+     * config('app.fallback_locale') -- the list silently renders empty
+     * instead of showing the fallback-locale content with the usual
+     * notice (resources/views/components/ui/content-fallback-notice.blade.php).
+     *
+     * Only changes behaviour for values that are actually an empty array;
+     * string attributes keep the exact same rule as before.
+     */
+    protected function filterTranslations(mixed $value = null, ?string $locale = null, ?array $allowedLocales = null, bool $allowNull = false, bool $allowEmptyString = false): bool
+    {
+        if (is_array($value) && $value === []) {
+            return false;
+        }
+
+        return $this->baseFilterTranslations($value, $locale, $allowedLocales, $allowNull, $allowEmptyString);
     }
 
     /**

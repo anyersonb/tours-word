@@ -70,11 +70,11 @@ class DestinationForm
                     // los llena, caso real: Cusco). Mismo patron que
                     // meta_title/meta_description de Tour (ver TourForm).
                     TextInput::make("meta_title.{$locale}")
-                        ->label('Meta título (SEO)')
+                        ->label('Título que aparece en Google')
                         ->helperText('Si se deja vacío, se usa el nombre del destino.')
                         ->maxLength(160),
                     Textarea::make("meta_description.{$locale}")
-                        ->label('Meta descripción (SEO)')
+                        ->label('Descripción que aparece en Google')
                         ->helperText('Si se deja vacío, se usa la descripción del destino.')
                         ->rows(2)
                         ->maxLength(320),

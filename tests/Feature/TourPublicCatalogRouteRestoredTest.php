@@ -17,8 +17,17 @@ use Tests\TestCase;
  * contrato del encargo pide explicitamente: resolucion por slug, el 301 del
  * slug historico, el 404 de un slug inexistente, la paginacion, que las dos
  * monedas formatean, y que la ficha carga sin N+1.
+ *
+ * Nota (2026-09-14): este archivo reemplaza a tests/Feature/
+ * TourPublicCatalogRouteTest.php, que quedo en un estado de archivo
+ * bloqueado por el sistema operativo (Windows) durante esta sesion -- ni
+ * lectura ni escritura ni "git checkout --" pudieron restaurarlo en su
+ * ruta original (EPERM en la operacion de rename/checkout). Contenido
+ * identico al de HEAD (e51769d), solo renombrada la clase para que
+ * coincida con el nuevo nombre de archivo. Ver el reporte del lote para el
+ * detalle completo.
  */
-class TourPublicCatalogRouteTest extends TestCase
+class TourPublicCatalogRouteRestoredTest extends TestCase
 {
     use RefreshDatabase;
 

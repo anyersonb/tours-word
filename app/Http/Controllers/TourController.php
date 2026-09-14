@@ -110,10 +110,32 @@ class TourController extends Controller
         $tour = Tour::findBySlugForLocale($internalLocale, $slug, ['destination', 'experiences', 'images']);
 
         if ($tour) {
+            $fallbackLocale = (string) config('app.fallback_locale');
+
+            // Defecto 2 (auditoria cliente, 2026-09-14): title/summary ya
+            // caian correctamente al idioma de respaldo por si solos
+            // (Spatie\Translatable\HasTranslations resuelve el fallback
+            // para atributos string). itinerary/inclusions/exclusions son
+            // atributos array -- Tour::filterTranslations() (fix de causa
+            // raiz, ver ese metodo) hace que isContentFallbackFor() tambien
+            // los detecte correctamente cuando la traduccion a $internalLocale
+            // existe pero esta vacia. No se puede derivar esto de
+            // "contentFallbackLocale" (calculado solo sobre "title"): un
+            // tour puede tener titulo/resumen en ingles real y, aun asi, el
+            // itinerario solo en español.
             return view('tours.show', [
                 'tour' => $tour,
                 'contentFallbackLocale' => $tour->isContentFallbackFor($internalLocale, 'title')
-                    ? (string) config('app.fallback_locale')
+                    ? $fallbackLocale
+                    : null,
+                'itineraryFallbackLocale' => $tour->isContentFallbackFor($internalLocale, 'itinerary')
+                    ? $fallbackLocale
+                    : null,
+                'inclusionsFallbackLocale' => $tour->isContentFallbackFor($internalLocale, 'inclusions')
+                    ? $fallbackLocale
+                    : null,
+                'exclusionsFallbackLocale' => $tour->isContentFallbackFor($internalLocale, 'exclusions')
+                    ? $fallbackLocale
                     : null,
             ]);
         }

@@ -52,6 +52,15 @@ class Destination extends Model
 
     /**
      * @var array<int, string>
+     *
+     * Defecto 2 (auditoria cliente, 2026-09-14): revisado si el bug de
+     * Tour::filterTranslations() (un array vacio "[]" bloqueando el
+     * fallback de idioma) aplica aqui tambien -- no aplica: todos estos
+     * atributos son strings, no columnas cast a `array`. filterTranslations()
+     * ya trata un string vacio como "no traducido" por defecto (ver
+     * Spatie\Translatable\HasTranslations), asi que el fallback de
+     * Destination ya funciona sin el fix. Si algun dia se agrega un campo
+     * de lista/JSON traducible aqui, replicar el override de Tour.
      */
     public array $translatable = ['name', 'slug', 'description', 'cover_image_alt', 'meta_title', 'meta_description'];
 

@@ -50,6 +50,12 @@ class Experience extends Model
 
     /**
      * @var array<int, string>
+     *
+     * Defecto 2 (auditoria cliente, 2026-09-14): mismo chequeo que en
+     * Destination -- no aplica el bug de Tour::filterTranslations() (array
+     * vacio bloqueando el fallback) porque todos estos atributos son
+     * strings, no columnas cast a `array`. Ver el docblock de
+     * Destination::$translatable para el detalle completo.
      */
     public array $translatable = ['name', 'slug', 'description', 'cover_image_alt', 'meta_title', 'meta_description'];
 

@@ -13,7 +13,17 @@
             <path d="M12 5v14M5 12h14" />
         </svg>
     </summary>
+    {{--
+        Defecto 1 (auditoria cliente, 2026-09-14): el slot ya llega
+        escapado -- cada llamador interpola su contenido con {{ }} (texto
+        plano) o ya lo saneo con App\Support\Html\RichTextSanitizer antes de
+        imprimirlo con {!! !!} (HTML de confianza, ver tours/show.blade.php).
+        Un {{ $slot }} aqui volvia a escapar ese resultado ya seguro
+        (double-escape en el caso de texto plano con "&"/"<"/">", y el mismo
+        bug del defecto 1 -- tags a la vista -- en el caso del HTML
+        saneado).
+    --}}
     <div class="pt-3 text-sm text-text-2">
-        {{ $slot }}
+        {!! $slot !!}
     </div>
 </details>
