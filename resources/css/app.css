@@ -188,11 +188,13 @@
      * blanco pase AA, así que vive en un solo sitio y se mide una vez. */
     .scrim-hero::before,
     .scrim-hero-h::before,
+    .scrim-band::before,
     .scrim-card::before {
         content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
     }
     .scrim-hero::before { background: var(--scrim-hero); }
     .scrim-hero-h::before { background: var(--scrim-hero); }
+    .scrim-band::before { background: var(--scrim-band); }
     .scrim-card::before { background: var(--scrim-card); }
     /* A partir de lg el hero tiene sitio para un scrim lateral, que deja
      * respirar la foto a la derecha sin perder contraste en el texto. */

@@ -53,133 +53,167 @@
 @endphp
 <x-layout :title="__('site.home.meta.title')" :description="__('site.home.meta.description')">
 
-    {{-- ============ 1. HERO ============ --}}
-    <section class="overflow-hidden bg-surface">
-        <div class="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:items-center lg:gap-12 lg:px-8 lg:py-20">
-            <div>
+    {{--
+        ============ 1. HERO ============
+        Pase visual 2026-09-14. Antes: rejilla de dos columnas con un
+        placeholder SVG a la derecha — el hueco más grande del sitio.
+        Ahora: foto a sangre con scrim propio.
+
+        El scrim NO es decoración: es lo que hace que el texto blanco pase AA
+        sobre una foto de montaña (que sola no lo permite). Sale del token
+        --scrim-hero-h, medido una vez en tokens.css.
+
+        La foto es de banco y TEMPORAL (la clienta la va a sustituir): por eso
+        no hay ningún recorte cableado. object-position: center 42% deja el
+        horizonte en el tercio alto y tolera otra foto sin retocar nada.
+    --}}
+    <section class="relative isolate overflow-hidden bg-ink-surface">
+        <div class="photo scrim-hero-h absolute inset-0">
+            <x-ui.picture
+                src="{{ asset('images/site/hero-machupicchu-amanecer.jpg') }}"
+                :alt="__('site.home.hero.photo_alt')"
+                sizes="100vw"
+                loading="eager"
+                fetchpriority="high"
+                decoding="sync"
+                position="center 42%"
+            />
+        </div>
+
+        <div class="shell relative z-10 flex min-h-[32rem] flex-col justify-center py-16 sm:min-h-[34rem] lg:min-h-[38rem] lg:py-24">
+            <div class="max-w-xl lg:max-w-2xl">
                 {{-- B3: no imprime nada sin Setting::get('rnavt_number') --}}
                 <x-ui.mincetur-badge class="mb-5" />
 
-                <h1 class="font-display text-3xl font-semibold leading-[1.15] text-ink sm:text-4xl lg:text-5xl">
+                <h1 class="font-display text-hero font-semibold text-white">
                     {{ __('site.home.hero.title_before') }}
-                    <span class="text-brand-text">{{ __('site.home.hero.title_highlight') }}</span>
+                    <span class="text-brand-100">{{ __('site.home.hero.title_highlight') }}</span>
                     {{ __('site.home.hero.title_after') }}
                 </h1>
 
-                <p class="mt-4 max-w-xl text-base text-text-2 sm:text-lg">
+                <p class="mt-5 max-w-xl text-lead text-on-dark-2">
                     {{ __('site.home.hero.subtitle') }}
                 </p>
 
-                <div class="mt-6 flex flex-wrap items-center gap-4">
-                    <x-ui.button href="{{ Route::has('tours.index') ? route('tours.index') : '#' }}">
+                <div class="mt-8 flex flex-wrap items-center gap-3">
+                    <x-ui.button href="{{ Route::has('tours.index') ? route('tours.index') : '#' }}" class="px-6 py-3 text-base shadow-e2">
                         {{ __('site.home.hero.cta_primary') }}
                     </x-ui.button>
-                    <x-ui.button variant="ghost" href="{{ Route::has('destinations.index') ? route('destinations.index') : '#' }}" :icon="$playIcon">
+                    {{-- Sobre foto, la variante "ghost" (texto verde sin
+                         fondo) no se lee: el secundario pasa a contorno
+                         blanco, que sí contrasta contra el scrim. --}}
+                    <a
+                        href="{{ Route::has('destinations.index') ? route('destinations.index') : '#' }}"
+                        class="inline-flex items-center justify-center gap-2 rounded-full border border-white/50 bg-ink-surface/65 px-6 py-3 text-base font-medium text-white backdrop-blur-sm transition-colors hover:bg-white hover:text-ink"
+                    >
+                        {!! $playIcon !!}
                         {{ __('site.home.hero.cta_secondary') }}
-                    </x-ui.button>
-                </div>
-
-                <div class="mt-8 flex flex-wrap gap-x-6 gap-y-3">
-                    @foreach($heroTrustIcons as $key => $icon)
-                        <x-ui.trust-badge :icon="$icon">{{ __('site.home.hero.trust.'.$key) }}</x-ui.trust-badge>
-                    @endforeach
+                    </a>
                 </div>
             </div>
 
-            <div class="relative">
-                <div class="aspect-[4/5] w-full overflow-hidden rounded-3xl bg-surface-2 sm:aspect-[16/10] lg:aspect-[4/5]">
-                    <img
-                        src="{{ PlaceholderImage::svg(1000, 1250, 'Foto del hero (pendiente)', '3d4a42') }}"
-                        alt="{{ __('site.home.hero.photo_alt') }}"
-                        width="1000" height="1250"
-                        class="h-full w-full object-cover"
-                    >
-                </div>
+            {{-- B1: x-ui.stats-strip no imprime nada sin Setting stat_*. Sin
+                 datos no queda ninguna caja vacía. --}}
+            <x-ui.stats-strip class="mt-10 max-w-3xl" />
+        </div>
 
-                {{-- B1: x-ui.stats-strip no imprime nada sin Setting stat_*.
-                     Este wrapper no tiene fondo/borde propio, así que si el
-                     hijo no renderiza nada, tampoco queda ninguna caja vacía. --}}
-                <div class="absolute -bottom-6 left-4 right-4 sm:left-auto sm:right-6 sm:w-[min(90%,26rem)]">
-                    <x-ui.stats-strip />
-                </div>
+        {{-- Franja de confianza: separada del bloque de texto y apoyada en el
+             borde inferior del hero, donde el scrim ya está más cerrado. --}}
+        <div class="relative z-10 border-t border-white/15 bg-ink-surface/55 backdrop-blur-sm">
+            <div class="shell flex flex-wrap gap-x-8 gap-y-3 py-4">
+                @foreach($heroTrustIcons as $key => $icon)
+                    <x-ui.trust-badge :icon="$icon" tone="dark">{{ __('site.home.hero.trust.'.$key) }}</x-ui.trust-badge>
+                @endforeach
             </div>
         </div>
     </section>
 
     {{-- ============ 2. TOURS DESTACADOS ============ --}}
-    @if($featuredTours->isNotEmpty())
-        <section class="bg-surface">
-            <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-                <x-ui.section-title as="h2">
-                    <x-slot:action>
-                        <x-ui.button variant="link" href="{{ Route::has('tours.index') ? route('tours.index') : '#' }}">
-                            {{ __('site.home.featured_tours.cta') }} &rarr;
-                        </x-ui.button>
-                    </x-slot:action>
-                    {{ __('site.home.featured_tours.title') }}
-                </x-ui.section-title>
+    <section class="bg-surface">
+        <div class="shell section">
+            <x-ui.section-title as="h2">
+                <x-slot:action>
+                    <x-ui.button variant="link" href="{{ Route::has('tours.index') ? route('tours.index') : '#' }}">
+                        {{ __('site.home.featured_tours.cta') }} &rarr;
+                    </x-ui.button>
+                </x-slot:action>
+                {{ __('site.home.featured_tours.title') }}
+            </x-ui.section-title>
 
-                @if($featuredTours->count() >= 2)
-                    <x-ui.carousel-shell label="{{ __('site.home.featured_tours.title') }}">
-                        @foreach($featuredTours as $i => $tour)
-                            <li class="w-[280px] shrink-0 snap-start sm:w-[340px]">
-                                <x-ui.tour-card
-                                    :image="optional($tour->images->first())->url() ?? PlaceholderImage::svg(480, 360, $tour->title, $photoPalette[$i % count($photoPalette)])"
-                                    :image-alt="$tour->title"
-                                    :title="$tour->title"
-                                    :summary="$tour->summary"
-                                    :duration="$tour->duration_label"
-                                    :category="optional($tour->experiences->first())->name"
-                                    :pen-cents="$tour->price_pen_cents"
-                                    :usd-cents="$tour->price_usd_cents"
-                                    href="{{ route('tours.show', $tour->slug) }}"
-                                />
-                            </li>
-                        @endforeach
-                    </x-ui.carousel-shell>
-                @else
-                    <div class="max-w-sm">
+            @if($featuredTours->count() >= 4)
+                {{-- Carrusel solo a partir de 4: con 2 o 3 tarjetas no hay
+                     nada que desplazar y el propio componente esconde sus
+                     controles, así que la sección se veía como una rejilla
+                     torcida. --}}
+                <x-ui.carousel-shell label="{{ __('site.home.featured_tours.title') }}">
+                    @foreach($featuredTours as $tour)
+                        <li class="w-[280px] shrink-0 snap-start sm:w-[340px]">
+                            <x-ui.tour-card
+                                :image="optional($tour->images->first())->url() ?? PlaceholderImage::svg(480, 360, $tour->title, $photoPalette[$loop->index % count($photoPalette)])"
+                                :image-alt="$tour->title"
+                                :title="$tour->title"
+                                :summary="$tour->summary"
+                                :duration="$tour->duration_label"
+                                :category="optional($tour->experiences->first())->name"
+                                :location="optional($tour->destination)->name"
+                                :pen-cents="$tour->price_pen_cents"
+                                :usd-cents="$tour->price_usd_cents"
+                                href="{{ route('tours.show', $tour->slug) }}"
+                                sizes="340px"
+                            />
+                        </li>
+                    @endforeach
+                </x-ui.carousel-shell>
+            @elseif($featuredTours->isNotEmpty())
+                {{-- Rejilla que se centra sola: con un único tour destacado
+                     (el caso de hoy) la tarjeta queda centrada, no huérfana
+                     pegada al margen izquierdo como estaba. --}}
+                <div class="mx-auto grid max-w-6xl justify-center gap-6 [grid-template-columns:repeat(auto-fit,minmax(min(100%,17rem),24rem))]">
+                    @foreach($featuredTours as $tour)
                         <x-ui.tour-card
-                            :image="optional($featuredTours->first()->images->first())->url() ?? PlaceholderImage::svg(480, 360, $featuredTours->first()->title, $photoPalette[0])"
-                            :image-alt="$featuredTours->first()->title"
-                            :title="$featuredTours->first()->title"
-                            :summary="$featuredTours->first()->summary"
-                            :duration="$featuredTours->first()->duration_label"
-                            :category="optional($featuredTours->first()->experiences->first())->name"
-                            :pen-cents="$featuredTours->first()->price_pen_cents"
-                            :usd-cents="$featuredTours->first()->price_usd_cents"
-                            href="{{ route('tours.show', $featuredTours->first()->slug) }}"
+                            :image="optional($tour->images->first())->url() ?? PlaceholderImage::svg(480, 360, $tour->title, $photoPalette[$loop->index % count($photoPalette)])"
+                            :image-alt="$tour->title"
+                            :title="$tour->title"
+                            :summary="$tour->summary"
+                            :duration="$tour->duration_label"
+                            :category="optional($tour->experiences->first())->name"
+                            :location="optional($tour->destination)->name"
+                            :pen-cents="$tour->price_pen_cents"
+                            :usd-cents="$tour->price_usd_cents"
+                            href="{{ route('tours.show', $tour->slug) }}"
+                            sizes="(min-width: 640px) 24rem, 90vw"
                         />
-                    </div>
-                @endif
-            </div>
-        </section>
-    @endif
+                    @endforeach
+                </div>
+            @else
+                <x-ui.empty-state>{{ __('site.home.empty.tours') }}</x-ui.empty-state>
+            @endif
+        </div>
+    </section>
 
     {{-- ============ 3. DESTINOS IMPERDIBLES ============ --}}
-    @if($destinations->isNotEmpty())
-        <section class="bg-surface">
-            <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-                <x-ui.section-title as="h2">
-                    <x-slot:action>
-                        <x-ui.button variant="link" href="{{ Route::has('destinations.index') ? route('destinations.index') : '#' }}">
-                            {{ __('site.home.destinations.cta') }} &rarr;
-                        </x-ui.button>
-                    </x-slot:action>
-                    {{ __('site.home.destinations.title') }}
-                </x-ui.section-title>
+    <section class="weave bg-sand">
+        <div class="shell section">
+            <x-ui.section-title as="h2">
+                <x-slot:action>
+                    <x-ui.button variant="link" href="{{ Route::has('destinations.index') ? route('destinations.index') : '#' }}">
+                        {{ __('site.home.destinations.cta') }} &rarr;
+                    </x-ui.button>
+                </x-slot:action>
+                {{ __('site.home.destinations.title') }}
+            </x-ui.section-title>
 
-                {{-- B5: rejilla adaptable (auto-fit), no cablea 4 columnas —
-                     hoy hay 2 destinos sembrados, no 4 como el mockup. --}}
-                <div class="grid justify-center gap-4 [grid-template-columns:repeat(auto-fit,minmax(220px,280px))]">
+            @if($destinations->isNotEmpty())
+                {{-- auto-fit con 1fr: las tarjetas LLENAN la fila. El tope de
+                     280px anterior las dejaba encogidas y centradas, con un
+                     hueco de ~170px a la izquierda del contenedor. --}}
+                <div class="grid gap-5 [grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr))]">
                     @foreach($destinations as $i => $destination)
                         {{--
                             D · lote 1/etapa D: foto real de catálogo con el
                             placeholder SVG como respaldo (nunca al revés).
-                            El alt real viene de cover_image_alt; sin ese
-                            dato, cae al nombre del destino — nunca el
-                            nombre del archivo ni un alt vacío en una imagen
-                            que aporta significado.
+                            El alt real viene de cover_image_alt; sin ese dato
+                            cae al nombre del destino.
                         --}}
                         <x-ui.destination-card
                             :image="$destination->coverImageUrl() ?? PlaceholderImage::svg(480, 600, $destination->name, $photoPalette[$i % count($photoPalette)])"
@@ -190,48 +224,56 @@
                         />
                     @endforeach
                 </div>
-            </div>
-        </section>
-    @endif
+            @else
+                <x-ui.empty-state>{{ __('site.home.empty.destinations') }}</x-ui.empty-state>
+            @endif
+        </div>
+    </section>
 
     {{-- ============ 4. ¿POR QUÉ ELEGIR VIAJAR CON NOSOTROS? ============ --}}
-    {{-- B10: sección explícitamente sobre --ground (fondo pálido), a
-         diferencia de las secciones vecinas, que van sobre --surface. --}}
-    <section class="bg-ground">
-        <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-            <x-ui.section-title as="h2">
-                {{ __('site.home.why_us.title_before') }}
-                <span class="text-brand-text">{{ __('site.home.why_us.title_highlight') }}</span>{{ __('site.home.why_us.title_after') }}
-            </x-ui.section-title>
-
-            <div class="grid gap-10 lg:grid-cols-2 lg:items-center">
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    @foreach(__('site.home.why_us.features') as $i => $feature)
-                        <x-ui.feature-card
-                            :icon="$whyUsIcons[$i] ?? $whyUsIcons[0]"
-                            :title="$feature['title']"
-                            :description="$feature['description']"
+    <section class="bg-surface">
+        <div class="shell section">
+            <div class="grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
+                {{-- La foto va a la izquierda en pantallas grandes: ancla el
+                     bloque y el texto deja de flotar. --}}
+                <div class="order-2 lg:order-1">
+                    <div class="photo aspect-[4/3] rounded-panel shadow-e3">
+                        <x-ui.picture
+                            src="{{ asset('images/site/nosotros-viajeros-ruta.jpg') }}"
+                            :alt="__('site.home.why_us.photo_alt')"
+                            sizes="(min-width: 1024px) 36rem, 92vw"
+                            position="center 40%"
                         />
-                    @endforeach
-                </div>
-
-                <div class="relative">
-                    <div class="aspect-[4/3] overflow-hidden rounded-3xl bg-surface-2">
-                        <img
-                            src="{{ PlaceholderImage::svg(900, 700, 'Foto pendiente', '2c6fa8') }}"
-                            alt="{{ __('site.home.why_us.photo_alt') }}"
-                            width="900" height="700" loading="lazy"
-                            class="h-full w-full object-cover"
-                        >
                     </div>
-                    <div class="absolute -bottom-6 left-4 flex max-w-[280px] items-center gap-3 rounded-2xl border border-line bg-surface p-4 shadow-md sm:left-6">
-                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-50 text-action" aria-hidden="true">
+                    {{-- Tarjeta flotante: hermana con margen negativo y
+                         z-index propio, no absolute dentro de un contenedor
+                         con overflow oculto — así no se recorta ni empuja el
+                         alto de la sección. --}}
+                    <div class="relative z-10 -mt-10 ml-4 mr-8 flex items-center gap-3 rounded-card border border-line bg-surface p-4 shadow-e3 sm:-mt-12 sm:ml-8 sm:mr-16">
+                        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-50 text-action" aria-hidden="true">
                             {!! $headsetIcon !!}
                         </span>
                         <div>
                             <p class="text-sm font-semibold text-ink">{{ __('site.home.why_us.assistance_title') }}</p>
-                            <p class="text-xs text-text-2">{{ __('site.home.why_us.assistance_description') }}</p>
+                            <p class="text-xs leading-relaxed text-text-2">{{ __('site.home.why_us.assistance_description') }}</p>
                         </div>
+                    </div>
+                </div>
+
+                <div class="order-1 lg:order-2">
+                    <x-ui.section-title as="h2">
+                        {{ __('site.home.why_us.title_before') }}
+                        <span class="text-brand-text">{{ __('site.home.why_us.title_highlight') }}</span>{{ __('site.home.why_us.title_after') }}
+                    </x-ui.section-title>
+
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        @foreach(__('site.home.why_us.features') as $i => $feature)
+                            <x-ui.feature-card
+                                :icon="$whyUsIcons[$i] ?? $whyUsIcons[0]"
+                                :title="$feature['title']"
+                                :description="$feature['description']"
+                            />
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -239,21 +281,21 @@
     </section>
 
     {{-- ============ 5. EXPERIENCIAS ÚNICAS ============ --}}
-    @if($experiences->isNotEmpty())
-        <section class="bg-surface">
-            <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-                <x-ui.section-title as="h2">
-                    <x-slot:action>
-                        <x-ui.button variant="link" href="{{ Route::has('experiences.index') ? route('experiences.index') : '#' }}">
-                            {{ __('site.home.experiences.cta') }} &rarr;
-                        </x-ui.button>
-                    </x-slot:action>
-                    {{ __('site.home.experiences.title') }}
-                </x-ui.section-title>
+    <section class="weave bg-sand">
+        <div class="shell section">
+            <x-ui.section-title as="h2">
+                <x-slot:action>
+                    <x-ui.button variant="link" href="{{ Route::has('experiences.index') ? route('experiences.index') : '#' }}">
+                        {{ __('site.home.experiences.cta') }} &rarr;
+                    </x-ui.button>
+                </x-slot:action>
+                {{ __('site.home.experiences.title') }}
+            </x-ui.section-title>
 
-                <div class="grid justify-center gap-6 [grid-template-columns:repeat(auto-fit,minmax(200px,260px))]">
+            @if($experiences->isNotEmpty())
+                <div class="grid gap-5 [grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr))]">
                     @foreach($experiences as $i => $experience)
-                        {{-- D · lote 1/etapa D: mismo patrón que Destinos arriba. --}}
+                        {{-- D · lote 1/etapa D: mismo patrón que Destinos. --}}
                         <x-ui.experience-card
                             :image="$experience->coverImageUrl() ?? PlaceholderImage::svg(480, 360, $experience->name, $photoPalette[$i % count($photoPalette)])"
                             :image-alt="filled($experience->cover_image_alt) ? $experience->cover_image_alt : $experience->name"
@@ -264,9 +306,11 @@
                         />
                     @endforeach
                 </div>
-            </div>
-        </section>
-    @endif
+            @else
+                <x-ui.empty-state>{{ __('site.home.empty.experiences') }}</x-ui.empty-state>
+            @endif
+        </div>
+    </section>
 
     {{--
         ============ 6. LO QUE DICEN NUESTROS VIAJEROS ============
@@ -279,46 +323,46 @@
     --}}
 
     {{-- ============ 7. NEWSLETTER ============ --}}
-    <section class="bg-surface">
-        <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-            <div class="grid overflow-hidden rounded-3xl border border-line bg-brand-50 lg:grid-cols-2">
-                <div class="aspect-[16/9] lg:aspect-auto">
-                    <img
-                        src="{{ PlaceholderImage::svg(700, 600, 'Foto pendiente', '135338') }}"
-                        alt="{{ __('site.home.newsletter.photo_alt') }}"
-                        width="700" height="600" loading="lazy"
-                        class="h-full w-full object-cover"
-                    >
-                </div>
-                <div class="flex flex-col justify-center gap-4 p-8 sm:p-10">
-                    <h2 class="font-display text-2xl font-semibold text-ink sm:text-3xl">{{ __('site.home.newsletter.title') }}</h2>
-                    <p class="text-text-2">{{ __('site.home.newsletter.description') }}</p>
+    <section class="relative isolate overflow-hidden bg-ink-surface">
+        <div class="photo scrim-band absolute inset-0">
+            <x-ui.picture
+                src="{{ asset('images/site/hero-valle-sagrado-panoramica.jpg') }}"
+                :alt="__('site.home.newsletter.photo_alt')"
+                sizes="100vw"
+                position="center 55%"
+            />
+        </div>
 
-                    {{--
-                        B4: sin entidad ni endpoint de newsletter (no hay
-                        tabla, no hay contrato de datos). Campo y botón
-                        DESHABILITADOS y declarados con title/aria-label —
-                        mismo patrón que el buscador del header — nunca un
-                        formulario que finge funcionar.
-                    --}}
-                    <div class="mt-2 flex flex-col gap-3 sm:flex-row">
-                        <label for="newsletter-email" class="sr-only">{{ __('site.home.newsletter.email_label') }}</label>
-                        <input
-                            id="newsletter-email"
-                            type="email"
-                            placeholder="{{ __('site.home.newsletter.email_placeholder') }}"
-                            disabled
-                            title="{{ __('site.home.newsletter.unavailable') }}"
-                            class="w-full rounded-full border border-line bg-surface px-4 py-2.5 text-sm text-ink placeholder:text-text-muted disabled:cursor-not-allowed disabled:opacity-70 sm:max-w-xs"
-                        >
-                        <x-ui.button
-                            disabled
-                            title="{{ __('site.home.newsletter.unavailable') }}"
-                            aria-label="{{ __('site.home.newsletter.unavailable') }}"
-                        >
-                            {{ __('site.home.newsletter.submit') }}
-                        </x-ui.button>
-                    </div>
+        <div class="shell section-tight relative z-10">
+            <div class="mx-auto max-w-2xl text-center">
+                <h2 class="font-display text-h2 font-semibold text-white">{{ __('site.home.newsletter.title') }}</h2>
+                <p class="mt-3 text-on-dark-2">{{ __('site.home.newsletter.description') }}</p>
+
+                {{--
+                    B4: sin entidad ni endpoint de newsletter (no hay tabla,
+                    no hay contrato de datos). Campo y botón DESHABILITADOS y
+                    declarados con title/aria-label — mismo patrón que el
+                    buscador del header — nunca un formulario que finge
+                    funcionar.
+                --}}
+                <div class="mx-auto mt-7 flex max-w-lg flex-col gap-3 sm:flex-row">
+                    <label for="newsletter-email" class="sr-only">{{ __('site.home.newsletter.email_label') }}</label>
+                    <input
+                        id="newsletter-email"
+                        type="email"
+                        placeholder="{{ __('site.home.newsletter.email_placeholder') }}"
+                        disabled
+                        title="{{ __('site.home.newsletter.unavailable') }}"
+                        class="w-full rounded-full border border-white/30 bg-white/10 px-5 py-3 text-sm text-white placeholder:text-on-dark-3 disabled:cursor-not-allowed disabled:opacity-70"
+                    >
+                    <x-ui.button
+                        disabled
+                        title="{{ __('site.home.newsletter.unavailable') }}"
+                        aria-label="{{ __('site.home.newsletter.unavailable') }}"
+                        class="shrink-0 px-6 py-3"
+                    >
+                        {{ __('site.home.newsletter.submit') }}
+                    </x-ui.button>
                 </div>
             </div>
         </div>

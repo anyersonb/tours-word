@@ -133,14 +133,22 @@
    * un cielo claro. Es lo que hace legal el texto blanco sobre montaña.
    * NO usar opacidades sueltas en las pantallas: se consume este token. */
   --scrim-hero:  linear-gradient(180deg,
-                   hsl(158 45% 6% / .34) 0%,
-                   hsl(158 45% 6% / .52) 38%,
-                   hsl(158 45% 6% / .78) 100%);
+                   hsl(158 45% 6% / .56) 0%,
+                   hsl(158 45% 6% / .72) 55%,
+                   hsl(158 45% 6% / .84) 100%);
   --scrim-hero-h: linear-gradient(90deg,
+                   hsl(158 45% 6% / .88) 0%,
+                   hsl(158 45% 6% / .76) 46%,
+                   hsl(158 45% 6% / .30) 80%,
+                   hsl(158 45% 6% / .12) 100%);
+  /* Banda de cierre a pantalla completa (newsletter/CTA): la foto es
+   * fondo, no protagonista, y TODO el texto va encima. Medido a 360 con
+   * el scrim de hero, --on-dark-2 sobre la panorámica caía a 4.07:1; con
+   * este, sube por encima de AA. */
+  --scrim-band:  linear-gradient(180deg,
                    hsl(158 45% 6% / .80) 0%,
-                   hsl(158 45% 6% / .62) 42%,
-                   hsl(158 45% 6% / .18) 78%,
-                   hsl(158 45% 6% / .10) 100%);
+                   hsl(158 45% 6% / .88) 100%);
+
   /* Scrim de tarjeta con rótulo abajo (destinos). Más corto que el de hero
    * porque el texto ocupa solo el último tercio. */
   --scrim-card:  linear-gradient(180deg,
