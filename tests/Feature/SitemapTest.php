@@ -105,18 +105,36 @@ class SitemapTest extends TestCase
     }
 
     /**
-     * public/robots.txt es un archivo ESTÁTICO que el webserver real sirve
-     * directo del docroot -- el kernel de testing no lo enruta (por eso
-     * $this->get('/robots.txt') daría 404 aquí aunque el archivo exista y
-     * el navegador real lo reciba bien). Se lee del disco, como lo vería
-     * el rastreador.
+     * Fix 2 + 5 (lote SEO): robots.txt paso de archivo ESTATICO (con un
+     * host cableado a mano, "http://127.0.0.1:8000/sitemap.xml" -- Defecto 2
+     * del CRO / S-04 del SEO) a ruta dinamica (App\Http\Controllers\
+     * RobotsController), exactamente como sitemap.xml. public/robots.txt ya
+     * no existe -- $this->get('/robots.txt') SI lo enruta ahora.
      */
     public function test_robots_txt_declares_the_sitemap_and_blocks_the_admin_panel(): void
     {
-        $contents = file_get_contents(public_path('robots.txt'));
+        $response = $this->get('/robots.txt');
 
-        $this->assertStringContainsString('Sitemap:', $contents);
-        $this->assertStringContainsString('sitemap.xml', $contents);
-        $this->assertStringContainsString('Disallow: /admin', $contents);
+        $response->assertOk();
+        $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
+        $response->assertSeeText('Disallow: /admin');
+        $response->assertSeeText('Sitemap: '.url('/sitemap.xml'));
+    }
+
+    /**
+     * Defecto 2/5 del CRO: el "Sitemap:" NUNCA debe volver a quedar
+     * cableado a un host muerto -- tiene que reflejar el host REAL de la
+     * request entrante, exactamente como canonical/hreflang ya lo hacen en
+     * components/layout.blade.php. Se prueba con un host distinto al de
+     * APP_URL (127.0.0.1:8000 en este entorno) para que el test falle de
+     * verdad si algún día alguien vuelve a cablear el dominio.
+     */
+    public function test_robots_txt_sitemap_line_reflects_the_real_request_host_not_a_hardcoded_one(): void
+    {
+        $response = $this->get('http://otro-host.test/robots.txt');
+
+        $response->assertOk();
+        $response->assertSeeText('Sitemap: http://otro-host.test/sitemap.xml');
+        $response->assertDontSeeText('127.0.0.1:8000');
     }
 }

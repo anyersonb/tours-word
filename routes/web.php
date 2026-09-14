@@ -3,6 +3,7 @@
 use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\DestinationController;
 use App\Http\Controllers\ExperienceController;
+use App\Http\Controllers\RobotsController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\TourController;
 use Illuminate\Support\Facades\Route;
@@ -20,6 +21,11 @@ Route::redirect('/', '/es/', 301);
 // exige el estándar de sitemaps. Fuera del grupo "locale" porque no es
 // contenido que dependa del segmento de la URL entrante.
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
+
+// Fix 2 + 5 (lote SEO): dinamico por la misma razon que sitemap.xml -- ver
+// App\Http\Controllers\RobotsController. public/robots.txt (el archivo
+// estatico que esto reemplaza) se borro.
+Route::get('/robots.txt', RobotsController::class)->name('robots');
 
 Route::prefix('{locale}')
     ->where(['locale' => '[A-Za-z-]+'])
