@@ -115,7 +115,14 @@ class DestinationAndExperiencePublicCatalogRouteTest extends TestCase
         $response->assertDontSee('<meta name="description" content="">', false);
     }
 
-    public function test_a_destination_with_seo_metadata_uses_it_instead_of_the_name_and_description(): void
+    /**
+     * Fix 2 (cierre lote SEO, 2026-09-14): un meta_title escrito por la
+     * clienta ya trae su propia marca -- se usa literal, sin el sufijo
+     * " · {app.name}" que x-layout compone para el titulo de RESPALDO
+     * (nombre del destino). Antes del fix este <title> salia duplicado:
+     * "... | Meta SEO · Pacha Viva".
+     */
+    public function test_a_destination_with_seo_metadata_uses_it_literally_without_appending_the_site_name(): void
     {
         Destination::factory()->create([
             'slug' => ['es' => 'destino-con-seo'],
@@ -128,8 +135,31 @@ class DestinationAndExperiencePublicCatalogRouteTest extends TestCase
         $response = $this->get('/es/destinos/destino-con-seo');
 
         $response->assertOk();
-        $response->assertSee('<title>Cusco: tours y experiencias | Meta SEO · '.config('app.name').'</title>', false);
+        $response->assertSee('<title>Cusco: tours y experiencias | Meta SEO</title>', false);
+        $response->assertDontSee('Meta SEO · '.config('app.name'), false);
         $response->assertSee('<meta name="description" content="Meta descripción dedicada para buscadores.">', false);
+    }
+
+    /**
+     * Fix 2 (cierre lote SEO): mismo control que la destinacion de arriba,
+     * para la experiencia -- meta_title escrito por la clienta literal, sin
+     * el sufijo " · {app.name}" encima.
+     */
+    public function test_an_experience_with_seo_metadata_uses_it_literally_without_appending_the_site_name(): void
+    {
+        Experience::factory()->create([
+            'slug' => ['es' => 'experiencia-con-seo'],
+            'name' => ['es' => 'Trekking'],
+            'description' => ['es' => 'Descripción visible en la página.'],
+            'meta_title' => ['es' => 'Trekking en los Andes | Meta SEO'],
+            'meta_description' => ['es' => 'Meta descripción dedicada para buscadores.'],
+        ]);
+
+        $response = $this->get('/es/experiencias/experiencia-con-seo');
+
+        $response->assertOk();
+        $response->assertSee('<title>Trekking en los Andes | Meta SEO</title>', false);
+        $response->assertDontSee('Meta SEO · '.config('app.name'), false);
     }
 
     public function test_an_experience_without_seo_metadata_falls_back_to_its_description_for_the_meta_tag(): void

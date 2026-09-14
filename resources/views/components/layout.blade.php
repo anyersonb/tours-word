@@ -25,6 +25,16 @@
     // opcional locale => URL absoluta; null (default) usa la reconstruccion
     // por defecto, igual que hoy para home/nosotros/contacto.
     'hreflangUrls' => null,
+    // Fix 2 (cierre lote SEO, 2026-09-14): cuando la clienta escribe su
+    // propio meta_title (Tour/Destination/Experience), ese texto YA trae su
+    // propia marca -- componerlo con "· " . config('app.name') encima
+    // duplicaba "Pacha Viva" en el <title> ("... | Pacha Viva · Pacha
+    // Viva"). "titleLiteral" (default false, sin cambio de comportamiento
+    // para home/nosotros/contacto/catalogo, que siempre pasan un titulo de
+    // pagina, no de contenido) le dice al layout que NO componga: el
+    // llamador ya decidio el <title> completo. Solo se compone cuando
+    // $title es el respaldo (nombre del tour/destino/experiencia).
+    'titleLiteral' => false,
 ])
 @php
     /**
@@ -60,7 +70,11 @@
      *   validadores de Facebook/LinkedIn lo rechazan). Ver aviso en el
      *   reporte: pendiente un JPG/PNG de 1200×630 antes de publicar.
      */
-    $pageTitle = $title ? $title.' · '.config('app.name') : config('app.name');
+    $pageTitle = match (true) {
+        $titleLiteral && filled($title) => $title,
+        filled($title) => $title.' · '.config('app.name'),
+        default => config('app.name'),
+    };
     $pageDescription = $description ?? __('site.seo.default_description');
     $canonicalUrl = $canonical ?? url()->current();
     $ogImageUrl = $ogImage ?? asset('images/brand/logo.svg');

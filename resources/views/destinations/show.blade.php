@@ -21,7 +21,14 @@
     // clienta todavia no los llena -- nunca una etiqueta <title> ni
     // "description" vacia (hoy pasaba con Cusco). Se pasa null (no '') para
     // que el "??" de x-layout SI dispare su propio respaldo de marca.
+    //
+    // Fix 2 (cierre lote SEO): "titleLiteral" es true solo cuando la clienta
+    // SI escribio meta_title -- ese texto ya trae su propia marca ("... |
+    // Pacha Viva") y x-layout no debe componerlo con "· Pacha Viva" encima
+    // (duplicado real, medido en produccion). Cuando cae al respaldo
+    // (nombre del destino), x-layout SI compone, igual que antes.
     $metaTitle = filled($destination['meta_title'] ?? null) ? $destination['meta_title'] : $destination['name'];
+    $titleLiteral = filled($destination['meta_title'] ?? null);
     $metaDescription = filled($destination['meta_description'] ?? null) ? $destination['meta_description'] : (filled($destination['description']) ? $destination['description'] : null);
 @endphp
 {{-- Fix 6 (lote SEO): "noindex" ya no es un booleano cableado -- combina el
@@ -49,6 +56,7 @@
 @endphp
 <x-layout
     title="{{ $metaTitle }}"
+    :title-literal="$titleLiteral"
     :description="$metaDescription"
     :noindex="$noindex"
     :translated-locales="$translatedLocales"
