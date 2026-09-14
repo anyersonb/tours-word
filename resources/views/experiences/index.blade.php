@@ -1,8 +1,8 @@
 @php
     use App\Support\PlaceholderImage;
 
-    // Mismos íconos y mismas claves (slug) que ya usa home.blade.php para no
-    // introducir un segundo mapa de íconos de experiencia.
+    // Mismos iconos y mismas claves (slug) que ya usa home.blade.php para no
+    // introducir un segundo mapa de iconos de experiencia.
     $experienceIcons = [
         'trekking' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><path d="m3 20 6-10 4 6 2-3 6 7H3Z"/></svg>',
         'gastronomia' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><path d="M6 3v7a2 2 0 0 0 2 2 2 2 0 0 0 2-2V3M8 12v9M17 3c-1.5 0-3 1.5-3 4s1.5 4 3 4v9"/></svg>',
@@ -18,34 +18,22 @@
     :noindex="true"
 >
 
-    {{-- ============ MIGAS DE PAN + TÍTULO ============ --}}
-    <section class="bg-surface">
-        <div class="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
-            <x-ui.breadcrumbs :items="[
-                ['label' => __('site.experiences.index.breadcrumb.home'), 'href' => route('home')],
-                ['label' => __('site.experiences.index.breadcrumb.current')],
-            ]" />
-        </div>
-
-        <div class="mx-auto max-w-7xl px-4 pb-8 pt-4 sm:px-6 lg:px-8">
-            <h1 class="font-display text-3xl font-semibold text-ink sm:text-4xl">
-                {{ __('site.experiences.index.hero.title') }}
-            </h1>
-            <p class="mt-3 max-w-2xl text-base text-text-2 sm:text-lg">
-                {{ __('site.experiences.index.hero.subtitle') }}
-            </p>
-        </div>
-    </section>
+    <x-ui.page-header
+        :breadcrumbs="[
+            ['label' => __('site.experiences.index.breadcrumb.home'), 'href' => route('home')],
+            ['label' => __('site.experiences.index.breadcrumb.current')],
+        ]"
+        :title="__('site.experiences.index.hero.title')"
+        :lead="__('site.experiences.index.hero.subtitle')"
+    />
 
     {{-- ============ REJILLA ============ --}}
-    <section class="bg-ground">
-        <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <section class="bg-surface">
+        <div class="shell section">
             @if(empty($experiences))
-                <p class="rounded-2xl border border-dashed border-line bg-surface p-8 text-center text-sm text-text-2">
-                    {{ __('site.experiences.index.empty') }}
-                </p>
+                <x-ui.empty-state>{{ __('site.experiences.index.empty') }}</x-ui.empty-state>
             @else
-                <div class="grid justify-center gap-6 [grid-template-columns:repeat(auto-fit,minmax(200px,260px))]">
+                <div class="grid gap-5 [grid-template-columns:repeat(auto-fit,minmax(min(100%,17rem),1fr))]">
                     @foreach($experiences as $experience)
                         <x-ui.experience-card
                             :image="$experience['gallery'][0]['src'] ?? PlaceholderImage::svg(480, 360, $experience['name'], '2c6fa8')"
