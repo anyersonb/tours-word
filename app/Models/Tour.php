@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\TourDifficulty;
+use App\Models\Concerns\HasUniqueSlugPerLocale;
 use App\Models\Concerns\ResolvesBySlugByLocale;
 use App\Support\Money;
 use Database\Factories\TourFactory;
@@ -17,7 +18,7 @@ use Spatie\Translatable\HasTranslations;
 class Tour extends Model
 {
     /** @use HasFactory<TourFactory> */
-    use HasFactory, HasTranslations, ResolvesBySlugByLocale;
+    use HasFactory, HasTranslations, HasUniqueSlugPerLocale, ResolvesBySlugByLocale;
 
     protected $fillable = [
         'destination_id',
@@ -167,26 +168,11 @@ class Tour extends Model
         return Money::usd($this->price_usd_cents);
     }
 
-    /**
-     * Whether a given (locale, slug) pair is already used by ANOTHER tour.
-     * Used by the Filament form's uniqueness validation, since a JSON
-     * translatable column can't carry a native per-locale unique index.
-     *
-     * $locale is interpolated into the JSON path (`slug->{$locale}`). Today
-     * it always comes from config('cms.active_locales') via TourForm's
-     * TranslatableTabs closure — never from the request — and the security
-     * audit (docs/lote-2/seguridad-2026-09-01.md, B-0) confirmed this isn't
-     * SQL injection (the quote gets doubled correctly). Still, the day a
-     * caller resolves a public slug URL and passes a request-controlled
-     * locale here, it must be checked against the whitelist first.
-     */
-    public static function slugTaken(string $locale, string $slug, ?int $exceptId = null): bool
-    {
-        abort_unless(array_key_exists($locale, config('cms.locales')), 400);
-
-        return static::query()
-            ->where("slug->{$locale}", $slug)
-            ->when($exceptId, fn (Builder $query) => $query->whereKeyNot($exceptId))
-            ->exists();
-    }
+    // slugTaken() moved to App\Models\Concerns\HasUniqueSlugPerLocale (O-1,
+    // docs/lote-3/seguridad-2026-09-14.md, Bajo): Destination and Experience
+    // needed the exact same "whether a given (locale, slug) pair is already
+    // used by ANOTHER record" check that only Tour had, and a public catalog
+    // that resolves by slug can't afford a second silently-unreachable
+    // record. See that trait's docblock for the full reasoning, including
+    // why interpolating $locale into `slug->{$locale}` is safe here.
 }

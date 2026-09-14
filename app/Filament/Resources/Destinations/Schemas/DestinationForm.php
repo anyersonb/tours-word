@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Destinations\Schemas;
 
 use App\Filament\Support\SecureImageUpload;
 use App\Filament\Support\TranslatableTabs;
+use App\Models\Destination;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
@@ -11,6 +12,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class DestinationForm
@@ -41,7 +43,22 @@ class DestinationForm
                         ->label('Slug')
                         ->required($locale === 'es')
                         ->maxLength(140)
-                        ->rule('alpha_dash'),
+                        ->rule('alpha_dash')
+                        // O-1 (docs/lote-3/seguridad-2026-09-14.md, Bajo):
+                        // TourForm ya validaba esto (Tour::slugTaken()) --
+                        // Destination nunca lo tuvo. El catálogo público
+                        // resuelve por slug (ResolvesBySlugByLocale), así
+                        // que dos destinos con el mismo slug para el mismo
+                        // idioma dejan a uno de los dos inalcanzable en
+                        // silencio: publicado en el CMS, invisible en el
+                        // sitio.
+                        ->rules([
+                            fn (?Model $record) => function (string $attribute, $value, \Closure $fail) use ($locale, $record) {
+                                if (filled($value) && Destination::slugTaken($locale, $value, $record?->getKey())) {
+                                    $fail("Ya existe otro destino con este slug para el idioma \"{$locale}\".");
+                                }
+                            },
+                        ]),
                     Textarea::make("description.{$locale}")
                         ->label('Descripción')
                         ->rows(3),

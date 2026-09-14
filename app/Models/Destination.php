@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\DeletesStoredFileOnDelete;
+use App\Models\Concerns\HasUniqueSlugPerLocale;
 use App\Models\Concerns\ResolvesBySlugByLocale;
 use Database\Factories\DestinationFactory;
 use Illuminate\Database\Eloquent\Builder;
@@ -15,7 +16,7 @@ use Spatie\Translatable\HasTranslations;
 class Destination extends Model
 {
     /** @use HasFactory<DestinationFactory> */
-    use DeletesStoredFileOnDelete, HasFactory, HasTranslations, ResolvesBySlugByLocale;
+    use DeletesStoredFileOnDelete, HasFactory, HasTranslations, HasUniqueSlugPerLocale, ResolvesBySlugByLocale;
 
     protected static function booted(): void
     {

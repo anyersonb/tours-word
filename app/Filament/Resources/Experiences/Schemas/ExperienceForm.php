@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Experiences\Schemas;
 
 use App\Filament\Support\SecureImageUpload;
 use App\Filament\Support\TranslatableTabs;
+use App\Models\Experience;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
@@ -11,6 +12,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class ExperienceForm
@@ -41,7 +43,20 @@ class ExperienceForm
                         ->label('Slug')
                         ->required($locale === 'es')
                         ->maxLength(140)
-                        ->rule('alpha_dash'),
+                        ->rule('alpha_dash')
+                        // O-1 (docs/lote-3/seguridad-2026-09-14.md, Bajo):
+                        // mismo fix que DestinationForm -- el catálogo
+                        // público resuelve por slug (ResolvesBySlugByLocale),
+                        // así que dos experiencias con el mismo slug para
+                        // el mismo idioma dejan a una inalcanzable en
+                        // silencio.
+                        ->rules([
+                            fn (?Model $record) => function (string $attribute, $value, \Closure $fail) use ($locale, $record) {
+                                if (filled($value) && Experience::slugTaken($locale, $value, $record?->getKey())) {
+                                    $fail("Ya existe otra experiencia con este slug para el idioma \"{$locale}\".");
+                                }
+                            },
+                        ]),
                     Textarea::make("description.{$locale}")
                         ->label('Descripción')
                         ->rows(3),
