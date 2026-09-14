@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             SettingSeeder::class,
             DemoTourSeeder::class,
+            DemoCatalogImageSeeder::class,
         ]);
     }
 }
