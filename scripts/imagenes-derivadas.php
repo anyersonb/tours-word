@@ -21,11 +21,29 @@
  * clienta suba desde el CMS), <x-ui.picture> sirve el original tal cual: la
  * ausencia de derivadas nunca rompe una pantalla.
  *
+ * Además produce la miniatura de compartido (og:image) a 1200x630 exactos.
+ * Esa sí es JPG y no WebP: hay clientes de mensajería y redes que todavía no
+ * previsualizan WebP, y una miniatura que no se ve es peor que una pesada.
+ *
  * Uso:  php scripts/imagenes-derivadas.php [--force]
  */
 
 $root = dirname(__DIR__);
 $force = in_array('--force', $argv, true);
+
+/*
+ * Miniatura de compartido. origen => [destino, foco vertical 0..1].
+ * El foco es el mismo que usa la pantalla donde vive la foto
+ * (object-position: center 42% en el hero de la home), para que la miniatura
+ * y el hero muestren el mismo encuadre.
+ */
+const OG_WIDTH = 1200;
+const OG_HEIGHT = 630;
+const OG_QUALITY = 82;
+
+$ogTargets = [
+    'public/images/site/hero-machupicchu-amanecer.jpg' => ['public/images/site/og-default.jpg', 0.42],
+];
 
 /** Carpeta => anchos a generar (nunca por encima del ancho original). */
 $targets = [
@@ -113,3 +131,73 @@ printf(
     $bytesIn / 1048576,
     $bytesOut / 1048576
 );
+
+/*
+ * ---------------------------------------------------------------------------
+ * Miniatura de compartido (og:image), 1200x630 EXACTOS.
+ *
+ * Recorte tipo "cover": se escala por el lado que falta y se recorta el otro
+ * con el foco declarado, nunca se deforma. Con un origen 1920x1299 (ratio
+ * 1.478) y un destino 1.905, manda el ancho: se usan los 1920 px completos y
+ * se recorta la altura a 1008 px, tomados alrededor del 42% de la foto.
+ * Un recorte así aguanta que se cambie el archivo de origen mientras siga
+ * siendo apaisado: no hay coordenadas cableadas, solo una proporción.
+ * ---------------------------------------------------------------------------
+ */
+foreach ($ogTargets as $relSrc => [$relOut, $focus]) {
+    $src = $root.'/'.$relSrc;
+    $out = $root.'/'.$relOut;
+
+    if (! is_file($src)) {
+        fwrite(STDERR, "aviso: no existe {$relSrc}, se omite la miniatura de compartido\n");
+
+        continue;
+    }
+
+    if (! $force && is_file($out) && filemtime($out) >= filemtime($src)) {
+        [$w, $h] = getimagesize($out);
+        printf("og:image ya al día: %s (%dx%d, %d KB)\n", $relOut, $w, $h, filesize($out) / 1024);
+
+        continue;
+    }
+
+    [$srcW, $srcH] = getimagesize($src);
+    $targetRatio = OG_WIDTH / OG_HEIGHT;
+
+    if ($srcW / $srcH > $targetRatio) {
+        // Origen más apaisado que el destino: manda el alto, se recorta a los lados.
+        $cropH = $srcH;
+        $cropW = (int) round($srcH * $targetRatio);
+        $cropX = (int) round(($srcW - $cropW) / 2);
+        $cropY = 0;
+    } else {
+        // Origen más alto: manda el ancho, se recorta arriba/abajo con el foco.
+        $cropW = $srcW;
+        $cropH = (int) round($srcW / $targetRatio);
+        $cropX = 0;
+        // Misma semántica que CSS object-position: center {focus}% -- se alinea
+        // el punto "focus" de la foto con el punto "focus" de la caja. Así la
+        // miniatura y el hero de la home enseñan exactamente el mismo encuadre.
+        $cropY = (int) round(max(0, min($srcH - $cropH, ($srcH - $cropH) * $focus)));
+    }
+
+    $source = imagecreatefromjpeg($src);
+    $canvas = imagecreatetruecolor(OG_WIDTH, OG_HEIGHT);
+    imagecopyresampled($canvas, $source, 0, 0, $cropX, $cropY, OG_WIDTH, OG_HEIGHT, $cropW, $cropH);
+    imagejpeg($canvas, $out, OG_QUALITY);
+    imagedestroy($canvas);
+    imagedestroy($source);
+
+    [$w, $h] = getimagesize($out);
+    printf(
+        "og:image generada: %s (%dx%d, %d KB) desde %s recortando %dx%d en y=%d\n",
+        $relOut,
+        $w,
+        $h,
+        filesize($out) / 1024,
+        basename($relSrc),
+        $cropW,
+        $cropH,
+        $cropY
+    );
+}

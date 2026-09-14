@@ -62,13 +62,25 @@
      *   mercado primario hispanohablante, S-08). Solo se emite en páginas
      *   indexables (`@unless($noindex)`) -- las fichas de catálogo hoy son
      *   noindex (contenido de MUESTRA) y no declaran hreflang todavía.
-     * - `$ogImageUrl`: no hay todavía una imagen de 1200×630 diseñada para
-     *   compartir en redes (las fotos de hoy son placeholders SVG inline, sin
-     *   archivo real que enlazar). Como stand-in uso el logo real de marca
-     *   (`public/images/brand/logo.svg`) en vez de inventar o de omitir el
-     *   tag — pero SVG no es universalmente soportado como og:image (algunos
-     *   validadores de Facebook/LinkedIn lo rechazan). Ver aviso en el
-     *   reporte: pendiente un JPG/PNG de 1200×630 antes de publicar.
+     * - `$ogImageUrl`: JPG real de 1200×630 (`public/images/site/og-default.jpg`),
+     *   generado por `scripts/imagenes-derivadas.php` recortando el hero de la
+     *   home con el MISMO foco vertical que usa esa pantalla. Reemplaza al logo
+     *   SVG que había de stand-in: SVG no es universalmente soportado como
+     *   og:image y varios validadores de Facebook/LinkedIn lo rechazan. Es JPG
+     *   y no WebP a propósito — hay clientes de mensajería que todavía no
+     *   previsualizan WebP, y una miniatura que no se ve es peor que una
+     *   pesada.
+     *
+     * - `$isNoindex` (2026-09-14): mientras `config('cms.catalog_demo_content')`
+     *   esté en true, va `noindex, nofollow` en TODO el sitio público, no solo
+     *   en el catálogo. Motivo concreto: la portada no emitía robots y su
+     *   carrusel pasó a anunciar "Camino Inca a Machu Picchu, 4 días —
+     *   S/ 3.500,00", que se lee como una oferta real; un precio inventado
+     *   publicado como real es un defecto, no un pendiente. Sale de la MISMA
+     *   bandera que ya resuelve las fichas y se resuelve en un solo sitio
+     *   (acá), así que bajarla devuelve el sitio entero a indexable sin tocar
+     *   código — por eso los tres índices de catálogo dejaron de cablear
+     *   `:noindex="true"`.
      */
     $pageTitle = match (true) {
         $titleLiteral && filled($title) => $title,
@@ -77,7 +89,9 @@
     };
     $pageDescription = $description ?? __('site.seo.default_description');
     $canonicalUrl = $canonical ?? url()->current();
-    $ogImageUrl = $ogImage ?? asset('images/brand/logo.svg');
+    $ogImageUrl = $ogImage ?? asset('images/site/og-default.jpg');
+
+    $isNoindex = $noindex || config('cms.catalog_demo_content');
 
     $currentRouteName = \Illuminate\Support\Facades\Route::currentRouteName();
     $currentRouteParams = \Illuminate\Support\Facades\Route::current()?->parameters() ?? [];
@@ -111,32 +125,60 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $pageTitle }}</title>
-    @if($noindex)
+    @if($isNoindex)
         <meta name="robots" content="noindex, nofollow">
     @endif
 
     <meta name="description" content="{{ $pageDescription }}">
     <link rel="canonical" href="{{ $canonicalUrl }}">
 
+    {{--
+        hreflang sigue atado al noindex POR CONTENIDO ($noindex), no al noindex
+        global de obra ($isNoindex). Lo que la nota de arriba prohíbe es un
+        grupo hreflang INCOHERENTE -- un alterno noindex apuntado desde uno
+        indexable. Mientras la bandera de contenido de muestra está arriba el
+        grupo entero es noindex por igual, así que la declaración es coherente
+        y queda simplemente inerte hasta que la bandera baje. Si en cambio se
+        atara a $isNoindex, al bajar la bandera el sitio volvería sin hreflang
+        hasta que alguien se acordara de esto.
+    --}}
     @unless($noindex)
         @foreach($hreflangAlternates as $altLocale => $altUrl)
             <link rel="alternate" hreflang="{{ str_replace('_', '-', strtolower($altLocale)) }}" href="{{ $altUrl }}">
         @endforeach
         <link rel="alternate" hreflang="x-default" href="{{ $xDefaultUrl }}">
-
-        <meta property="og:type" content="{{ $ogType }}">
-        <meta property="og:site_name" content="{{ config('app.name') }}">
-        <meta property="og:locale" content="{{ str_replace('-', '_', app()->getLocale()) }}">
-        <meta property="og:title" content="{{ $pageTitle }}">
-        <meta property="og:description" content="{{ $pageDescription }}">
-        <meta property="og:image" content="{{ $ogImageUrl }}">
-        <meta property="og:url" content="{{ $canonicalUrl }}">
-
-        <meta name="twitter:card" content="summary_large_image">
-        <meta name="twitter:title" content="{{ $pageTitle }}">
-        <meta name="twitter:description" content="{{ $pageDescription }}">
-        <meta name="twitter:image" content="{{ $ogImageUrl }}">
     @endunless
+
+    {{--
+        Open Graph / Twitter SIEMPRE, también en páginas noindex. Estaban
+        dentro del mismo @unless que el hreflang, mezclando dos asuntos
+        distintos: indexar y COMPARTIR. Una URL noindex se sigue pegando en
+        WhatsApp o Slack y merece su miniatura; de hecho, mientras el sitio
+        está en obra es justo cuando más se comparte a mano.
+    --}}
+    <meta property="og:type" content="{{ $ogType }}">
+    <meta property="og:site_name" content="{{ config('app.name') }}">
+    <meta property="og:locale" content="{{ str_replace('-', '_', app()->getLocale()) }}">
+    <meta property="og:title" content="{{ $pageTitle }}">
+    <meta property="og:description" content="{{ $pageDescription }}">
+    <meta property="og:url" content="{{ $canonicalUrl }}">
+    <meta property="og:image" content="{{ $ogImageUrl }}">
+    @if($ogImage === null)
+        {{-- Ancho/alto solo del archivo por defecto, que sí sabemos que mide
+             1200x630. Si un día una ficha pasa su propia "ogImage", declarar
+             estas medidas a ciegas sería mentir sobre un archivo que no
+             conocemos, y un og:image:width falso es peor que ninguno. Sin esto
+             varios clientes difieren la tarjeta hasta descargar la imagen y el
+             primer compartido sale sin miniatura. --}}
+        <meta property="og:image:width" content="1200">
+        <meta property="og:image:height" content="630">
+        <meta property="og:image:type" content="image/jpeg">
+    @endif
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $pageTitle }}">
+    <meta name="twitter:description" content="{{ $pageDescription }}">
+    <meta name="twitter:image" content="{{ $ogImageUrl }}">
 
     {{--
         Único lugar del sitio donde se cargan las tipografías de marca (A2).

@@ -10,12 +10,14 @@
     ];
     $defaultExperienceIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15 9-2 6-6 2 2-6 6-2Z"/></svg>';
 @endphp
-{{-- noindex se queda puesto mientras el contenido sea de MUESTRA (seeder
-     DemoTourSeeder); se quita cuando la clienta cargue experiencias reales. --}}
+{{-- El noindex ya no se cablea aca: mientras
+     config("cms.catalog_demo_content") este en true, x-layout pone
+     "noindex, nofollow" en TODO el sitio publico. Cableandolo en esta
+     vista, bajar la bandera dejaba los tres indices fuera del indice sin
+     que nadie lo notara. --}}
 <x-layout
     :title="__('site.experiences.index.meta.title')"
     :description="__('site.experiences.index.meta.description')"
-    :noindex="true"
 >
 
     <x-ui.page-header

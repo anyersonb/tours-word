@@ -38,7 +38,13 @@
             @if($tourCount)
                 <span class="eyebrow mt-1.5 block text-on-dark-2">{{ $tourCount }}</span>
             @elseif($tagline)
-                <span class="mt-1 line-clamp-2 block text-sm text-on-dark-2">{{ $tagline }}</span>
+                {{-- Sin "block": la utilidad de display de Tailwind se emite
+                     DESPUES de line-clamp en la hoja, asi que ganaba y dejaba el
+                     -webkit-line-clamp inerte. Con los textos cortos del catalogo
+                     de muestra no se notaba; con las descripciones reales el
+                     resumen se iba a 9 lineas y tapaba la foto. line-clamp-2 ya
+                     pone el display que necesita. --}}
+                <span class="mt-1 line-clamp-2 text-sm text-on-dark-2">{{ $tagline }}</span>
             @endif
         </span>
         <span

@@ -1,12 +1,14 @@
 @php
     use App\Support\PlaceholderImage;
 @endphp
-{{-- noindex se queda puesto mientras el contenido sea de MUESTRA (seeder
-     DemoTourSeeder); se quita cuando la clienta cargue destinos reales. --}}
+{{-- El noindex ya no se cablea aca: mientras
+     config("cms.catalog_demo_content") este en true, x-layout pone
+     "noindex, nofollow" en TODO el sitio publico. Cableandolo en esta
+     vista, bajar la bandera dejaba los tres indices fuera del indice sin
+     que nadie lo notara. --}}
 <x-layout
     :title="__('site.destinations.index.meta.title')"
     :description="__('site.destinations.index.meta.description')"
-    :noindex="true"
 >
 
     {{-- Cabecera sin foto: las fotos de cabecera disponibles son 3 y ya las
