@@ -1,6 +1,16 @@
 @php
     use App\Support\PlaceholderImage;
 
+    // Objetivo (lote i18n, 2026-09-14): Tour::meta_title/meta_description ya
+    // son editables en Filament y están sembrados, pero esta ficha usaba
+    // title/summary a secas -- lo que la clienta escribe en esos campos
+    // nunca llegaba al <title>/<meta description>. Con respaldo: un
+    // meta_title/meta_description vacío ($tour['meta_title'] === '' cuando
+    // el tour no tiene ese campo traducido, o nunca se completó) cae al
+    // título/resumen, nunca un <title> vacío.
+    $metaTitle = filled($tour['meta_title'] ?? null) ? $tour['meta_title'] : $tour['title'];
+    $metaDescription = filled($tour['meta_description'] ?? null) ? $tour['meta_description'] : $tour['summary'];
+
     $galleryImages = collect($tour['images'])->map(fn ($image) => ['src' => $image['src'], 'alt' => $image['alt']])->all();
     if (empty($galleryImages)) {
         $galleryImages = [['src' => PlaceholderImage::svg(1200, 800, $tour['title'], '2c6fa8'), 'alt' => $tour['title']]];
@@ -17,7 +27,7 @@
 @endphp
 {{-- noindex se queda puesto mientras el contenido sea de MUESTRA (seeder
      DemoTourSeeder); se quita cuando la clienta cargue tours reales. --}}
-<x-layout title="{{ $tour['title'] }}" description="{{ $tour['summary'] }}" :noindex="true">
+<x-layout title="{{ $metaTitle }}" description="{{ $metaDescription }}" :noindex="true">
 
     {{-- ============ MIGAS DE PAN + GALERÍA + PRECIO/CTA ============ --}}
     <section class="bg-surface">
