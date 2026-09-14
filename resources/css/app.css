@@ -174,7 +174,10 @@
     /* .photo envuelve SIEMPRE la foto; el hijo <img> se estira. El velo
      * (--photo-tint) unifica fotos de banco de temperaturas distintas. */
     .photo { position: relative; overflow: hidden; background-color: var(--surface-2); }
-    .photo > img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    /* :is() cubre tanto <img> suelto como el <img> dentro de <picture>
+     * que emite <x-ui.picture>. */
+    .photo > picture { display: contents; }
+    .photo :is(img) { display: block; width: 100%; height: 100%; object-fit: cover; }
     .photo::after {
         content: ''; position: absolute; inset: 0; pointer-events: none;
         background: var(--photo-tint);
@@ -199,11 +202,11 @@
 
     /* Zoom suave al pasar el ratón por una tarjeta con foto. Se anula con
      * prefers-reduced-motion. */
-    .photo-zoom > img { transition: transform .5s cubic-bezier(.2,.6,.2,1); }
-    .group:hover .photo-zoom > img { transform: scale(1.06); }
+    .photo-zoom :is(img) { transition: transform .5s cubic-bezier(.2,.6,.2,1); }
+    .group:hover .photo-zoom :is(img) { transform: scale(1.06); }
     @media (prefers-reduced-motion: reduce) {
-        .photo-zoom > img { transition: none; }
-        .group:hover .photo-zoom > img { transform: none; }
+        .photo-zoom :is(img) { transition: none; }
+        .group:hover .photo-zoom :is(img) { transform: none; }
     }
 
     /* --- Tipografía de apoyo ------------------------------------------ */
@@ -249,7 +252,7 @@
      * .photo ya reserva la caja, pero las <img> sueltas con width/height
      * necesitan esto para respetar el aspecto al escalar. */
     img { max-width: 100%; height: auto; }
-    .photo > img { height: 100%; }
+    .photo :is(img) { height: 100%; }
 
     /* Selección con el verde de marca. */
     ::selection { background-color: var(--brand-100); color: var(--ink); }

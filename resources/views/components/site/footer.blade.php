@@ -27,38 +27,51 @@
     $hasInformationColumn = filled($privacyPolicyUrl) || filled($cancellationPolicyUrl) || filled($complaintsBookUrl);
     $hasContactColumn = filled($contactPhone) || filled($contactEmail) || filled($contactAddress);
 @endphp
-<footer class="border-t border-line bg-surface">
-    <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
-            <div>
-                <x-brand.mark variant="horizontal" class="h-7 w-auto" />
+{{--
+    Pase visual 2026-09-14: el pie iba sobre --surface (blanco) igual que la
+    última sección de casi todas las pantallas, así que no cerraba nada — la
+    página simplemente se quedaba sin contenido. Ahora va sobre
+    --ink-surface, la superficie oscura de marca. Contrastes medidos con la
+    fórmula WCAG sobre ese fondo: blanco 15.59:1, --on-dark-2 10.32:1,
+    --on-dark-3 6.07:1. Los tres pasan AA de texto normal.
+--}}
+<footer class="weave-dark bg-ink-surface text-on-dark-2">
+    <div class="shell py-14 lg:py-16">
+        <div class="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+            <div class="sm:col-span-2 lg:col-span-1">
+                <x-brand.mark variant="mono" class="h-7 w-auto text-white" />
                 @if(filled($companyName))
-                    <p class="mt-3 text-sm text-text-2">{{ $companyName }}</p>
+                    <p class="mt-4 text-sm text-on-dark-2">{{ $companyName }}</p>
                 @endif
+                <p class="mt-4 max-w-xs text-sm leading-relaxed text-on-dark-3">
+                    {{ __('site.seo.default_description') }}
+                </p>
             </div>
 
             <nav aria-label="{{ __('site.footer.quick_links') }}">
-                <h3 class="mb-3 text-sm font-semibold text-ink">{{ __('site.footer.quick_links') }}</h3>
-                <ul class="space-y-2 text-sm text-text-2">
-                    <li><a href="{{ route('home') }}" class="hover:text-action">{{ __('site.nav.home') }}</a></li>
-                    <li><a href="{{ Route::has('tours.index') ? route('tours.index') : '#' }}" class="hover:text-action">{{ __('site.nav.tours') }}</a></li>
-                    <li><a href="{{ Route::has('about') ? route('about') : '#' }}" class="hover:text-action">{{ __('site.nav.about') }}</a></li>
-                    <li><a href="{{ Route::has('contact') ? route('contact') : '#' }}" class="hover:text-action">{{ __('site.nav.contact') }}</a></li>
+                <h3 class="eyebrow mb-4 text-on-dark-3">{{ __('site.footer.quick_links') }}</h3>
+                <ul class="space-y-2.5 text-sm">
+                    <li><a href="{{ route('home') }}" class="text-on-dark-2 transition-colors hover:text-white">{{ __('site.nav.home') }}</a></li>
+                    <li><a href="{{ Route::has('tours.index') ? route('tours.index') : '#' }}" class="text-on-dark-2 transition-colors hover:text-white">{{ __('site.nav.tours') }}</a></li>
+                    <li><a href="{{ Route::has('destinations.index') ? route('destinations.index') : '#' }}" class="text-on-dark-2 transition-colors hover:text-white">{{ __('site.nav.destinations') }}</a></li>
+                    <li><a href="{{ Route::has('experiences.index') ? route('experiences.index') : '#' }}" class="text-on-dark-2 transition-colors hover:text-white">{{ __('site.nav.experiences') }}</a></li>
+                    <li><a href="{{ Route::has('about') ? route('about') : '#' }}" class="text-on-dark-2 transition-colors hover:text-white">{{ __('site.nav.about') }}</a></li>
+                    <li><a href="{{ Route::has('contact') ? route('contact') : '#' }}" class="text-on-dark-2 transition-colors hover:text-white">{{ __('site.nav.contact') }}</a></li>
                 </ul>
             </nav>
 
             @if($hasInformationColumn)
                 <div>
-                    <h3 class="mb-3 text-sm font-semibold text-ink">{{ __('site.footer.information') }}</h3>
-                    <ul class="space-y-2 text-sm text-text-2">
+                    <h3 class="eyebrow mb-4 text-on-dark-3">{{ __('site.footer.information') }}</h3>
+                    <ul class="space-y-2.5 text-sm">
                         @if(filled($privacyPolicyUrl))
-                            <li><a href="{{ $privacyPolicyUrl }}" class="hover:text-action">{{ __('site.footer.privacy_policy') }}</a></li>
+                            <li><a href="{{ $privacyPolicyUrl }}" class="text-on-dark-2 transition-colors hover:text-white">{{ __('site.footer.privacy_policy') }}</a></li>
                         @endif
                         @if(filled($cancellationPolicyUrl))
-                            <li><a href="{{ $cancellationPolicyUrl }}" class="hover:text-action">{{ __('site.footer.cancellation_policy') }}</a></li>
+                            <li><a href="{{ $cancellationPolicyUrl }}" class="text-on-dark-2 transition-colors hover:text-white">{{ __('site.footer.cancellation_policy') }}</a></li>
                         @endif
                         @if(filled($complaintsBookUrl))
-                            <li><a href="{{ $complaintsBookUrl }}" class="hover:text-action">{{ __('site.footer.complaints_book') }}</a></li>
+                            <li><a href="{{ $complaintsBookUrl }}" class="text-on-dark-2 transition-colors hover:text-white">{{ __('site.footer.complaints_book') }}</a></li>
                         @endif
                     </ul>
                 </div>
@@ -66,16 +79,16 @@
 
             @if($hasContactColumn)
                 <div>
-                    <h3 class="mb-3 text-sm font-semibold text-ink">{{ __('site.footer.contact') }}</h3>
-                    <ul class="space-y-2 text-sm text-text-2">
+                    <h3 class="eyebrow mb-4 text-on-dark-3">{{ __('site.footer.contact') }}</h3>
+                    <ul class="space-y-2.5 text-sm">
                         @if(filled($contactPhone))
-                            <li><a href="tel:{{ preg_replace('/\s+/', '', $contactPhone) }}" class="hover:text-action">{{ $contactPhone }}</a></li>
+                            <li><a href="tel:{{ preg_replace('/\s+/', '', $contactPhone) }}" class="text-on-dark-2 transition-colors hover:text-white">{{ $contactPhone }}</a></li>
                         @endif
                         @if(filled($contactEmail))
-                            <li><a href="mailto:{{ $contactEmail }}" class="hover:text-action">{{ $contactEmail }}</a></li>
+                            <li><a href="mailto:{{ $contactEmail }}" class="text-on-dark-2 transition-colors hover:text-white">{{ $contactEmail }}</a></li>
                         @endif
                         @if(filled($contactAddress))
-                            <li>{{ $contactAddress }}</li>
+                            <li class="text-on-dark-2">{{ $contactAddress }}</li>
                         @endif
                     </ul>
                 </div>
@@ -83,7 +96,7 @@
         </div>
 
         @if($hasLegalBlock || filled($rnavtNumber))
-            <div class="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-line-soft pt-6 text-xs text-text-muted">
+            <div class="mt-12 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-on-dark-line pt-6 text-xs text-on-dark-3">
                 @if(filled($companyRuc))
                     <span>RUC {{ $companyRuc }}</span>
                 @endif
@@ -91,12 +104,12 @@
                     <span>RNAVT {{ $rnavtNumber }}</span>
                 @endif
                 @if(filled($esnnaPosterUrl))
-                    <a href="{{ $esnnaPosterUrl }}" class="hover:text-action">Afiche ESNNA</a>
+                    <a href="{{ $esnnaPosterUrl }}" class="transition-colors hover:text-white">Afiche ESNNA</a>
                 @endif
             </div>
         @endif
 
-        <div class="mt-6 border-t border-line-soft pt-6 text-sm text-text-muted">
+        <div class="mt-6 border-t border-on-dark-line pt-6 text-sm text-on-dark-3">
             &copy; {{ now()->year }} {{ $companyName ?: config('app.name') }}. {{ __('site.footer.rights') }}
         </div>
     </div>

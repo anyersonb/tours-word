@@ -1,11 +1,17 @@
 @php
+    /*
+     * Pase visual 2026-09-14: 'active' estaba cableado a false en los cinco
+     * ítems que no son Inicio, así que el sitio nunca marcaba dónde estabas.
+     * Ahora sale de request()->routeIs() con comodín, para que la ficha
+     * (tours.show) también marque su índice.
+     */
     $navItems = [
         ['label' => __('site.nav.home'), 'route' => route('home'), 'active' => request()->routeIs('home')],
-        ['label' => __('site.nav.tours'), 'route' => Route::has('tours.index') ? route('tours.index') : '#', 'active' => false],
-        ['label' => __('site.nav.destinations'), 'route' => Route::has('destinations.index') ? route('destinations.index') : '#', 'active' => false],
-        ['label' => __('site.nav.experiences'), 'route' => Route::has('experiences.index') ? route('experiences.index') : '#', 'active' => false],
-        ['label' => __('site.nav.about'), 'route' => Route::has('about') ? route('about') : '#', 'active' => false],
-        ['label' => __('site.nav.contact'), 'route' => Route::has('contact') ? route('contact') : '#', 'active' => false],
+        ['label' => __('site.nav.tours'), 'route' => Route::has('tours.index') ? route('tours.index') : '#', 'active' => request()->routeIs('tours.*')],
+        ['label' => __('site.nav.destinations'), 'route' => Route::has('destinations.index') ? route('destinations.index') : '#', 'active' => request()->routeIs('destinations.*')],
+        ['label' => __('site.nav.experiences'), 'route' => Route::has('experiences.index') ? route('experiences.index') : '#', 'active' => request()->routeIs('experiences.*')],
+        ['label' => __('site.nav.about'), 'route' => Route::has('about') ? route('about') : '#', 'active' => request()->routeIs('about')],
+        ['label' => __('site.nav.contact'), 'route' => Route::has('contact') ? route('contact') : '#', 'active' => request()->routeIs('contact*')],
     ];
 
     // Objetivo (lote i18n, 2026-09-14): el selector de idioma solo ofrece
@@ -40,9 +46,11 @@
         });
 @endphp
 <header
-    x-data="{ mobileOpen: false }"
+    x-data="{ mobileOpen: false, scrolled: false }"
     @keydown.escape.window="mobileOpen = false"
-    class="sticky top-0 z-40 border-b border-line bg-surface"
+    @scroll.window="scrolled = window.scrollY > 8"
+    :class="scrolled ? 'shadow-e2' : ''"
+    class="sticky top-0 z-40 border-b border-line bg-surface transition-shadow duration-300"
 >
     <div class="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-6 xl:px-8">
         <a href="{{ route('home') }}" class="flex shrink-0 items-center" aria-label="{{ config('app.name') }}">
@@ -61,7 +69,7 @@
             @foreach($navItems as $item)
                 <a
                     href="{{ $item['route'] }}"
-                    class="text-sm font-medium whitespace-nowrap transition-colors hover:text-action {{ $item['active'] ? 'text-action' : 'text-text-2' }}"
+                    class="relative py-1 text-sm font-medium whitespace-nowrap transition-colors hover:text-action after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:rounded-full after:bg-action after:transition-transform after:duration-300 after:content-[''] {{ $item['active'] ? 'text-action after:scale-x-100' : 'text-text-2 after:scale-x-0 hover:after:scale-x-100' }}"
                     @if($item['active']) aria-current="page" @endif
                 >{{ $item['label'] }}</a>
             @endforeach

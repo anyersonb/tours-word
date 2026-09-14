@@ -150,7 +150,7 @@
   /* Velo tenue permanente sobre TODA foto de catálogo: unifica fotos de
    * banco de temperaturas distintas y evita que una foto muy saturada
    * pelee con la marca. Muy sutil a propósito. */
-  --photo-tint:  hsl(var(--brand-h) 40% 12% / .06);
+  --photo-tint:  hsl(var(--brand-h) 40% 12% / .04);
 
   /* --- 4. Escala tipográfica fluida ---------------------------------- */
   /* clamp(min, preferido, max): el mínimo es el valor a 360px y el máximo
