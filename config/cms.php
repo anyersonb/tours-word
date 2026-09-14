@@ -23,6 +23,13 @@ return [
         'pt_BR' => 'Português (Brasil)',
     ],
 
+    // Alcance corregido por Anyerson el 2026-09-10: el sitio será SOLO español
+    // e inglés; PT-BR queda fuera del proyecto (se deja inerte en "locales"
+    // porque el esquema y LocalePrefixRoutingTest ya lo referencian).
+    // El inglés NO se activa todavía: lang/en/site.php tiene 42 líneas contra
+    // las 300 del español y faltan contact-form.php y validation.php enteros,
+    // así que activarlo dejaría /en/ mostrando claves crudas. Se activa cuando
+    // el backend complete lang/en/ -- pendiente declarado, no olvido.
     'active_locales' => ['es'],
 
     /*

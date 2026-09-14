@@ -44,8 +44,8 @@
         @endif
 
         <div class="mt-auto flex items-center justify-between pt-2">
-            <x-ui.money :pen-cents="$penCents" :usd-cents="$usdCents" prefix="Desde" class="font-display text-lg font-semibold text-ink" />
-            <x-ui.button :href="$href" size="sm">Ver tour</x-ui.button>
+            <x-ui.money :pen-cents="$penCents" :usd-cents="$usdCents" :prefix="__('site.ui.tour_card.price_prefix')" class="font-display text-lg font-semibold text-ink" />
+            <x-ui.button :href="$href" size="sm">{{ __('site.ui.tour_card.cta') }}</x-ui.button>
         </div>
     </div>
 </article>

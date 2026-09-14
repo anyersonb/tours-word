@@ -18,6 +18,30 @@ return [
             'pagination_group' => 'Paginación de :label',
             'go_to_card' => 'Ir a la tarjeta :position de :total',
         ],
+
+        // Paginación de catálogo y galería de ficha (lote 3, componentes
+        // x-ui.pagination y x-ui.gallery, nuevos).
+        'pagination' => [
+            'nav_label' => 'Paginación',
+            'previous' => 'Anterior',
+            'next' => 'Siguiente',
+            'page_of' => 'Página :current de :last',
+        ],
+
+        'gallery' => [
+            'nav_label' => 'Galería de fotos de :title',
+            'thumbnails_group' => 'Miniaturas de :title',
+            'show_photo' => 'Ver foto :position de :total',
+        ],
+
+        // R (lote 3): x-ui.tour-card traía "Ver tour" y el prefijo "Desde"
+        // cableados a mano desde el lote 1 — se traducen acá porque el
+        // catálogo nuevo triplica su uso y activar EN no puede depender de
+        // acordarse de este componente.
+        'tour_card' => [
+            'cta' => 'Ver tour',
+            'price_prefix' => 'Desde',
+        ],
     ],
 
     'nav' => [
@@ -294,6 +318,102 @@ return [
             'description' => 'Déjanos ser parte de tu próxima aventura.',
             'button' => 'Explorar tours',
             'photo_alt' => 'Viajero contemplando Machu Picchu desde el mirador al amanecer',
+        ],
+    ],
+
+    // Catálogo y ficha de tours (lote 3, maquetación pura sobre
+    // App\Support\CatalogFixtures). Ningún nombre/descripción de tour vive
+    // acá: es contenido de catálogo, no texto de interfaz, y lo escribe la
+    // clienta desde el CMS — ver la nota en CatalogFixtures.
+    'tours' => [
+        'index' => [
+            'meta' => [
+                'title' => 'Tours en Perú',
+                'description' => 'Descubre todos nuestros tours por Perú. Filtra por destino o por experiencia y encuentra el viaje ideal para ti.',
+            ],
+            'breadcrumb' => [
+                'home' => 'Inicio',
+                'current' => 'Tours',
+            ],
+            'hero' => [
+                'title' => 'Nuestros tours',
+                'subtitle' => 'Explora todos nuestros tours por Perú y filtra por destino o por experiencia para encontrar el viaje ideal para ti.',
+            ],
+            'filters' => [
+                'destination_label' => 'Destino',
+                'destination_placeholder' => 'Todos los destinos',
+                'experience_label' => 'Experiencia',
+                'experience_placeholder' => 'Todas las experiencias',
+                'submit' => 'Filtrar',
+                'clear' => 'Quitar filtros',
+            ],
+            'empty' => 'No encontramos tours con esos filtros. Prueba quitando alguno.',
+        ],
+
+        'show' => [
+            'breadcrumb_index' => 'Tours',
+            'price_prefix' => 'Desde',
+            'cta_reserve' => 'Reservar este tour',
+            'duration_label' => 'Duración',
+            'difficulty_label' => 'Dificultad',
+            'meeting_point_title' => 'Punto de encuentro',
+            'itinerary_title' => 'Itinerario',
+            'inclusions_title' => 'Incluye',
+            'exclusions_title' => 'No incluye',
+            'cta_banner_title' => '¿Quieres conocer más tours en :destination?',
+            'cta_banner_button' => 'Ver más tours',
+        ],
+    ],
+
+    // Catálogo y ficha de destinos (lote 3). Mismo patrón que 'tours'.
+    'destinations' => [
+        'index' => [
+            'meta' => [
+                'title' => 'Destinos en Perú',
+                'description' => 'Descubre los destinos que tenemos para ti en Perú.',
+            ],
+            'breadcrumb' => [
+                'home' => 'Inicio',
+                'current' => 'Destinos',
+            ],
+            'hero' => [
+                'title' => 'Destinos',
+                'subtitle' => 'Explora los destinos que tenemos para ti en Perú.',
+            ],
+            'empty' => 'Muy pronto vas a encontrar acá todos nuestros destinos.',
+        ],
+
+        'show' => [
+            'breadcrumb_index' => 'Destinos',
+            'related_tours_title' => 'Tours en :destination',
+            'related_tours_empty' => 'Todavía no publicamos tours en este destino. Vuelve pronto.',
+            'cta_all_tours' => 'Ver todos los tours',
+        ],
+    ],
+
+    // Catálogo y ficha de experiencias (lote 3). Mismo patrón que 'tours'.
+    'experiences' => [
+        'index' => [
+            'meta' => [
+                'title' => 'Experiencias en Perú',
+                'description' => 'Descubre las experiencias que tenemos para ti en Perú.',
+            ],
+            'breadcrumb' => [
+                'home' => 'Inicio',
+                'current' => 'Experiencias',
+            ],
+            'hero' => [
+                'title' => 'Experiencias',
+                'subtitle' => 'Explora las experiencias que tenemos para ti en Perú.',
+            ],
+            'empty' => 'Muy pronto vas a encontrar acá todas nuestras experiencias.',
+        ],
+
+        'show' => [
+            'breadcrumb_index' => 'Experiencias',
+            'related_tours_title' => 'Tours de :experience',
+            'related_tours_empty' => 'Todavía no publicamos tours de esta experiencia. Vuelve pronto.',
+            'cta_all_tours' => 'Ver todos los tours',
         ],
     ],
 

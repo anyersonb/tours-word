@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\SitemapController;
+use App\Support\CatalogFixtures;
+use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Route;
 
 // Prefijo de idioma en TODAS las URLs, incluido español (lote 1 ronda 2,
@@ -61,4 +64,106 @@ Route::prefix('{locale}')
         Route::get('/nosotros', function () {
             return view('nosotros');
         })->name('about');
+
+        // ============================================================
+        // MAQUETA — lote 3. Sustituir por controladores reales.
+        //
+        // Catálogo y ficha de tours/destinos/experiencias. Decisión de
+        // Anyerson: este lote es maquetación pura, el backend viene
+        // después. Los datos de ejemplo salen de App\Support\
+        // CatalogFixtures (fuente única, ver esa clase) — estas rutas
+        // SOLO leen ese array en memoria, nunca la base de datos, aunque
+        // los modelos reales (Tour/Destination/Experience) ya existen
+        // desde el lote 2. El contrato de datos exacto que cada vista
+        // espera recibir está en el reporte del lote 3.
+        // ============================================================
+
+        Route::get('/tours', function (Request $request) {
+            $destinationSlug = $request->query('destino');
+            $experienceSlug = $request->query('experiencia');
+
+            $tours = array_values(array_filter(CatalogFixtures::tours(), function (array $tour) use ($destinationSlug, $experienceSlug) {
+                if ($destinationSlug && ($tour['destination']['slug'] ?? null) !== $destinationSlug) {
+                    return false;
+                }
+
+                if ($experienceSlug && ! collect($tour['experiences'])->contains('slug', $experienceSlug)) {
+                    return false;
+                }
+
+                return true;
+            }));
+
+            $perPage = 6;
+            $page = LengthAwarePaginator::resolveCurrentPage();
+            $paginator = new LengthAwarePaginator(
+                array_slice($tours, ($page - 1) * $perPage, $perPage),
+                count($tours),
+                $perPage,
+                $page,
+                [
+                    'path' => LengthAwarePaginator::resolveCurrentPath(),
+                    'query' => $request->query(),
+                ]
+            );
+
+            return view('tours.index', [
+                'tours' => $paginator,
+                'destinationOptions' => CatalogFixtures::destinations(),
+                'experienceOptions' => CatalogFixtures::experiences(),
+                'filters' => [
+                    'destino' => $destinationSlug,
+                    'experiencia' => $experienceSlug,
+                ],
+            ]);
+        })->name('tours.index');
+
+        // NOTA: el closure recibe TODOS los parámetros de la ruta por
+        // posición (locale, luego slug) — Laravel no los empareja por
+        // nombre para closures con parámetros escalares (ver
+        // Illuminate\Routing\ResolvesRouteDependencies::resolveMethodDependencies).
+        // Omitir $locale aquí hace que $slug reciba 'es' por error: costó
+        // una ronda de depuración detectarlo (los 3 index sin {slug}
+        // funcionaban bien porque solo tienen un parámetro tipado Request).
+        Route::get('/tours/{slug}', function (string $locale, string $slug) {
+            $tour = CatalogFixtures::tour($slug);
+
+            abort_unless($tour, 404);
+
+            return view('tours.show', ['tour' => $tour]);
+        })->name('tours.show');
+
+        Route::get('/destinos', function () {
+            return view('destinations.index', [
+                'destinations' => CatalogFixtures::destinations(),
+            ]);
+        })->name('destinations.index');
+
+        Route::get('/destinos/{slug}', function (string $locale, string $slug) {
+            $destination = CatalogFixtures::destination($slug);
+
+            abort_unless($destination, 404);
+
+            return view('destinations.show', [
+                'destination' => $destination,
+                'relatedTours' => CatalogFixtures::toursByDestination($slug),
+            ]);
+        })->name('destinations.show');
+
+        Route::get('/experiencias', function () {
+            return view('experiences.index', [
+                'experiences' => CatalogFixtures::experiences(),
+            ]);
+        })->name('experiences.index');
+
+        Route::get('/experiencias/{slug}', function (string $locale, string $slug) {
+            $experience = CatalogFixtures::experience($slug);
+
+            abort_unless($experience, 404);
+
+            return view('experiences.show', [
+                'experience' => $experience,
+                'relatedTours' => CatalogFixtures::toursByExperience($slug),
+            ]);
+        })->name('experiences.show');
     });
