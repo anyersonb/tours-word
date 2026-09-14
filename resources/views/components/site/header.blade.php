@@ -8,11 +8,36 @@
         ['label' => __('site.nav.contact'), 'route' => Route::has('contact') ? route('contact') : '#', 'active' => false],
     ];
 
-    $locales = config('cms.locales', []);
+    // Objetivo (lote i18n, 2026-09-14): el selector de idioma solo ofrece
+    // locales ACTIVOS. "locales" (config('cms.locales')) es el esquema
+    // completo (incluye pt_BR, todavía fuera del proyecto); filtrar acá
+    // evita que el componente tenga que fingir un estado "próximamente"
+    // para un idioma que no va a existir (Anyerson, 2026-09-10).
     $activeLocales = config('cms.active_locales', []);
+    $locales = collect(config('cms.locales', []))->only($activeLocales)->all();
     $currentLocale = app()->getLocale();
 
     $currencies = config('cms.currencies', []);
+
+    // URL de cada locale activo para la MISMA pantalla que se está viendo.
+    // Misma lógica que el hreflang de x-layout (resources/views/components/
+    // layout.blade.php): misma ruta y mismos parámetros de la request
+    // actual, cambiando solo 'locale' -- nunca una URL armada a mano, para
+    // no divergir del hreflang real del <head>. Si el tour/destino/
+    // experiencia no tiene slug en el locale destino, route() igual genera
+    // la URL (con el slug del locale actual) y TourController::show() /
+    // ResolvesBySlugByLocale ya resuelven ese caso cayendo al slug del
+    // locale de respaldo -- no hay que esquivarlo acá.
+    $currentRouteName = \Illuminate\Support\Facades\Route::currentRouteName();
+    $currentRouteParams = \Illuminate\Support\Facades\Route::current()?->parameters() ?? [];
+
+    $localeAlternateUrls = collect($activeLocales)
+        ->mapWithKeys(function (string $loc) use ($currentRouteName, $currentRouteParams) {
+            $targetRoute = $currentRouteName ?: 'home';
+            $params = array_merge($currentRouteParams, ['locale' => \App\Support\Locale::toSegment($loc)]);
+
+            return [$loc => route($targetRoute, $params)];
+        });
 @endphp
 <header
     x-data="{ mobileOpen: false }"
@@ -61,7 +86,7 @@
 
             <x-header.currency-switcher :currencies="$currencies" />
 
-            <x-header.locale-switcher :locales="$locales" :active-locales="$activeLocales" :current="$currentLocale" />
+            <x-header.locale-switcher :locales="$locales" :current="$currentLocale" :alternate-urls="$localeAlternateUrls" />
 
             <x-ui.button href="{{ Route::has('contact') ? route('contact') : '#' }}" size="sm" class="whitespace-nowrap">
                 {{ __('site.header.contact_cta') }}
@@ -120,14 +145,22 @@
         <div class="border-t border-line-soft px-4 py-4">
             <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-text-muted">{{ __('site.header.language') }}</p>
             {{-- En móvil las opciones van en línea, a la vista: un dropdown
-                 aquí queda fuera del viewport del drawer sin ahorrar nada. --}}
+                 aquí queda fuera del viewport del drawer sin ahorrar nada.
+                 Mismas URLs alternas que el desplegable de escritorio
+                 ($localeAlternateUrls, calculado arriba). --}}
             <div class="flex flex-wrap gap-2">
                 @foreach($locales as $code => $label)
-                    @php $isActive = in_array($code, $activeLocales, true); @endphp
-                    <span
-                        class="rounded-full border px-3 py-1.5 text-sm font-medium {{ $isActive ? 'border-action text-action' : 'border-line-soft text-text-muted opacity-60' }}"
-                        @if(!$isActive) title="{{ __('site.header.language_soon') }}" @endif
-                    >{{ strtoupper(str_replace('_', '-', $code)) }}</span>
+                    @if($code === $currentLocale)
+                        <span
+                            class="rounded-full border border-action px-3 py-1.5 text-sm font-medium text-action"
+                            aria-current="true"
+                        >{{ strtoupper(str_replace('_', '-', $code)) }}</span>
+                    @else
+                        <a
+                            href="{{ $localeAlternateUrls[$code] ?? '#' }}"
+                            class="rounded-full border border-line-soft px-3 py-1.5 text-sm font-medium text-text-2 hover:border-action hover:text-action"
+                        >{{ strtoupper(str_replace('_', '-', $code)) }}</a>
+                    @endif
                 @endforeach
             </div>
         </div>

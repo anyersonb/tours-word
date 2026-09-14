@@ -1,4 +1,4 @@
-@props(['locales', 'activeLocales', 'current'])
+@props(['locales', 'current', 'alternateUrls' => []])
 <div
     x-data="{ open: false }"
     @click.outside="open = false"
@@ -18,10 +18,16 @@
     </button>
 
     {{--
-        Lugar reservado para EN / PT-BR (lote 5). Hoy solo ES está activo
-        (config('cms.active_locales')), así que las otras dos opciones se
-        muestran deshabilitadas con su motivo — no son enlaces rotos a /en
-        o /pt-br, que todavía no existen.
+        Objetivo (lote i18n, 2026-09-14): un enlace real por cada locale
+        activo (config('cms.active_locales')), apuntando a la MISMA pantalla
+        que se está viendo. La URL destino la calcula x-site.header con la
+        MISMA lógica que el hreflang de x-layout (App\Support\Locale +
+        route() con los parámetros de la request actual) -- nunca se arma
+        acá para no divergir de ese hreflang.
+
+        PT-BR no aparece: $locales ya llega filtrado a solo los locales
+        activos (el alcance del sitio es ES/EN, decisión de Anyerson del
+        2026-09-10) -- no se promete un idioma que no existe.
     --}}
     <div
         x-show="open"
@@ -31,22 +37,20 @@
         role="menu"
     >
         @foreach($locales as $code => $label)
-            @php $isActive = in_array($code, $activeLocales, true); @endphp
-            @if($isActive)
+            @if($code === $current)
                 <span class="flex items-center justify-between px-4 py-2.5 text-sm font-semibold text-action" role="menuitem" aria-current="true">
                     {{ $label }}
                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
                 </span>
             @else
-                <span
-                    class="flex cursor-not-allowed items-center justify-between px-4 py-2.5 text-sm text-text-muted opacity-60"
+                <a
+                    href="{{ $alternateUrls[$code] ?? '#' }}"
+                    @click="open = false"
+                    class="flex items-center justify-between px-4 py-2.5 text-sm text-text-2 hover:bg-ground hover:text-action"
                     role="menuitem"
-                    aria-disabled="true"
-                    title="{{ __('site.header.language_soon') }}"
                 >
                     {{ $label }}
-                    <span class="text-xs">{{ __('site.header.language_soon') }}</span>
-                </span>
+                </a>
             @endif
         @endforeach
     </div>
