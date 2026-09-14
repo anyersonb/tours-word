@@ -7,6 +7,7 @@ use App\Models\Experience;
 use App\Models\Tour;
 use App\Models\TourSlugHistory;
 use App\Support\Locale;
+use App\Support\LocaleAlternates;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -93,7 +94,13 @@ class TourController extends Controller
         ]);
     }
 
-    public function show(string $locale, string $slug): View|RedirectResponse
+    /**
+     * $localeAlternates NO es un parametro de ruta: Laravel resuelve por
+     * TIPO los argumentos que no coinciden con un segmento de la URL y por
+     * NOMBRE los que si (ver el docblock de la clase), asi que puede ir
+     * delante de {locale}/{slug} sin afectar su binding.
+     */
+    public function show(LocaleAlternates $localeAlternates, string $locale, string $slug): View|RedirectResponse
     {
         // Defecto latente de idioma: $locale es el segmento de la URL, no
         // la clave interna de las columnas JSON traducibles -- ver el
@@ -110,6 +117,22 @@ class TourController extends Controller
         $tour = Tour::findBySlugForLocale($internalLocale, $slug, ['destination', 'experiences', 'images']);
 
         if ($tour) {
+            // DEF-02 (QA visual 2026-09-14): la busqueda de arriba tambien
+            // resuelve con el slug de OTRO idioma. Si este tour tiene slug
+            // propio en el idioma de la URL, esa otra URL no es una segunda
+            // direccion valida: es un duplicado. 301 al canonico, mismo
+            // criterio que tour_slug_histories. Sin slug propio no hay
+            // canonico y se sigue sirviendo el contenido de respaldo (200 +
+            // aviso + noindex) -- ver ResolvesBySlugByLocale.
+            if ($canonicalSlug = $tour->canonicalSlugFor($internalLocale, $slug)) {
+                return redirect()->route('tours.show', ['locale' => $locale, 'slug' => $canonicalSlug], 301);
+            }
+
+            // DEF-01: el selector de idioma del header ya no adivina la URL
+            // del otro idioma cambiando el prefijo -- la declara este
+            // controller, que es quien tiene el registro y sus slugs.
+            $localeAlternates->set($tour->urlsByLocale('tours.show'));
+
             $fallbackLocale = (string) config('app.fallback_locale');
 
             // Defecto 2 (auditoria cliente, 2026-09-14): title/summary ya

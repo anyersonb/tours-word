@@ -26,24 +26,17 @@
     $currencies = config('cms.currencies', []);
 
     // URL de cada locale activo para la MISMA pantalla que se está viendo.
-    // Misma lógica que el hreflang de x-layout (resources/views/components/
-    // layout.blade.php): misma ruta y mismos parámetros de la request
-    // actual, cambiando solo 'locale' -- nunca una URL armada a mano, para
-    // no divergir del hreflang real del <head>. Si el tour/destino/
-    // experiencia no tiene slug en el locale destino, route() igual genera
-    // la URL (con el slug del locale actual) y TourController::show() /
-    // ResolvesBySlugByLocale ya resuelven ese caso cayendo al slug del
-    // locale de respaldo -- no hay que esquivarlo acá.
-    $currentRouteName = \Illuminate\Support\Facades\Route::currentRouteName();
-    $currentRouteParams = \Illuminate\Support\Facades\Route::current()?->parameters() ?? [];
-
-    $localeAlternateUrls = collect($activeLocales)
-        ->mapWithKeys(function (string $loc) use ($currentRouteName, $currentRouteParams) {
-            $targetRoute = $currentRouteName ?: 'home';
-            $params = array_merge($currentRouteParams, ['locale' => \App\Support\Locale::toSegment($loc)]);
-
-            return [$loc => route($targetRoute, $params)];
-        });
+    //
+    // DEF-01 (QA visual 2026-09-14): esto se calculaba acá reconstruyendo la
+    // ruta actual con los MISMOS parámetros y cambiando solo 'locale'. En
+    // una ficha el {slug} es una columna JSON traducible, así que desde
+    // "/en/tours/<slug-en>" el enlace "Español" apuntaba a
+    // "/es/tours/<slug-en>" -- 404. El cálculo se fue entero a
+    // App\Support\LocaleAlternates (ver su docblock): en las fichas lo
+    // declara el controller con el slug real de cada idioma, y en las
+    // pantallas sin slug sigue siendo la misma reconstrucción de antes.
+    // Acá no se arma ninguna URL: si vuelve a armarse, vuelve el defecto.
+    $localeAlternateUrls = collect(app(\App\Support\LocaleAlternates::class)->urls());
 @endphp
 <header
     x-data="{ mobileOpen: false, scrolled: false }"

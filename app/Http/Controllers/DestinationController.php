@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Destination;
 use App\Models\Tour;
 use App\Support\Locale;
+use App\Support\LocaleAlternates;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 
 /**
  * Real backend for the destinations catalog/ficha, replacing the
@@ -25,7 +27,11 @@ class DestinationController extends Controller
         ]);
     }
 
-    public function show(string $locale, string $slug): View
+    /**
+     * $localeAlternates no es un parametro de ruta -- ver el docblock del
+     * metodo homonimo en TourController.
+     */
+    public function show(LocaleAlternates $localeAlternates, string $locale, string $slug): View|RedirectResponse
     {
         // Defecto latente de idioma (docs/lote-3/seguridad-2026-09-14.md,
         // V-3): $locale es el segmento de la URL, no la clave interna de
@@ -38,6 +44,16 @@ class DestinationController extends Controller
         $destination = Destination::findBySlugForLocale($internalLocale, $slug, 'gallery');
 
         abort_unless($destination, 404);
+
+        // DEF-01 / DEF-02 (QA visual 2026-09-14): 301 al slug canonico de
+        // este idioma en vez de servir un duplicado, y URLs reales (no
+        // adivinadas) para el selector de idioma. Mismo criterio y mismo
+        // orden que TourController::show(), donde esta el porque completo.
+        if ($canonicalSlug = $destination->canonicalSlugFor($internalLocale, $slug)) {
+            return redirect()->route('destinations.show', ['locale' => $locale, 'slug' => $canonicalSlug], 301);
+        }
+
+        $localeAlternates->set($destination->urlsByLocale('destinations.show'));
 
         return view('destinations.show', [
             'destination' => $destination,
