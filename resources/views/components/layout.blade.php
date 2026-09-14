@@ -21,11 +21,17 @@
      *   como no depende de un nombre de ruta ni de un prefijo fijo, sigue
      *   siendo correcto el día que el backend anteponga `/es/`, `/en/`,
      *   `/pt-br/` a las URLs (S-08): no hay nada que reescribir acá.
-     * - `hreflang`: con un solo locale activo (`es`), el bloque emite un
-     *   único alternate autorreferencial + `x-default` apuntando también a
-     *   `es` (mercado primario hispanohablante, según recomienda S-08). El
-     *   día que se active `en`/`pt-br` con URL propia, se agrega su alternate
-     *   sin tocar esta plantilla.
+     * - `hreflang` (objetivo 4, lote i18n 2026-09-14): un alternate por cada
+     *   config('cms.active_locales'), generado con la MISMA ruta y los
+     *   MISMOS parámetros de la request actual, cambiando solo 'locale' --
+     *   nunca una URL inventada. Con un solo locale activo esto ya emitía
+     *   un único autorreferencial; con dos o más, cada alternate apunta a
+     *   una URL real (200), nunca a una que redirige o da 404: si esto
+     *   fuera falso, sería peor que no declarar hreflang. `x-default`
+     *   apunta al locale de respaldo (`config('app.fallback_locale')`,
+     *   mercado primario hispanohablante, S-08). Solo se emite en páginas
+     *   indexables (`@unless($noindex)`) -- las fichas de catálogo hoy son
+     *   noindex (contenido de MUESTRA) y no declaran hreflang todavía.
      * - `$ogImageUrl`: no hay todavía una imagen de 1200×630 diseñada para
      *   compartir en redes (las fotos de hoy son placeholders SVG inline, sin
      *   archivo real que enlazar). Como stand-in uso el logo real de marca
@@ -38,6 +44,23 @@
     $pageDescription = $description ?? __('site.seo.default_description');
     $canonicalUrl = $canonical ?? url()->current();
     $ogImageUrl = $ogImage ?? asset('images/brand/logo.svg');
+
+    $currentRouteName = \Illuminate\Support\Facades\Route::currentRouteName();
+    $currentRouteParams = \Illuminate\Support\Facades\Route::current()?->parameters() ?? [];
+
+    $hreflangAlternates = collect(config('cms.active_locales'))
+        ->mapWithKeys(function (string $loc) use ($currentRouteName, $currentRouteParams) {
+            if (! $currentRouteName) {
+                return [];
+            }
+
+            $params = array_merge($currentRouteParams, ['locale' => \App\Support\Locale::toSegment($loc)]);
+
+            return [$loc => route($currentRouteName, $params)];
+        });
+
+    $xDefaultLocale = config('app.fallback_locale');
+    $xDefaultUrl = $hreflangAlternates->get($xDefaultLocale, $canonicalUrl);
 @endphp
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
@@ -53,8 +76,10 @@
     <link rel="canonical" href="{{ $canonicalUrl }}">
 
     @unless($noindex)
-        <link rel="alternate" hreflang="es" href="{{ $canonicalUrl }}">
-        <link rel="alternate" hreflang="x-default" href="{{ $canonicalUrl }}">
+        @foreach($hreflangAlternates as $altLocale => $altUrl)
+            <link rel="alternate" hreflang="{{ str_replace('_', '-', strtolower($altLocale)) }}" href="{{ $altUrl }}">
+        @endforeach
+        <link rel="alternate" hreflang="x-default" href="{{ $xDefaultUrl }}">
 
         <meta property="og:type" content="{{ $ogType }}">
         <meta property="og:site_name" content="{{ config('app.name') }}">
