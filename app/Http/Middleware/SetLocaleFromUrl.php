@@ -38,14 +38,34 @@ class SetLocaleFromUrl
             abort(404);
         }
 
+        $canonicalSegment = Locale::toSegment($locale);
+
+        // Objetivo 5 (lote i18n, 2026-09-14): "/ES/nosotros" respondia 200
+        // porque fromSegment() ya normaliza a minusculas antes de comparar
+        // -- misma familia de fallo que un duplicado www/no-www. El segmento
+        // CRUDO de la URL (con su casing original) debe ser exactamente el
+        // canonico o no se sirve contenido: 301 a la version en minusculas,
+        // preservando el resto del path y el query string.
+        if ($segment !== $canonicalSegment) {
+            $path = preg_replace(
+                '#^/'.preg_quote($segment, '#').'#',
+                '/'.$canonicalSegment,
+                $request->getPathInfo(),
+                1
+            );
+
+            $query = $request->getQueryString();
+
+            return redirect()->to($path.($query ? '?'.$query : ''), 301);
+        }
+
         App::setLocale($locale);
 
         // Permite que route('about'), route('contact'), etc. sigan
         // generando URLs correctas sin que ninguna vista pase 'locale' a
         // mano -- mandato del lote: conservar los nombres de ruta tal cual
-        // estaban antes del prefijo. Se normaliza con toSegment() para que
-        // "/ES/nosotros" no filtre mayúsculas hacia los enlaces generados.
-        URL::defaults(['locale' => Locale::toSegment($locale)]);
+        // estaban antes del prefijo.
+        URL::defaults(['locale' => $canonicalSegment]);
 
         return $next($request);
     }
