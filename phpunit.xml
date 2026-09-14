@@ -37,6 +37,12 @@
         <env name="DB_TIMEZONE" value="-05:00"/>
         <env name="DB_URL" value=""/>
         <env name="MAIL_MAILER" value="array"/>
+        <!-- O-2 (docs/lote-3/seguridad-2026-09-14.md): config('contact.notify_email')
+             ahora falla cerrado (null) sin esta variable, así que sin ella la suite
+             completa perdería la cobertura de "se envía cuando SÍ hay
+             destinatario" y sólo probaría el camino de "no se envía".
+             ContactNotificationFailClosedTest cubre ambos casos explícitamente. -->
+        <env name="CONTACT_NOTIFY_EMAIL" value="tests@pachaviva.test"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
