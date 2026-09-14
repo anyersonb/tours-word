@@ -1,0 +1,61 @@
+# F-2 (docs/lote-3/seguridad-2026-09-14.md, Alto). This directory is
+# reachable straight from the web through the public/storage symlink
+# (`artisan storage:link`, documented in docs/lote-2/README.md) — it is NOT
+# behind Laravel's router. Today the ONLY thing stopping a PHP file from
+# landing here and being executed is App\Filament\Support\SecureImageUpload's
+# MIME whitelist at the application layer (see its docblock and F-2 part B
+# of the audit): one future `->image()` field, one disk misconfiguration
+# (see F-4 / config/livewire.php), or one bug in that single check, and this
+# becomes remote code execution. This file removes the OTHER half of the
+# chain — server-side execution — so a file that slips past validation is
+# still just a static file, never a script, no matter how it got here.
+#
+# Applies to this directory AND its subdirectories (destinations/,
+# experiences/, team/, tours/, etc.) unless AllowOverride on the vhost
+# blocks .htaccess inheritance — see the deploy-day check in
+# docs/lote-2/README.md.
+#
+# Belt-and-suspenders, three independent mechanisms, because a single one
+# can be absent or disabled on a given host:
+
+# 1) Turn the PHP engine off for this directory outright (classic mod_php).
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>
+
+# 2) Deny access outright to anything with an executable-looking extension,
+#    regardless of which handler would have run it (mod_php, PHP-FPM/
+#    FastCGI via mod_fcgid/mod_proxy_fcgi, CGI). Also denies .html/.htm/.svg:
+#    the upload whitelist only ever writes .jpg/.png/.webp here (see
+#    SecureImageUpload::configure()), so a request for anything else in this
+#    tree is never legitimate traffic.
+<FilesMatch "\.(php|phtml|pht|phar|php[3-8]?|phps|cgi|fcgi|pl|py|asp|aspx|sh|jsp|htaccess|htm|html|svg)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# 3) Strip any handler/MIME mapping that would make Apache execute these
+#    extensions as PHP instead of serving them as plain files (defence in
+#    depth in case rule 2 above is ever bypassed, e.g. by a proxy that
+#    doesn't honour <FilesMatch>).
+<IfModule mod_mime.c>
+    RemoveHandler .php .phtml .pht .phar .php3 .php4 .php5 .php6 .php7 .php8 .phps .cgi .fcgi .pl .py
+    RemoveType .php .phtml .pht .phar .php3 .php4 .php5 .php6 .php7 .php8 .phps
+</IfModule>
+
+# LiteSpeed reads Apache-style .htaccess (its docs claim broad
+# compatibility with mod_rewrite/mod_authz_core directives), but this was
+# NOT verified against a real LiteSpeed instance -- there is no server yet.
+# Re-verify all three mechanisms above the day there is one; see the
+# checklist in docs/lote-2/README.md.
