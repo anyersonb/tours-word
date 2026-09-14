@@ -132,7 +132,7 @@
                                     :category="optional($tour->experiences->first())->name"
                                     :pen-cents="$tour->price_pen_cents"
                                     :usd-cents="$tour->price_usd_cents"
-                                    href="#"
+                                    href="{{ route('tours.show', $tour->slug) }}"
                                 />
                             </li>
                         @endforeach
@@ -148,7 +148,7 @@
                             :category="optional($featuredTours->first()->experiences->first())->name"
                             :pen-cents="$featuredTours->first()->price_pen_cents"
                             :usd-cents="$featuredTours->first()->price_usd_cents"
-                            href="#"
+                            href="{{ route('tours.show', $featuredTours->first()->slug) }}"
                         />
                     </div>
                 @endif
@@ -186,7 +186,7 @@
                             :image-alt="filled($destination->cover_image_alt) ? $destination->cover_image_alt : $destination->name"
                             :name="$destination->name"
                             :tagline="$destination->description"
-                            href="#"
+                            href="{{ route('destinations.show', $destination->slug) }}"
                         />
                     @endforeach
                 </div>
@@ -260,7 +260,7 @@
                             :title="$experience->name"
                             :description="$experience->description"
                             :icon="$experienceIcons[$experience->slug] ?? $defaultExperienceIcon"
-                            href="#"
+                            href="{{ route('experiences.show', $experience->slug) }}"
                         />
                     @endforeach
                 </div>
