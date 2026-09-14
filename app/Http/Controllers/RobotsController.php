@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\Indexability;
 use Illuminate\Http\Response;
 
 /**
@@ -35,12 +36,28 @@ class RobotsController extends Controller
 {
     public function __invoke(): Response
     {
+        // INVARIANTE: el permiso de rastreo NO depende de ninguna bandera.
+        // "User-agent: *" + "Disallow: /admin" se emiten siempre, en todo
+        // estado del sitio, porque poder descargar la página es condición
+        // NECESARIA para que el rastreador llegue a leer su meta noindex.
+        // Un "Disallow: /" aquí conseguiría lo contrario de lo que se
+        // busca: la URL quedaría rastreada-bloqueada pero indexable por
+        // enlaces externos, sin forma de leer el noindex que la desindexa.
         $lines = [
             'User-agent: *',
             'Disallow: /admin',
-            '',
-            'Sitemap: '.url('/sitemap.xml'),
         ];
+
+        // La directiva "Sitemap:" sí cuelga de la misma bandera que el
+        // propio sitemap (App\Support\Indexability): mientras no haya
+        // ninguna URL indexable, SitemapController responde 404 y anunciar
+        // aquí una URL que no existe sería otra señal contradictoria (y un
+        // error permanente de "no se pudo leer el sitemap" en Search
+        // Console). Cuando la bandera baje, la línea vuelve sola.
+        if (Indexability::siteIsIndexable()) {
+            $lines[] = '';
+            $lines[] = 'Sitemap: '.url('/sitemap.xml');
+        }
 
         return response(implode("\n", $lines)."\n", 200)
             ->header('Content-Type', 'text/plain; charset=UTF-8');

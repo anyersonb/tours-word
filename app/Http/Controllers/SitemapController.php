@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\Indexability;
 use App\Support\Locale;
 use Illuminate\Http\Response;
 
@@ -25,6 +26,20 @@ use Illuminate\Http\Response;
  * IMPORTA: APP_URL debe ser el dominio real en producción, porque también
  * alimenta config('filesystems.disks.public.url') (URLs de imágenes,
  * Defecto 5 del CRO) y cualquier generación futura por consola. Ver S-04.
+ *
+ * 2026-09-14 -- SITIO ENTERO EN NOINDEX: desde 7d25bf0,
+ * components/layout.blade.php mete "noindex, nofollow" en TODAS las
+ * páginas públicas mientras config('cms.catalog_demo_content') esté en
+ * true, incluidas home/nosotros/contacto en los dos locales activos --
+ * justo las 6 URLs que este controlador anunciaba. Un sitemap que lista
+ * URLs noindex es una señal contradictoria: le pide al rastreador que
+ * priorice el rastreo de lo que la propia página le dice que no indexe.
+ *
+ * Por eso la lista ya no se decide aquí: cuelga de
+ * App\Support\Indexability::siteIsIndexable(), la MISMA bandera que lee el
+ * layout. Sin URLs indexables, esta ruta responde 404 (ver abajo el porqué
+ * de 404 y no de un <urlset> vacío). El día que la bandera baje, el
+ * sitemap vuelve solo, sin tocar código.
  */
 class SitemapController extends Controller
 {
@@ -36,8 +51,29 @@ class SitemapController extends Controller
      */
     private const ROUTE_NAMES = ['home', 'about', 'contact'];
 
+    /**
+     * 404 y no "200 con <urlset> vacío" por dos razones concretas:
+     *
+     * 1. Un <urlset> sin hijos es INVÁLIDO contra el esquema oficial:
+     *    sitemaps.org/schemas/sitemap/0.9/sitemap.xsd declara
+     *    <xsd:element name="url" type="tUrl" maxOccurs="unbounded"/> sin
+     *    minOccurs, y el default de minOccurs es 1. Publicar un documento
+     *    inválido para decir "no tengo nada" es peor que no publicarlo.
+     * 2. 404 es la respuesta honesta: el recurso no existe en este estado.
+     *    Un rastreador que la recibe deja de pedirlo y reintenta más
+     *    tarde; cuando la bandera baje, lo encontrará con contenido.
+     *
+     * Y para que el 404 no sea, a su vez, otra señal contradictoria,
+     * RobotsController deja de declarar "Sitemap:" en el mismo estado --
+     * ambos controladores leen la misma Indexability. Lo que NO cambia
+     * nunca es el permiso de rastreo: robots.txt sigue permitiendo todo
+     * salvo /admin, porque si un rastreador no puede descargar la página
+     * jamás llega a leer su meta noindex.
+     */
     public function __invoke(): Response
     {
+        abort_unless(Indexability::siteIsIndexable(), 404);
+
         $urls = [];
 
         foreach (config('cms.active_locales') as $locale) {

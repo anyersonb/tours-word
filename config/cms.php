@@ -50,6 +50,18 @@ return [
     | inglés" del lote SEO, resources/views/destinations/show.blade.php y
     | resources/views/experiences/show.blade.php).
     |
+    | ALCANCE REAL desde 7d25bf0: ya no es solo "las fichas del catálogo".
+    | components/layout.blade.php hace `$isNoindex = $noindex ||
+    | config('cms.catalog_demo_content')`, así que mientras esto esté en
+    | true el sitio ENTERO va noindex -- home, nosotros y contacto
+    | incluidos, en los dos locales activos. Por eso también cuelgan de
+    | aquí, vía App\Support\Indexability, sitemap.xml (que si no anunciaría
+    | justo esas páginas noindex: señal contradictoria) y la directiva
+    | "Sitemap:" de robots.txt. Bajar esta bandera devuelve las tres cosas a
+    | la vez, sin tocar código. Lo que NO cuelga de aquí y no debe colgar
+    | nunca: el permiso de rastreo de robots.txt, porque poder descargar la
+    | página es condición necesaria para que el noindex se llegue a leer.
+    |
     */
 
     'catalog_demo_content' => true,
