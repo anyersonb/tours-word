@@ -40,6 +40,8 @@ class Destination extends Model
         'cover_image_alt',
         'is_published',
         'order',
+        'meta_title',
+        'meta_description',
     ];
 
     protected $casts = [
@@ -50,7 +52,7 @@ class Destination extends Model
     /**
      * @var array<int, string>
      */
-    public array $translatable = ['name', 'slug', 'description', 'cover_image_alt'];
+    public array $translatable = ['name', 'slug', 'description', 'cover_image_alt', 'meta_title', 'meta_description'];
 
     /**
      * @return HasMany<Tour, $this>

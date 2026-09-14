@@ -47,6 +47,20 @@ class ExperienceForm
                         ->rows(3),
                     TextInput::make("cover_image_alt.{$locale}")
                         ->label('Texto alternativo de la imagen'),
+                    // Defecto 3 (auditoria CRO/SEO): sin esto, <title> y
+                    // "meta description" de la ficha caian al nombre/
+                    // descripcion tal cual (vacios cuando la clienta aun no
+                    // los llena, caso real: Trekking). Mismo patron que
+                    // meta_title/meta_description de Tour (ver TourForm).
+                    TextInput::make("meta_title.{$locale}")
+                        ->label('Meta título (SEO)')
+                        ->helperText('Si se deja vacío, se usa el nombre de la experiencia.')
+                        ->maxLength(160),
+                    Textarea::make("meta_description.{$locale}")
+                        ->label('Meta descripción (SEO)')
+                        ->helperText('Si se deja vacío, se usa la descripción de la experiencia.')
+                        ->rows(2)
+                        ->maxLength(320),
                 ]),
                 Section::make('Galería')
                     ->schema([

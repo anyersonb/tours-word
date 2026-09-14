@@ -34,6 +34,28 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Contenido de muestra del catálogo
+    |--------------------------------------------------------------------------
+    |
+    | true mientras tours/destinos/experiencias siguen sembrados por
+    | DemoTourSeeder (lote 3): fuerza "noindex" en las fichas de destino y
+    | experiencia, independientemente de si el contenido está traducido,
+    | porque publicar un "Cusco" o "Trekking" de muestra en un motor de
+    | búsqueda sería indexar contenido inventado. Extraído a config (en vez
+    | de quedar cableado como `:noindex="true"` en el Blade) exactamente por
+    | la misma razón que "active_locales" ya es config: es el único lugar que
+    | hay que tocar para levantarlo cuando la clienta cargue contenido real
+    | -- a partir de ahí, el noindex de cada ficha depende SOLO de si esa
+    | ficha tiene traducción real al locale de la URL (ver "indexación del
+    | inglés" del lote SEO, resources/views/destinations/show.blade.php y
+    | resources/views/experiences/show.blade.php).
+    |
+    */
+
+    'catalog_demo_content' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | Moneda
     |--------------------------------------------------------------------------
     |

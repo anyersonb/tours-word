@@ -60,6 +60,92 @@ class DestinationAndExperiencePublicCatalogRouteTest extends TestCase
         $this->get('/es/destinos/destino-sin-galeria')->assertOk();
     }
 
+    /**
+     * Defecto 1 (auditoria CRO, ALTO): sin respaldo, x-ui.gallery renderiza
+     * un <img> con src="" (caja 960x540 en blanco) cuando el destino no
+     * tiene fotos todavia -- caso real del dia uno de la clienta. El
+     * respaldo es el mismo marcador de posicion SVG local que ya usa
+     * tours/show.blade.php para el mismo caso (data URI, sin red).
+     */
+    public function test_a_destination_with_no_gallery_images_falls_back_to_the_placeholder_image(): void
+    {
+        Destination::factory()->create(['slug' => ['es' => 'destino-sin-galeria-2']]);
+
+        $response = $this->get('/es/destinos/destino-sin-galeria-2');
+
+        $response->assertOk();
+        $response->assertSee('data:image/svg+xml;base64,', false);
+        // Control negativo: nunca un <img src=""> vacio.
+        $response->assertDontSee('src=""', false);
+    }
+
+    public function test_an_experience_with_no_gallery_images_falls_back_to_the_placeholder_image(): void
+    {
+        Experience::factory()->create(['slug' => ['es' => 'experiencia-sin-galeria']]);
+
+        $response = $this->get('/es/experiencias/experiencia-sin-galeria');
+
+        $response->assertOk();
+        $response->assertSee('data:image/svg+xml;base64,', false);
+        $response->assertDontSee('src=""', false);
+    }
+
+    /**
+     * Defecto 3 (auditoria SEO, ALTO): Cusco/Trekking no tenian
+     * meta_title/meta_description dedicados y "description" venia vacio ->
+     * <meta name="description"> salia vacio (confirmado por curl antes del
+     * fix). Sin meta_title/meta_description en Filament, la ficha debe
+     * caer honestamente al nombre (title) y quedarse sin description
+     * cuando tampoco hay "description" -- nunca un <title> vacio, y
+     * x-layout cae a su respaldo de marca para "description" en ese caso.
+     */
+    public function test_a_destination_without_seo_metadata_falls_back_to_its_name_for_the_title_tag(): void
+    {
+        Destination::factory()->create([
+            'slug' => ['es' => 'destino-sin-seo'],
+            'name' => ['es' => 'Cusco Sin Meta'],
+            'description' => ['es' => null],
+        ]);
+
+        $response = $this->get('/es/destinos/destino-sin-seo');
+
+        $response->assertOk();
+        $response->assertSee('<title>Cusco Sin Meta · '.config('app.name').'</title>', false);
+        // Nunca vacio: cae al respaldo de marca de x-layout, no a "".
+        $response->assertDontSee('<meta name="description" content="">', false);
+    }
+
+    public function test_a_destination_with_seo_metadata_uses_it_instead_of_the_name_and_description(): void
+    {
+        Destination::factory()->create([
+            'slug' => ['es' => 'destino-con-seo'],
+            'name' => ['es' => 'Cusco'],
+            'description' => ['es' => 'Descripción visible en la página.'],
+            'meta_title' => ['es' => 'Cusco: tours y experiencias | Meta SEO'],
+            'meta_description' => ['es' => 'Meta descripción dedicada para buscadores.'],
+        ]);
+
+        $response = $this->get('/es/destinos/destino-con-seo');
+
+        $response->assertOk();
+        $response->assertSee('<title>Cusco: tours y experiencias | Meta SEO · '.config('app.name').'</title>', false);
+        $response->assertSee('<meta name="description" content="Meta descripción dedicada para buscadores.">', false);
+    }
+
+    public function test_an_experience_without_seo_metadata_falls_back_to_its_description_for_the_meta_tag(): void
+    {
+        Experience::factory()->create([
+            'slug' => ['es' => 'experiencia-sin-seo'],
+            'name' => ['es' => 'Trekking Sin Meta'],
+            'description' => ['es' => 'Descripción de respaldo de la experiencia.'],
+        ]);
+
+        $response = $this->get('/es/experiencias/experiencia-sin-seo');
+
+        $response->assertOk();
+        $response->assertSee('<meta name="description" content="Descripción de respaldo de la experiencia.">', false);
+    }
+
     public function test_the_destination_gallery_round_trips_the_translatable_alt_text(): void
     {
         $destination = Destination::factory()->create(['slug' => ['es' => 'destino-con-galeria']]);

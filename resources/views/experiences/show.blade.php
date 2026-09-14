@@ -1,22 +1,70 @@
 @php
     use App\Support\PlaceholderImage;
+
+    // Mismo respaldo que tours/show.blade.php (Defecto 1 del CRO): sin esto,
+    // una experiencia sin fotos todavia deja la caja de x-ui.gallery vacia
+    // (960x540 en blanco) en vez de mostrar el marcador de posicion
+    // consistente que ya usa el resto del sitio.
+    $galleryImages = collect($experience['gallery'])->map(fn ($image) => ['src' => $image['src'], 'alt' => $image['alt']])->all();
+    if (empty($galleryImages)) {
+        $galleryImages = [['src' => PlaceholderImage::svg(1200, 800, $experience['name'], '2c6fa8'), 'alt' => $experience['name']]];
+    }
+
+    $breadcrumbItems = [
+        ['label' => __('site.experiences.index.breadcrumb.home'), 'href' => route('home')],
+        ['label' => __('site.experiences.show.breadcrumb_index'), 'href' => route('experiences.index')],
+        ['label' => $experience['name']],
+    ];
+
+    // Fix 3 (auditoria CRO/SEO): meta_title/meta_description dedicados,
+    // traducibles, con respaldo honesto al nombre/descripcion cuando la
+    // clienta todavia no los llena -- nunca una etiqueta <title> ni
+    // "description" vacia (hoy pasaba con Trekking). Se pasa null (no '')
+    // para que el "??" de x-layout SI dispare su propio respaldo de marca.
+    $metaTitle = filled($experience['meta_title'] ?? null) ? $experience['meta_title'] : $experience['name'];
+    $metaDescription = filled($experience['meta_description'] ?? null) ? $experience['meta_description'] : (filled($experience['description']) ? $experience['description'] : null);
 @endphp
-{{-- noindex se queda puesto mientras el contenido sea de MUESTRA (seeder
-     DemoTourSeeder); se quita cuando la clienta cargue experiencias reales. --}}
-<x-layout title="{{ $experience['name'] }}" description="{{ $experience['description'] }}" :noindex="true">
+{{-- Fix 6 (lote SEO): "noindex" ya no es un booleano cableado -- combina el
+     motivo MUESTRA (config('cms.catalog_demo_content'), independiente de
+     este objetivo y que se apaga solo cuando la clienta cargue experiencias
+     reales) con el fallback de contenido por locale (una experiencia sin
+     traduccion al ingles no debe indexarse en "/en/"). "translatedLocales"
+     deja que x-layout retire el hreflang hacia locales cuyo contenido para
+     ESTA experiencia cae a fallback -- un hreflang que apunta a una URL
+     noindex es una contradiccion. --}}
+@php
+    $noindex = config('cms.catalog_demo_content') || $contentFallbackLocale !== null;
+    $translatedLocales = $experience->getTranslatedLocales('name');
+
+    // El slug es una columna JSON traducible -- puede ser distinto por
+    // locale. Sin esto, x-layout reutilizaria el slug de la request actual
+    // para TODOS los alternates (ver el comentario de "hreflangUrls" en
+    // components/layout.blade.php).
+    $hreflangUrls = collect($translatedLocales)
+        ->mapWithKeys(fn ($loc) => [$loc => route('experiences.show', [
+            'locale' => \App\Support\Locale::toSegment($loc),
+            'slug' => $experience->getTranslation('slug', $loc, false),
+        ])])
+        ->all();
+@endphp
+<x-layout
+    title="{{ $metaTitle }}"
+    :description="$metaDescription"
+    :noindex="$noindex"
+    :translated-locales="$translatedLocales"
+    :hreflang-urls="$hreflangUrls"
+>
 
     {{-- ============ MIGAS DE PAN + GALERÍA + DESCRIPCIÓN ============ --}}
+    <x-seo.breadcrumb-jsonld :items="$breadcrumbItems" />
+
     <section class="bg-surface">
         <div class="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
-            <x-ui.breadcrumbs :items="[
-                ['label' => __('site.experiences.index.breadcrumb.home'), 'href' => route('home')],
-                ['label' => __('site.experiences.show.breadcrumb_index'), 'href' => route('experiences.index')],
-                ['label' => $experience['name']],
-            ]" />
+            <x-ui.breadcrumbs :items="$breadcrumbItems" />
         </div>
 
         <div class="mx-auto max-w-5xl px-4 pb-10 pt-6 sm:px-6 lg:px-8">
-            <x-ui.gallery :images="$experience['gallery']" :label="__('site.ui.gallery.nav_label', ['title' => $experience['name']])" />
+            <x-ui.gallery :images="$galleryImages" :label="__('site.ui.gallery.nav_label', ['title' => $experience['name']])" />
 
             {{-- Objetivo 2 (lote i18n): lang="es" honesto cuando esta
                  experiencia todavia no tiene su traduccion al locale de la

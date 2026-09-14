@@ -38,6 +38,8 @@ class Experience extends Model
         'cover_image_alt',
         'is_published',
         'order',
+        'meta_title',
+        'meta_description',
     ];
 
     protected $casts = [
@@ -48,7 +50,7 @@ class Experience extends Model
     /**
      * @var array<int, string>
      */
-    public array $translatable = ['name', 'slug', 'description', 'cover_image_alt'];
+    public array $translatable = ['name', 'slug', 'description', 'cover_image_alt', 'meta_title', 'meta_description'];
 
     /**
      * @return BelongsToMany<Tour, $this>

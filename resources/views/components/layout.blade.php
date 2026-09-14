@@ -5,6 +5,26 @@
     'canonical' => null,
     'ogImage' => null,
     'ogType' => 'website',
+    // Fix 6 (lote SEO, decision ya tomada por Anyerson): locales para los
+    // que ESTE registro (Destination/Experience/Tour) tiene traduccion
+    // propia -- null (default) significa "no aplica" (home/nosotros/
+    // contacto son estaticas, con paridad de claves 1:1 via lang/, nunca
+    // dependen de una traduccion de modelo). Cuando se pasa un array, se
+    // usa para NO emitir un hreflang hacia un locale cuyo contenido para
+    // este registro cae a fallback -- esa URL es noindex (ver "noindex" en
+    // destinations/show.blade.php y experiences/show.blade.php), y un
+    // hreflang que apunta a una URL noindex es una contradiccion.
+    'translatedLocales' => null,
+    // Fix 6: reemplazo puntual de la reconstruccion por defecto
+    // (route($currentRouteName, [...MISMOS parametros..., 'locale' => X]))
+    // para rutas cuyo parametro de slug CAMBIA por locale (Destination/
+    // Experience/Tour: "slug" es una columna JSON traducible, no el mismo
+    // string en los dos idiomas). Sin esto, el alternate "en" de una ficha
+    // reutilizaba el slug en ESPAÑOL de la request actual -- URL que puede
+    // no resolver o (peor) resolver por fallback a otro contenido. array
+    // opcional locale => URL absoluta; null (default) usa la reconstruccion
+    // por defecto, igual que hoy para home/nosotros/contacto.
+    'hreflangUrls' => null,
 ])
 @php
     /**
@@ -49,7 +69,16 @@
     $currentRouteParams = \Illuminate\Support\Facades\Route::current()?->parameters() ?? [];
 
     $hreflangAlternates = collect(config('cms.active_locales'))
-        ->mapWithKeys(function (string $loc) use ($currentRouteName, $currentRouteParams) {
+        // Fix 6: si el llamador declaro translatedLocales, un locale que NO
+        // esta en esa lista significa que la version de ESTE registro en
+        // ese locale cae a fallback y es noindex -- su alterno desaparece
+        // en vez de apuntar a una URL contradictoria.
+        ->when($translatedLocales !== null, fn ($locales) => $locales->intersect($translatedLocales))
+        ->mapWithKeys(function (string $loc) use ($currentRouteName, $currentRouteParams, $hreflangUrls) {
+            if (isset($hreflangUrls[$loc])) {
+                return [$loc => $hreflangUrls[$loc]];
+            }
+
             if (! $currentRouteName) {
                 return [];
             }
