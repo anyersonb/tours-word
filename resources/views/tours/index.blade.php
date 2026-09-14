@@ -23,7 +23,10 @@
         :title="__('site.tours.index.hero.title')"
         :lead="__('site.tours.index.hero.subtitle')"
         :image="asset('images/site/hero-cordillera-rio.jpg')"
-        image-alt=""
+        {{-- La foto de cabecera NO es decorativa: es la foto de la pantalla,
+             igual que en home, nosotros y contacto, y las tres traen texto.
+             Un alt="" acá dejaba la cabecera muda para un lector de pantalla. --}}
+        :image-alt="__('site.tours.index.hero.photo_alt')"
         position="center 55%"
     />
 
@@ -87,6 +90,11 @@
                             :usd-cents="$tour['price_usd_cents']"
                             :href="route('tours.show', $tour['slug'])"
                             sizes="(min-width: 1024px) 24rem, (min-width: 640px) 45vw, 92vw"
+                            {{-- Nivel 2: en un índice cada tarjeta cuelga
+                                 directamente del H1 de la pantalla. No hay
+                                 sección intermedia, así que tampoco hay H2
+                                 que inventar para tapar el hueco. --}}
+                            heading-level="2"
                         />
                     @endforeach
                 </div>

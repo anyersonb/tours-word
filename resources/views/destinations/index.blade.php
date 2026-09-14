@@ -41,6 +41,9 @@
                             :name="$destination['name']"
                             :tagline="$destination['description']"
                             :href="route('destinations.show', $destination['slug'])"
+                            {{-- Nivel 2, igual que en los otros dos índices:
+                                 la tarjeta cuelga del H1 de la pantalla. --}}
+                            heading-level="2"
                         />
                     @endforeach
                 </div>

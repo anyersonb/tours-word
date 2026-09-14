@@ -16,7 +16,13 @@
      * 1440, no deducido). El factor 1.9 = (5/4 de la caja) x (3/2 del origen).
      */
     'sizes' => '(min-width: 1024px) 36rem, (min-width: 640px) 84vw, 168vw',
+    // Mismo contrato que x-ui.tour-card: el nivel lo decide la pantalla que
+    // coloca la tarjeta (2 en un índice, 3 dentro de una sección con su H2).
+    'headingLevel' => 3,
 ])
+@php
+    $hl = max(2, min(4, (int) $headingLevel));
+@endphp
 {{--
     Tarjeta-retrato de destino: foto a sangre con el rótulo encima. El
     degradado NO es decorativo — es lo único que hace que el texto blanco
@@ -32,9 +38,17 @@
         <x-ui.picture :src="$image" :alt="$imageAlt" :sizes="$sizes" />
     </span>
 
-    <span class="absolute inset-x-0 bottom-0 z-[2] flex items-end justify-between gap-3 p-5">
-        <span class="min-w-0">
-            <span class="block font-display text-h3 font-semibold text-white">{{ $name }}</span>
+    {{-- Contenedores en <div> y no en <span>: el rótulo es un encabezado de
+         verdad (h2 en el índice, h3 dentro de una sección), y un <span> solo
+         admite contenido de texto. El <a> envolvente sí lo admite: su modelo
+         de contenido es transparente, así que hereda el del <div> de la
+         rejilla. Se mantiene el <a> como envoltorio — la tarjeta entera es el
+         objetivo táctil — en vez de un enlace estirado como el de tour-card,
+         porque acá el rótulo vive dentro de una caja "absolute" y el ::before
+         se recortaría a esa franja en vez de cubrir la tarjeta. --}}
+    <div class="absolute inset-x-0 bottom-0 z-[2] flex items-end justify-between gap-3 p-5">
+        <div class="min-w-0">
+            <h{{ $hl }} class="font-display text-h3 font-semibold text-white">{{ $name }}</h{{ $hl }}>
             @if($tourCount)
                 <span class="eyebrow mt-1.5 block text-on-dark-2">{{ $tourCount }}</span>
             @elseif($tagline)
@@ -46,12 +60,12 @@
                      pone el display que necesita. --}}
                 <span class="mt-1 line-clamp-2 text-sm text-on-dark-2">{{ $tagline }}</span>
             @endif
-        </span>
+        </div>
         <span
             class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/15 text-white ring-1 ring-white/30 backdrop-blur-sm transition-all duration-300 group-hover:bg-white group-hover:text-ink"
             aria-hidden="true"
         >
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </span>
-    </span>
+    </div>
 </a>

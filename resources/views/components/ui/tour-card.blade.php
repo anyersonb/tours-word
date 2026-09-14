@@ -16,7 +16,17 @@
     // x-ui.picture lo necesita para no bajarse la variante grande (sin esto
     // el navegador asume 100vw y se baja la mas pesada).
     'sizes' => '(min-width: 1024px) 22rem, (min-width: 640px) 45vw, 90vw',
+    // Nivel del encabezado del título en el esquema del documento. Lo decide
+    // quien coloca la tarjeta, igual que "sizes": en un índice la tarjeta
+    // cuelga directamente del H1 de la pantalla (nivel 2); dentro de una
+    // sección que ya tiene su propio H2 (home, fichas) cuelga de esa sección
+    // (nivel 3, el de por defecto). El nivel NO decide el tamaño de letra:
+    // ese sale siempre de text-h3, así que la tarjeta se ve igual en las dos.
+    'headingLevel' => 3,
 ])
+@php
+    $hl = max(2, min(4, (int) $headingLevel));
+@endphp
 {{--
     Tarjeta de tour. Toda la superficie es enlace (::before del <a> cubre la
     tarjeta) para que el objetivo táctil sea la tarjeta entera, no solo el
@@ -38,11 +48,11 @@
     </div>
 
     <div class="flex flex-1 flex-col gap-3 p-5">
-        <h3 class="font-display text-h3 font-semibold text-ink">
+        <h{{ $hl }} class="font-display text-h3 font-semibold text-ink">
             <a href="{{ $href }}" class="before:absolute before:inset-0 before:content-['']">
                 {{ $title }}
             </a>
-        </h3>
+        </h{{ $hl }}>
 
         @if($summary)
             <p class="line-clamp-2 text-sm leading-relaxed text-text-2">{{ $summary }}</p>

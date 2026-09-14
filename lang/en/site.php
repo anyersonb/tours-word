@@ -342,6 +342,9 @@ return [
             'hero' => [
                 'title' => 'Our tours',
                 'subtitle' => 'Explore all our tours across Peru and filter by destination or experience to find the perfect trip for you.',
+                // Stock photo: the alt describes only what is visible. The range
+                // and the location are not named, as neither is confirmed.
+                'photo_alt' => 'Mountain river crossing a valley of golden grassland, with snow-capped peaks in the background',
             ],
             'filters' => [
                 'destination_label' => 'Destination',

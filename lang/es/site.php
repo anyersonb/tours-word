@@ -344,6 +344,9 @@ return [
             'hero' => [
                 'title' => 'Nuestros tours',
                 'subtitle' => 'Explora todos nuestros tours por Perú y filtra por destino o por experiencia para encontrar el viaje ideal para ti.',
+                // Foto de banco: el alt describe solo lo que se ve. No se nombra
+                // la cordillera ni el lugar, porque no está confirmado cuál es.
+                'photo_alt' => 'Río de montaña cruzando un valle de pastizales dorados, con picos nevados al fondo',
             ],
             'filters' => [
                 'destination_label' => 'Destino',
