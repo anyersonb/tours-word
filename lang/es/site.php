@@ -284,7 +284,22 @@ return [
 
         'map' => [
             'title' => '¿Dónde estamos?',
-            'placeholder_alt' => 'Mapa referencial — pendiente de dirección real',
+            // DEF-B, segunda vuelta (la clienta, 2026-09-14): decía "Mapa
+            // referencial — pendiente de dirección real". En la primera pasada
+            // lo clasifiqué con los avisos que ella había aprobado y me
+            // equivoqué de lado: "todavía no configuramos una dirección"
+            // cuenta el estado del NEGOCIO, pero "pendiente de dirección real"
+            // cuenta nuestro proceso de producción — delata que lo que se ve
+            // es un sustituto que pusimos nosotros. Sus palabras: "sigue
+            // siendo lenguaje de obra, no de cliente".
+            //
+            // La redacción nueva describe lo que el recuadro ES (una imagen,
+            // no un mapa interactivo: decisión C3, sin iframe de terceros por
+            // la CSP) y no menciona ningún dato que falte. Además era el único
+            // texto de esta página que mentía cuando SÍ hay dirección
+            // cargada: el recuadro se sigue mostrando igual y ya no habría
+            // nada "pendiente".
+            'placeholder_alt' => 'Mapa ilustrativo',
             'visit_us' => 'Visítanos en nuestra oficina',
             'cta' => 'Ver en Google Maps',
             'cta_new_tab' => '(se abre en una pestaña nueva)',

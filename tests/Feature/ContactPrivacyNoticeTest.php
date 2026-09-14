@@ -122,6 +122,13 @@ class ContactPrivacyNoticeTest extends TestCase
             'being drafted',
             'sin envío real',
             'no real submission',
+            // Segunda vuelta (2026-09-14): el relleno confesado dentro del
+            // recuadro del mapa. No se busca "placeholder" a secas porque es
+            // un atributo HTML legítimo en cada campo del formulario — se
+            // buscan las redacciones exactas que estuvieron publicadas.
+            'referencial',
+            'pendiente de dirección real',
+            'pending real address',
         ] as $forbidden) {
             $this->assertStringNotContainsStringIgnoringCase(
                 $forbidden,

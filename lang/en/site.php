@@ -265,7 +265,8 @@ return [
 
         'map' => [
             'title' => 'Where are we?',
-            'placeholder_alt' => 'Placeholder map — pending real address',
+            // DEF-B, second pass: see the Spanish file.
+            'placeholder_alt' => 'Illustrative map',
             'visit_us' => 'Visit us at our office',
             'cta' => 'View on Google Maps',
             'cta_new_tab' => '(opens in a new tab)',
