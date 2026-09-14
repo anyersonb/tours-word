@@ -18,7 +18,7 @@ use Tests\TestCase;
  * doesn't cover). The fix is a closed MIME whitelist plus an extension taken
  * from the server-detected MIME type, never the client's filename.
  */
-class TourImageUploadSecurityTest extends TestCase
+class TourImageUploadSecurityRulesTest extends TestCase
 {
     use RefreshDatabase;
 

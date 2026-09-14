@@ -60,7 +60,11 @@ class TourController extends Controller
         // siempre resuelve aquí porque SetLocaleFromUrl ya respondió 404
         // para cualquier segmento que no sea un locale activo, antes de
         // que la request llegue a este controller.
-        $internalLocale = Locale::fromSegment($locale) ?? $locale;
+        // B-03 (docs/lote-3/seguridad-enrutado-2026-09-14.md): el respaldo no puede
+        // ser el segmento CRUDO de la URL. Hoy es inalcanzable (el middleware aborta
+        // 404 antes), pero si alguien quitara el middleware de este grupo, ese valor
+        // acabaria interpolado como nombre de columna en el camino JSON slug->{...}.
+        $internalLocale = Locale::fromSegment($locale) ?? (string) config('app.fallback_locale');
 
         $tours = Tour::query()
             ->published()
@@ -108,7 +112,11 @@ class TourController extends Controller
         // original, sin convertir) sigue viajando tal cual a
         // redirectFromHistory() porque ahí hace falta para construir la
         // URL del 301 (route() espera el segmento, no la clave interna).
-        $internalLocale = Locale::fromSegment($locale) ?? $locale;
+        // B-03 (docs/lote-3/seguridad-enrutado-2026-09-14.md): el respaldo no puede
+        // ser el segmento CRUDO de la URL. Hoy es inalcanzable (el middleware aborta
+        // 404 antes), pero si alguien quitara el middleware de este grupo, ese valor
+        // acabaria interpolado como nombre de columna en el camino JSON slug->{...}.
+        $internalLocale = Locale::fromSegment($locale) ?? (string) config('app.fallback_locale');
 
         // Objetivo 2 (lote i18n): si no hay slug->{$locale}, cae al slug del
         // locale de respaldo (config('app.fallback_locale')) para que
@@ -180,7 +188,11 @@ class TourController extends Controller
      */
     private function redirectFromHistory(string $locale, string $slug): View|RedirectResponse
     {
-        $internalLocale = Locale::fromSegment($locale) ?? $locale;
+        // B-03 (docs/lote-3/seguridad-enrutado-2026-09-14.md): el respaldo no puede
+        // ser el segmento CRUDO de la URL. Hoy es inalcanzable (el middleware aborta
+        // 404 antes), pero si alguien quitara el middleware de este grupo, ese valor
+        // acabaria interpolado como nombre de columna en el camino JSON slug->{...}.
+        $internalLocale = Locale::fromSegment($locale) ?? (string) config('app.fallback_locale');
 
         $history = TourSlugHistory::query()
             ->where('locale', $internalLocale)
