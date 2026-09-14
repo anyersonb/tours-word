@@ -80,3 +80,106 @@
    * --surface. Ya no hace falta reservarlo a texto grande/iconografía. */
   --text-muted:  var(--ink-3);
 }
+
+/* ============================================================================
+ * PASE VISUAL (2026-09-14) — capa 2 de tokens.
+ *
+ * Misma regla dura que arriba: los componentes consumen SOLO tokens
+ * semánticos. Lo que sigue NO reinventa la paleta: el eje sigue siendo
+ * --brand-h: 155. Se agrega alrededor.
+ *
+ *  1. Un neutro CÁLIDO (arena) para alternar fondos de sección. El sitio
+ *     entero sobre --ground (verde grisáceo) + --surface (blanco) se leía
+ *     plano; la arena da un tercer escalón sin meter un hue nuevo de marca.
+ *  2. Superficie OSCURA de marca (--ink-surface) para el pie y los bloques
+ *     de cierre, con sus propios tokens de texto medidos sobre ella.
+ *  3. Scrims para foto: un degradado no es "decorativo", es lo que hace que
+ *     el texto blanco pase AA sobre una foto. Se declara como token para que
+ *     todas las pantallas usen el MISMO, medido una sola vez.
+ *  4. Escala tipográfica fluida, ritmo vertical, radios y sombras.
+ *
+ * Contrastes calculados con la fórmula WCAG 2.1 (relative luminance), no a
+ * ojo. El detalle de cada par medido va en el comentario de cada token.
+ * ========================================================================= */
+:root {
+  /* --- 1. Neutro cálido (arena) -------------------------------------- */
+  /* Tercer fondo de sección. Contrastes medidos sobre --sand:
+   *   --ink 15.17:1 · --text-2 8.41:1 · --text-muted 4.67:1 · --brand-700
+   *   8.18:1 · --action 6.00:1. Los cinco pasan AA de texto normal.
+   * OJO: sobre --sand-deep, --text-muted cae a 4.21:1 (solo texto grande).
+   * Sobre --sand-deep usar --text-2 (7.58:1) o --text (13.68:1). */
+  --sand:      #f7f3ec;
+  --sand-deep: #efe7da; /* variante para bordes/relleno sutil sobre --sand */
+  --sand-line: #e3d9c8; /* borde hairline sobre --sand */
+
+  /* --- 2. Superficie oscura de marca --------------------------------- */
+  /* hsl(155 62% 10%) = --brand-900. Se le da nombre propio de superficie
+   * porque su rol no es "el tono 900 de la rampa" sino "el fondo oscuro
+   * del sitio", y tiene su propia familia de texto encima.
+   * Medidos sobre --ink-surface (#0a291c):
+   *   #fff 15.59:1 · --on-dark-2 (#c6d6cd) 10.32:1 · --on-dark-3 (#8fa79b) 6.07:1
+   * Y sobre --ink-surface-2: 12.48:1 / 8.26:1 / 4.85:1.
+   * Los tres pasan AA de texto normal. */
+  --ink-surface:   hsl(var(--brand-h) calc(62% * var(--brand-s)) 10%);
+  --ink-surface-2: hsl(var(--brand-h) calc(55% * var(--brand-s)) 15%);
+  --on-dark:       #fff;
+  --on-dark-2:     #c6d6cd;
+  --on-dark-3:     #8fa79b;
+  --on-dark-line:  hsl(var(--brand-h) calc(30% * var(--brand-s)) 24%);
+
+  /* --- 3. Tratamiento de imagen -------------------------------------- */
+  /* Scrim de hero: sobre la zona de texto deja una luminancia <= 0.055,
+   * con la que el blanco puro mide >= 4.5:1 incluso si la foto debajo es
+   * un cielo claro. Es lo que hace legal el texto blanco sobre montaña.
+   * NO usar opacidades sueltas en las pantallas: se consume este token. */
+  --scrim-hero:  linear-gradient(180deg,
+                   hsl(158 45% 6% / .34) 0%,
+                   hsl(158 45% 6% / .52) 38%,
+                   hsl(158 45% 6% / .78) 100%);
+  --scrim-hero-h: linear-gradient(90deg,
+                   hsl(158 45% 6% / .80) 0%,
+                   hsl(158 45% 6% / .62) 42%,
+                   hsl(158 45% 6% / .18) 78%,
+                   hsl(158 45% 6% / .10) 100%);
+  /* Scrim de tarjeta con rótulo abajo (destinos). Más corto que el de hero
+   * porque el texto ocupa solo el último tercio. */
+  --scrim-card:  linear-gradient(180deg,
+                   hsl(158 45% 6% / 0) 30%,
+                   hsl(158 45% 6% / .42) 58%,
+                   hsl(158 45% 6% / .86) 100%);
+  /* Velo tenue permanente sobre TODA foto de catálogo: unifica fotos de
+   * banco de temperaturas distintas y evita que una foto muy saturada
+   * pelee con la marca. Muy sutil a propósito. */
+  --photo-tint:  hsl(var(--brand-h) 40% 12% / .06);
+
+  /* --- 4. Escala tipográfica fluida ---------------------------------- */
+  /* clamp(min, preferido, max): el mínimo es el valor a 360px y el máximo
+   * el de 1440px. Evita tener que declarar 3 breakpoints por título. */
+  --fs-hero:    clamp(2.125rem, 1.30rem + 3.66vw, 4rem);      /* 34 -> 64 */
+  --fs-h1:      clamp(1.875rem, 1.35rem + 2.33vw, 3rem);      /* 30 -> 48 */
+  --fs-h2:      clamp(1.5rem,  1.17rem + 1.48vw, 2.25rem);    /* 24 -> 36 */
+  --fs-h3:      clamp(1.125rem, 1.02rem + 0.46vw, 1.375rem);  /* 18 -> 22 */
+  --fs-lead:    clamp(1.0625rem, 0.99rem + 0.32vw, 1.25rem);  /* 17 -> 20 */
+  --lh-display: 1.08;
+  --lh-title:   1.18;
+  --ls-display: -0.02em;
+  --ls-eyebrow: 0.14em;
+
+  /* --- 5. Ritmo vertical y radios ------------------------------------ */
+  --section-y:    clamp(3.25rem, 1.9rem + 6vw, 6rem);
+  --section-y-sm: clamp(2.25rem, 1.5rem + 3.3vw, 3.75rem);
+  --r-sm: 0.5rem;
+  --r-md: 0.875rem;
+  --r-lg: 1.25rem;
+  --r-xl: 1.75rem;
+
+  /* --- 6. Sombras -----------------------------------------------------
+   * Teñidas con el hue de marca en vez de negro puro: sobre --ground y
+   * --sand, una sombra gris neutra se ve sucia. */
+  --elev-1:       0 1px 2px hsl(var(--brand-h) 25% 12% / .06);
+  --elev-2:       0 4px 14px -3px hsl(var(--brand-h) 25% 12% / .12),
+                  0 2px 4px -2px hsl(var(--brand-h) 25% 12% / .07);
+  --elev-3:       0 20px 44px -14px hsl(var(--brand-h) 30% 10% / .24),
+                  0 4px 10px -4px hsl(var(--brand-h) 25% 12% / .10);
+  --elev-ring:    inset 0 0 0 1px hsl(var(--brand-h) 20% 30% / .08);
+}

@@ -78,6 +78,45 @@
     --color-accent-orange: var(--accent-orange);
     --color-accent-blue: var(--accent-blue);
     --color-on-accent: var(--on-accent);
+
+    /* ---- Pase visual 2026-09-14 ---------------------------------------
+     * Neutro cálido, superficie oscura y sus textos. Mismos nombres que en
+     * tokens.css: bg-sand, bg-ink-surface, text-on-dark-2, border-on-dark-line. */
+    --color-sand: var(--sand);
+    --color-sand-deep: var(--sand-deep);
+    --color-sand-line: var(--sand-line);
+    --color-ink-surface: var(--ink-surface);
+    --color-ink-surface-2: var(--ink-surface-2);
+    --color-on-dark: var(--on-dark);
+    --color-on-dark-2: var(--on-dark-2);
+    --color-on-dark-3: var(--on-dark-3);
+    --color-on-dark-line: var(--on-dark-line);
+
+    /* Escala tipográfica fluida -> text-hero, text-h1, text-h2, text-h3, text-lead.
+     * Un solo valor por rol, sin cadena sm:/lg: en cada título. */
+    --text-hero: var(--fs-hero);
+    --text-hero--line-height: var(--lh-display);
+    --text-hero--letter-spacing: var(--ls-display);
+    --text-h1: var(--fs-h1);
+    --text-h1--line-height: var(--lh-display);
+    --text-h1--letter-spacing: var(--ls-display);
+    --text-h2: var(--fs-h2);
+    --text-h2--line-height: var(--lh-title);
+    --text-h2--letter-spacing: var(--ls-display);
+    --text-h3: var(--fs-h3);
+    --text-h3--line-height: 1.3;
+    --text-lead: var(--fs-lead);
+    --text-lead--line-height: 1.6;
+
+    /* Radios -> rounded-sm2, rounded-md2... (nombres propios para no pisar
+     * la escala nativa de Tailwind, que otras vistas ya usan). */
+    --radius-card: var(--r-lg);
+    --radius-panel: var(--r-xl);
+
+    /* Elevación -> shadow-e1, shadow-e2, shadow-e3 */
+    --shadow-e1: var(--elev-1);
+    --shadow-e2: var(--elev-2);
+    --shadow-e3: var(--elev-3);
 }
 
 @layer base {
@@ -98,4 +137,120 @@
     [x-cloak] {
         display: none !important;
     }
+}
+
+/* ============================================================================
+ * PASE VISUAL (2026-09-14) — primitivas de layout y de imagen.
+ *
+ * Van en @layer components (CSS literal, no utilidades compuestas) por dos
+ * razones: (1) el escáner de Tailwind no puede purgarlas, y (2) el ritmo
+ * vertical y el ancho de caja son decisiones del SISTEMA, no de cada
+ * pantalla — si cada vista repite "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
+ * y "py-12 lg:py-16", cambiarlo cuesta 9 archivos y siempre queda una
+ * desalineada (así estaba: la home usaba py-12/py-16, las fichas py-10).
+ * ========================================================================= */
+@layer components {
+    /* Caja horizontal única del sitio. */
+    .shell {
+        width: 100%;
+        max-width: 80rem; /* 1280 = max-w-7xl, el que ya usaban home/índices */
+        margin-inline: auto;
+        padding-inline: 1rem;
+    }
+    @media (min-width: 640px) { .shell { padding-inline: 1.5rem; } }
+    @media (min-width: 1024px) { .shell { padding-inline: 2rem; } }
+
+    /* Caja estrecha para texto corrido (fichas): 65-70 caracteres. */
+    .shell-prose { max-width: 46rem; }
+
+    /* Ritmo vertical. .section = bloque normal · .section-tight = bloque
+     * secundario (CTA de cierre, tira de filtros). */
+    .section { padding-block: var(--section-y); }
+    .section-tight { padding-block: var(--section-y-sm); }
+    .section-t { padding-top: var(--section-y); }
+    .section-b { padding-bottom: var(--section-y); }
+
+    /* --- Tratamiento de imagen ---------------------------------------- */
+    /* .photo envuelve SIEMPRE la foto; el hijo <img> se estira. El velo
+     * (--photo-tint) unifica fotos de banco de temperaturas distintas. */
+    .photo { position: relative; overflow: hidden; background-color: var(--surface-2); }
+    .photo > img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .photo::after {
+        content: ''; position: absolute; inset: 0; pointer-events: none;
+        background: var(--photo-tint);
+    }
+
+    /* Scrims. Se aplican al contenedor de la foto, nunca con una opacidad
+     * inventada en la pantalla: el degradado es lo que hace que el texto
+     * blanco pase AA, así que vive en un solo sitio y se mide una vez. */
+    .scrim-hero::before,
+    .scrim-hero-h::before,
+    .scrim-card::before {
+        content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    }
+    .scrim-hero::before { background: var(--scrim-hero); }
+    .scrim-hero-h::before { background: var(--scrim-hero); }
+    .scrim-card::before { background: var(--scrim-card); }
+    /* A partir de lg el hero tiene sitio para un scrim lateral, que deja
+     * respirar la foto a la derecha sin perder contraste en el texto. */
+    @media (min-width: 1024px) {
+        .scrim-hero-h::before { background: var(--scrim-hero-h); }
+    }
+
+    /* Zoom suave al pasar el ratón por una tarjeta con foto. Se anula con
+     * prefers-reduced-motion. */
+    .photo-zoom > img { transition: transform .5s cubic-bezier(.2,.6,.2,1); }
+    .group:hover .photo-zoom > img { transform: scale(1.06); }
+    @media (prefers-reduced-motion: reduce) {
+        .photo-zoom > img { transition: none; }
+        .group:hover .photo-zoom > img { transform: none; }
+    }
+
+    /* --- Tipografía de apoyo ------------------------------------------ */
+    .eyebrow {
+        font-family: var(--font-sans);
+        font-size: .75rem;
+        font-weight: 600;
+        line-height: 1.2;
+        letter-spacing: var(--ls-eyebrow);
+        text-transform: uppercase;
+    }
+
+    /* Regla fina de marca bajo los títulos de sección. */
+    .rule-brand {
+        display: block; height: .25rem; width: 3rem;
+        border-radius: 9999px; background-color: var(--action);
+    }
+
+    /* --- Motivo geométrico de marca -----------------------------------
+     * Geometría abstracta (mandato de marca: nada figurativo). Franjas
+     * diagonales a muy baja opacidad para romper los fondos planos de las
+     * secciones grandes. */
+    .weave {
+        background-image:
+            repeating-linear-gradient(135deg,
+                hsl(var(--brand-h) 30% 30% / .05) 0 1px,
+                transparent 1px 14px);
+    }
+    .weave-dark {
+        background-image:
+            repeating-linear-gradient(135deg,
+                hsl(var(--brand-h) 40% 70% / .06) 0 1px,
+                transparent 1px 14px);
+    }
+}
+
+@layer base {
+    /* Los display quedan con el tracking negativo del sistema; sin esto
+     * Fraunces a 48-64px se ve suelta. */
+    h1, h2, h3 { letter-spacing: var(--ls-display); }
+
+    /* Evita el salto de layout mientras carga cada foto: el contenedor
+     * .photo ya reserva la caja, pero las <img> sueltas con width/height
+     * necesitan esto para respetar el aspecto al escalar. */
+    img { max-width: 100%; height: auto; }
+    .photo > img { height: 100%; }
+
+    /* Selección con el verde de marca. */
+    ::selection { background-color: var(--brand-100); color: var(--ink); }
 }
