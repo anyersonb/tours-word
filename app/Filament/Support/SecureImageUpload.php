@@ -7,22 +7,23 @@ use Illuminate\Support\Str;
 
 /**
  * Closes M-1 (docs/lote-2/seguridad-2026-09-01.md) for every image-upload
- * field added AFTER the tour gallery: Filament's ->image() only adds
- * `mimetypes:image/*`, which lets an SVG carrying an inline <script> through,
- * and GIF/PHP or GIF/HTML polyglots renamed .pht/.html slip past Laravel's
- * extension-based PHP-upload block entirely. The fix is a closed MIME
- * whitelist plus a stored extension derived from the MIME type the server
- * actually detects (finfo, via UploadedFile::getMimeType()) — never the
- * client's filename or its claimed extension.
+ * field: Filament's ->image() only adds `mimetypes:image/*`, which lets an
+ * SVG carrying an inline <script> through, and GIF/PHP or GIF/HTML
+ * polyglots renamed .pht/.html slip past Laravel's extension-based
+ * PHP-upload block entirely. The fix is a closed MIME whitelist plus a
+ * stored extension derived from the MIME type the server actually detects
+ * (finfo, via UploadedFile::getMimeType()) — never the client's filename or
+ * its claimed extension.
  *
- * `App\Filament\Resources\Tours\Schemas\TourForm` predates this helper and
- * keeps its own inline copy of the same logic. It is left untouched on
- * purpose: it already has its own green security suite
- * (tests/Feature/TourImageUploadSecurityTest.php) and refactoring
- * already-tested code wasn't in scope for the batch that added this helper
- * (docs/lote-1/01-esquema-lote1.md, S3). Every NEW upload field
- * (Destination/Experience cover image, TeamMember photo) uses this instead
- * of reimplementing it.
+ * `App\Filament\Resources\Tours\Schemas\TourForm` predated this helper and
+ * kept its own inline copy of the same logic until F-2 part 2
+ * (docs/lote-3/seguridad-2026-09-14.md, Alto) unified it here: two
+ * implementations of one security rule diverge the moment either one
+ * changes, and TourForm had already drifted before this fix. Every upload
+ * field in the panel (tour gallery, Destination/Experience cover image +
+ * gallery, TeamMember photo) goes through this class now — none of them
+ * reimplement it. tests/Feature/SecureUploadCoverageTest.php is the
+ * guardrail against a future field skipping it again.
  */
 class SecureImageUpload
 {

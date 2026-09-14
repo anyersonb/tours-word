@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Tours\Schemas;
 
 use App\Enums\TourDifficulty;
+use App\Filament\Support\SecureImageUpload;
 use App\Filament\Support\TranslatableTabs;
 use App\Models\Destination;
 use App\Models\Experience;
@@ -184,35 +185,21 @@ class TourForm
                             ->relationship('images')
                             ->label('')
                             ->schema([
-                                FileUpload::make('path')
-                                    ->label('Imagen')
-                                    // ->image() only adds `mimetypes:image/*`,
-                                    // which accepts image/svg+xml (inline
-                                    // <script>). A closed whitelist of the
-                                    // three formats the site actually serves
-                                    // is what the security audit
-                                    // (docs/lote-2/seguridad-2026-09-01.md,
-                                    // M-1) asked for.
-                                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                                    ->maxSize(4096)
-                                    ->disk('public')
-                                    ->directory('tours')
-                                    // The extension on disk must come from the
-                                    // MIME type Laravel detects on the server
-                                    // (finfo over the real file bytes), never
-                                    // from the client-supplied original
-                                    // extension: that's how a GIF polyglot
-                                    // renamed evil.pht or evil.html got served
-                                    // from the same origin as a script.
-                                    ->getUploadedFileNameForStorageUsing(
-                                        fn ($file) => Str::ulid().'.'.match ($file->getMimeType()) {
-                                            'image/jpeg' => 'jpg',
-                                            'image/png' => 'png',
-                                            'image/webp' => 'webp',
-                                            default => 'bin',
-                                        }
-                                    )
-                                    ->required(),
+                                // F-2 part 2 (docs/lote-3/seguridad-2026-09-14.md,
+                                // Alto): this used to be its own inline copy
+                                // of the same MIME whitelist + server-detected
+                                // extension logic as App\Filament\Support\
+                                // SecureImageUpload -- two implementations of
+                                // one security rule that had already
+                                // diverged the moment SecureImageUpload was
+                                // introduced (this field predates it, see
+                                // that class's docblock). Unified so there is
+                                // exactly one place this rule can be changed
+                                // — and exactly one place it can be forgotten.
+                                SecureImageUpload::configure(
+                                    FileUpload::make('path')->label('Imagen'),
+                                    'tours'
+                                )->required(),
                                 ...collect(config('cms.active_locales'))
                                     ->map(fn (string $locale) => TextInput::make("alt.{$locale}")
                                         ->label("Texto alternativo ({$locale})"))
