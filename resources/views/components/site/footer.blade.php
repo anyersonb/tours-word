@@ -19,6 +19,13 @@
     $contactAddress = Setting::get('contact_address');
 
     $hasLegalBlock = filled($companyRuc) || filled($companyName) || filled($rnavtNumber) || filled($esnnaPosterUrl);
+
+    // Objetivo 5 (lote i18n): una columna con encabezado y una lista sin
+    // ningun elemento es un defecto visible, la misma familia de fallo que
+    // un bloque legal vacio (linea 21). No se oculta el @if item por item:
+    // se oculta la COLUMNA completa si NINGUNO de sus datos esta cargado.
+    $hasInformationColumn = filled($privacyPolicyUrl) || filled($cancellationPolicyUrl) || filled($complaintsBookUrl);
+    $hasContactColumn = filled($contactPhone) || filled($contactEmail) || filled($contactAddress);
 @endphp
 <footer class="border-t border-line bg-surface">
     <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -40,35 +47,39 @@
                 </ul>
             </nav>
 
-            <div>
-                <h3 class="mb-3 text-sm font-semibold text-ink">{{ __('site.footer.information') }}</h3>
-                <ul class="space-y-2 text-sm text-text-2">
-                    @if(filled($privacyPolicyUrl))
-                        <li><a href="{{ $privacyPolicyUrl }}" class="hover:text-action">{{ __('site.footer.privacy_policy') }}</a></li>
-                    @endif
-                    @if(filled($cancellationPolicyUrl))
-                        <li><a href="{{ $cancellationPolicyUrl }}" class="hover:text-action">{{ __('site.footer.cancellation_policy') }}</a></li>
-                    @endif
-                    @if(filled($complaintsBookUrl))
-                        <li><a href="{{ $complaintsBookUrl }}" class="hover:text-action">{{ __('site.footer.complaints_book') }}</a></li>
-                    @endif
-                </ul>
-            </div>
+            @if($hasInformationColumn)
+                <div>
+                    <h3 class="mb-3 text-sm font-semibold text-ink">{{ __('site.footer.information') }}</h3>
+                    <ul class="space-y-2 text-sm text-text-2">
+                        @if(filled($privacyPolicyUrl))
+                            <li><a href="{{ $privacyPolicyUrl }}" class="hover:text-action">{{ __('site.footer.privacy_policy') }}</a></li>
+                        @endif
+                        @if(filled($cancellationPolicyUrl))
+                            <li><a href="{{ $cancellationPolicyUrl }}" class="hover:text-action">{{ __('site.footer.cancellation_policy') }}</a></li>
+                        @endif
+                        @if(filled($complaintsBookUrl))
+                            <li><a href="{{ $complaintsBookUrl }}" class="hover:text-action">{{ __('site.footer.complaints_book') }}</a></li>
+                        @endif
+                    </ul>
+                </div>
+            @endif
 
-            <div>
-                <h3 class="mb-3 text-sm font-semibold text-ink">{{ __('site.footer.contact') }}</h3>
-                <ul class="space-y-2 text-sm text-text-2">
-                    @if(filled($contactPhone))
-                        <li><a href="tel:{{ preg_replace('/\s+/', '', $contactPhone) }}" class="hover:text-action">{{ $contactPhone }}</a></li>
-                    @endif
-                    @if(filled($contactEmail))
-                        <li><a href="mailto:{{ $contactEmail }}" class="hover:text-action">{{ $contactEmail }}</a></li>
-                    @endif
-                    @if(filled($contactAddress))
-                        <li>{{ $contactAddress }}</li>
-                    @endif
-                </ul>
-            </div>
+            @if($hasContactColumn)
+                <div>
+                    <h3 class="mb-3 text-sm font-semibold text-ink">{{ __('site.footer.contact') }}</h3>
+                    <ul class="space-y-2 text-sm text-text-2">
+                        @if(filled($contactPhone))
+                            <li><a href="tel:{{ preg_replace('/\s+/', '', $contactPhone) }}" class="hover:text-action">{{ $contactPhone }}</a></li>
+                        @endif
+                        @if(filled($contactEmail))
+                            <li><a href="mailto:{{ $contactEmail }}" class="hover:text-action">{{ $contactEmail }}</a></li>
+                        @endif
+                        @if(filled($contactAddress))
+                            <li>{{ $contactAddress }}</li>
+                        @endif
+                    </ul>
+                </div>
+            @endif
         </div>
 
         @if($hasLegalBlock || filled($rnavtNumber))
