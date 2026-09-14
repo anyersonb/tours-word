@@ -233,3 +233,130 @@ No puedo salir al mercado así.
 - [x] **No OK — corregir y volver a presentar.** Con el punto 1 resuelto y los puntos 2, 3 y 4
       arreglados, lo vuelvo a mirar y lo apruebo. Los puntos 5 a 8 los acepto para una
       siguiente fase.
+
+---
+---
+
+# REVALIDACIÓN — 14/09/2026, segunda vuelta
+
+Me avisan de que los cuatro puntos están arreglados. Los vuelvo a probar yo, con el clic hecho.
+Lo de arriba no se toca: es el acta de lo que vi la primera vez.
+
+## R1. El botón de reservar — **RESUELTO, y mejor de lo que pedí**
+
+Probado en la ficha del Camino Inca, pulsando el botón de verdad:
+- El botón ya no promete lo que no hace: dice **"Solicitar reserva"** y debajo,
+  "Te respondemos con disponibilidad y formas de pago para cerrar la reserva". Ahora el cliente
+  sabe qué va a pasar cuando lo pulse. Esto era la mitad del problema.
+- Al pulsarlo **caigo directamente en el formulario**, no arriba de la página de Contacto.
+- El formulario se presenta como lo que es: distintivo "SOLICITUD DE RESERVA", título
+  "Solicita tu reserva" y una línea que me pide lo que hace falta: "Cuéntanos fechas y número
+  de personas".
+- Y lo que más me importaba: hay un recuadro **"TOUR SELECCIONADO — Camino Inca a Machu Picchu,
+  4 días"**, con enlace "Ver la ficha del tour" por si me equivoqué de tour.
+- El desplegable **"Asunto" ya viene puesto en "Reserva de un tour"**.
+
+¿Me queda claro de qué tour es la consulta que voy a mandar? **Sí, sin ninguna duda.** Y a mí
+me llegará identificada. Doy este punto por cerrado.
+
+**Y lo mandé de verdad**, con datos válidos: "Somos dos personas y queremos salir el 12 de mayo.
+Confírmenme disponibilidad y cómo se paga la reserva." Salió el aviso verde y el recuadro del
+tour seleccionado se queda puesto. Funciona.
+
+*Detalle de nada:* después de enviar una **solicitud de reserva**, el aviso dice "Tu mensaje fue
+enviado correctamente". Quedaría más fino "Recibimos tu solicitud de reserva". No bloquea.
+
+## R2. Las notas internas publicadas — **CASI RESUELTO, se les escapó una**
+
+Repasé los cuatro sitios:
+- Casilla del formulario: ahora dice "Acepto que mis datos se usen únicamente para responder a
+  esta consulta". **Limpia.**
+- Pregunta frecuente de cancelación: ahora dice "Todavía no publicamos una política de
+  cancelación general. Si necesitas cancelar o reprogramar, escríbenos lo antes posible y te
+  confirmamos las condiciones de tu reserva". **Limpia, y además le da salida al cliente.**
+- Texto bajo el mapa: "Todavía no configuramos una dirección de oficina. Vuelve pronto".
+  **Limpia.**
+- Boletín de la portada: "Suscríbete a nuestro boletín y recibe promociones exclusivas para tu
+  próximo viaje". **Limpia.**
+
+**Queda una, dentro del recuadro gris del mapa:** en el centro pone *"Mapa referencial —
+pendiente de dirección real"*. Eso sigue siendo lenguaje de obra, no de cliente. Es el mismo
+caso que las otras cuatro. Menor, porque está dentro de un cuadro que de todos modos está
+vacío, pero si el cuadro se ve, el texto se lee.
+
+## R3. La barra de precio en el móvil — **RESUELTO. Y no, no me estorba**
+
+Probado a 360 px en la ficha del Camino Inca, bajando por la página de verdad:
+- Abajo del todo va una barra fija con **"Desde US$ 933,33"** y el botón **"Solicitar reserva"**.
+  Me acompaña mientras leo. Ya no tengo que bajar cuatro párrafos para saber el precio: lo
+  tengo siempre delante, que es justo lo que pedí.
+- **¿Estorba?** No. Es una franja baja, no tapa el texto que estoy leyendo y el contenido sigue
+  pasando por encima sin cortarse. Con el itinerario abierto seguía leyendo el "Día 4" completo
+  justo encima de la barra. Bien resuelto; no la quitaría.
+- De paso: el itinerario desplegado en móvil se lee perfectamente, con su texto completo.
+
+## R4. El titular de la portada en móvil — **RESUELTO**
+
+A 360 px, "Vive lo mejor de Perú con expertos locales" se lee **entero y de un golpe**. Ya no
+hay palabras que se desvanezcan sobre la montaña: el texto va en blanco parejo y la foto que
+queda detrás está lo bastante apagada. Primera impresión correcta.
+
+## R5. Destinos y Experiencias (las dos que no había abierto) — TERMINADAS
+
+Entré en las dos. **No se notan a medio hacer**: las dos tienen migas de pan, su título, una
+línea de presentación y tres tarjetas con foto, nombre y resumen. En Destinos (Cusco, Valle
+Sagrado, Arequipa) y en Experiencias (Trekking, Gastronomía, Cultura) las fotos pegan con lo
+que dice cada texto — las tejedoras en Cultura y el maíz en Gastronomía están bien elegidas.
+
+Dos cosas para siguiente fase, ninguna me frena:
+- Al lado de Tours se ven **más sosas**: Tours tiene una cabecera con foto de fondo y ellas no,
+  solo fondo liso. Siendo pantallas hermanas, canta un poco.
+- En las tarjetas de destino me gustaría ver **cuántos tours hay en ese destino** ("4 tours en
+  Cusco"). Es lo que me haría pulsar.
+
+---
+
+# VEREDICTO SEGUNDA VUELTA: APROBADO
+
+Los cuatro puntos están resueltos, y el principal lo han resuelto mejor de lo que yo pedí:
+no se han limitado a arrastrar el tour hasta el formulario, han cambiado la promesa del botón
+("Solicitar reserva" + qué va a pasar después) y han convertido la pantalla de contacto en una
+solicitud de reserva de verdad, con el tour identificado y el asunto puesto. Ese era **el**
+problema del sitio y ya no está.
+
+Lo he comprobado yo, pulsando: el botón, el formulario enviado de verdad con el tour delante,
+las notas internas una por una, el móvil a 360 con la barra de precio y el titular, y las dos
+pantallas que me faltaban.
+
+**Autorizo a seguir.** Con la advertencia de siempre, que no es culpa vuestra: esto no sale a
+la calle hasta que yo entregue mis datos reales (dirección, teléfono, RUC, RNAVT y las
+políticas) y mis fotos y textos definitivos.
+
+## Lo que me llevo a una siguiente fase (nada de esto bloquea)
+
+1. **Queda una nota interna en el mapa**: "Mapa referencial — pendiente de dirección real".
+   Es la única superviviente de la limpieza. La primera que quiero quitada.
+2. **Al entrar en inglés, que el precio salga en dólares por defecto.** El selector funciona y
+   se mantiene al navegar, pero el extranjero no debería tener que buscarlo.
+3. **Poder redondear los precios en dólares.** "US$ 933,33" parece casa de cambio; quiero poner
+   "US$ 935".
+4. **El cuadro "Información de contacto" vacío**: prefiero que no aparezca a que aparezca con
+   un "Vuelve pronto". Igual para el recuadro del mapa.
+5. **El símbolo junto a "Pacha Viva"** parece un gráfico de barras; no dice agencia ni Perú.
+6. **Destinos y Experiencias con cabecera con foto**, como Tours, y con el número de tours en
+   cada tarjeta de destino.
+7. Al enviar una solicitud de reserva, que el aviso diga **"Recibimos tu solicitud de reserva"**
+   en vez de "Tu mensaje fue enviado".
+
+## No verificado (lo dejo dicho, no lo doy por bueno)
+- **Nosotros**: sigo sin abrirla. Es la única de las nueve que no he mirado.
+- Las **fichas de detalle de un destino y de una experiencia** (entré a las de tour, no a estas).
+- Si el correo del formulario **llega de verdad** a una bandeja: yo solo veo el aviso en pantalla.
+- El **buscador** de la lupa: sigue apagado con la nota "próximamente".
+- El sitio **en inglés en el móvil**, y la revalidación de estos arreglos en inglés.
+- El **boletín**: no llegué a suscribirme para ver qué contesta.
+
+## Decisión
+- [x] **OK — autorizo a producción**, sujeto a que yo entregue datos legales, fotos y textos
+      reales, y con la lista de siete puntos de arriba para la siguiente fase.
+- [ ] No OK
