@@ -259,3 +259,35 @@
     /* Selección con el verde de marca. */
     ::selection { background-color: var(--brand-100); color: var(--ink); }
 }
+
+@layer components {
+    /*
+     * Texto largo de la clienta (RichEditor ya saneado por
+     * App\Support\Html\RichTextSanitizer). El HTML llega sin clases, así que
+     * el ritmo tipográfico tiene que venir del contenedor: sin esto, varios
+     * <p> seguidos salían pegados sin separación, que es como se veía la
+     * descripción de una ficha con más de un párrafo.
+     */
+    .prose-pv > * + * { margin-top: 1em; }
+    .prose-pv p { line-height: 1.7; }
+    .prose-pv strong { font-weight: 600; color: var(--text); }
+    .prose-pv a { color: var(--action); text-decoration: underline; text-underline-offset: 3px; }
+    .prose-pv a:hover { color: var(--action-hover); }
+    .prose-pv :is(ul, ol) { padding-left: 1.25rem; display: flex; flex-direction: column; gap: .4rem; }
+    .prose-pv ul { list-style: disc; }
+    .prose-pv ol { list-style: decimal; }
+    .prose-pv :is(h2, h3, h4) {
+        font-family: var(--font-display);
+        font-weight: 600;
+        color: var(--text);
+        margin-top: 1.6em;
+    }
+    .prose-pv h2 { font-size: var(--fs-h3); }
+    .prose-pv h3 { font-size: 1.0625rem; }
+    .prose-pv blockquote {
+        border-left: 3px solid var(--action);
+        padding-left: 1rem;
+        color: var(--text-2);
+        font-style: italic;
+    }
+}

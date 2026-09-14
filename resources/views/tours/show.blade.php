@@ -73,13 +73,19 @@
     {{-- ============ MIGAS DE PAN + GALERÍA + PRECIO/CTA ============ --}}
     <x-seo.breadcrumb-jsonld :items="$breadcrumbItems" />
 
-    <section class="bg-surface">
-        <div class="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
+    <section class="border-b border-sand-line bg-sand">
+        <div class="shell py-4">
             <x-ui.breadcrumbs :items="$breadcrumbItems" />
         </div>
+    </section>
 
-        <div class="mx-auto grid max-w-7xl gap-10 px-4 py-8 sm:px-6 lg:grid-cols-[3fr_2fr] lg:items-start lg:px-8 lg:py-12">
-            <div>
+    <section class="bg-surface">
+        <div class="shell section">
+            <div class="grid gap-10 lg:grid-cols-[3fr_2fr] lg:items-start lg:gap-14">
+            {{-- min-w-0: sin esto el item de rejilla toma el min-content de la
+                 tira de miniaturas (5 x 80px + huecos = 440px) y la ficha
+                 desbordaba 96px a 360. Medido con getBoundingClientRect. --}}
+            <div class="min-w-0">
                 <x-ui.gallery :images="$galleryImages" :label="__('site.ui.gallery.nav_label', ['title' => $tour['title']])" />
 
                 {{-- Objetivo 2 (lote i18n): lang="es" honesto en cada bloque
@@ -89,71 +95,87 @@
                      Ver ResolvesBySlugByLocale y el aviso de abajo. --}}
                 @php($fallbackLangAttr = $contentFallbackLocale ? str_replace('_', '-', $contentFallbackLocale) : null)
 
-                <h1 class="mt-6 font-display text-3xl font-semibold text-ink sm:text-4xl" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>{{ $tour['title'] }}</h1>
-
-                <x-ui.content-fallback-notice :locale="$contentFallbackLocale" />
-
                 @if($tour['destination'])
-                    <a href="{{ route('destinations.show', $tour['destination']['slug']) }}" class="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-brand-text hover:underline">
+                    <a href="{{ route('destinations.show', $tour['destination']['slug']) }}" class="mt-8 inline-flex items-center gap-1.5 text-sm font-medium text-brand-text transition-colors hover:text-action hover:underline">
                         {!! $iconPin !!}{{ $tour['destination']['name'] }}
                     </a>
                 @endif
 
-                <p class="mt-4 text-base text-text-2 sm:text-lg" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>{{ $tour['summary'] }}</p>
+                <h1 class="mt-3 font-display text-h1 font-semibold text-ink" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>{{ $tour['title'] }}</h1>
 
-                <div class="mt-5 flex flex-wrap gap-x-6 gap-y-3 text-sm text-text-2">
-                    @if($tour['duration_label'])
-                        <span class="inline-flex items-center gap-1.5">
-                            {!! $iconClock !!}
-                            <strong class="font-medium text-ink">{{ __('site.tours.show.duration_label') }}:</strong> {{ $tour['duration_label'] }}
-                        </span>
-                    @endif
-                    @if($tour['difficulty'])
-                        <span class="inline-flex items-center gap-1.5">
-                            {!! $iconGauge !!}
-                            {{-- $tour['difficulty'] is App\Enums\TourDifficulty (Tour::$casts), never a
-                                 plain string: PHP forbids enums from declaring __toString(), and the
-                                 model-level cast can't be swapped for a plain string either without
-                                 breaking ToursTable's typed `fn (?TourDifficulty $state)` column
-                                 closure. ->value is the one line this ficha touches for hueco #3
-                                 (see the lote report, objetivo 2). --}}
-                            <strong class="font-medium text-ink">{{ __('site.tours.show.difficulty_label') }}:</strong> {{ __('tours.difficulty.'.$tour['difficulty']->value) }}
-                        </span>
-                    @endif
-                </div>
+                <x-ui.content-fallback-notice :locale="$contentFallbackLocale" />
+
+                <p class="mt-4 max-w-2xl text-lead text-text-2" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>{{ $tour['summary'] }}</p>
 
                 {{-- Defecto 1 (auditoria cliente, 2026-09-14): "description"
                      se edita con Filament\Forms\Components\RichEditor (ver
                      TourForm) -- es HTML de la clienta, no texto plano.
-                     {{ }} lo escapaba y mostraba los tags "&lt;p&gt;" en
-                     pantalla; App\Support\Html\RichTextSanitizer lo limpia
-                     (whitelist exacta de la toolbar del editor) antes de
-                     imprimirlo con {!! !!}. --}}
-                <div class="mt-8 max-w-2xl text-base leading-relaxed text-text-2" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>
+                     Se escapaba y mostraba los tags en pantalla;
+                     App\Support\Html\RichTextSanitizer lo limpia (whitelist
+                     exacta de la toolbar del editor) antes de imprimirlo. --}}
+                <div class="prose-pv mt-6 max-w-2xl text-base leading-relaxed text-text-2" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>
                     {!! RichTextSanitizer::sanitize($tour['description']) !!}
                 </div>
             </div>
 
-            <div class="lg:sticky lg:top-24">
-                <div class="rounded-3xl border border-line bg-surface p-6 shadow-sm">
-                    <x-ui.money
-                        :pen-cents="$tour['price_pen_cents']"
-                        :usd-cents="$tour['price_usd_cents']"
-                        :prefix="__('site.tours.show.price_prefix')"
-                        class="font-display text-2xl font-semibold text-ink"
-                    />
+            {{-- Panel de reserva. Antes era una caja casi vacia (precio +
+                 boton) que dejaba una columna entera en blanco, mientras
+                 duracion, dificultad y punto de encuentro estaban repartidos
+                 por la columna izquierda. Ahora viven aca, que es donde se
+                 decide la compra. --}}
+            <aside class="min-w-0 lg:sticky lg:top-24">
+                <div class="overflow-hidden rounded-panel border border-line bg-surface shadow-e3">
+                    <div class="border-b border-line-soft bg-brand-50 px-6 py-5">
+                        <x-ui.money
+                            :pen-cents="$tour['price_pen_cents']"
+                            :usd-cents="$tour['price_usd_cents']"
+                            :prefix="__('site.tours.show.price_prefix')"
+                            class="font-display text-h2 font-semibold text-ink"
+                        />
+                    </div>
 
-                    <x-ui.button href="{{ route('contact') }}" class="mt-5 w-full justify-center">
-                        {{ __('site.tours.show.cta_reserve') }}
-                    </x-ui.button>
+                    <div class="p-6">
+                        <x-ui.button href="{{ route('contact') }}" class="w-full justify-center px-6 py-3 text-base">
+                            {{ __('site.tours.show.cta_reserve') }}
+                        </x-ui.button>
 
-                    @if($tour['meeting_point'])
-                        <div class="mt-6 border-t border-line-soft pt-5">
-                            <p class="text-sm font-semibold text-ink">{{ __('site.tours.show.meeting_point_title') }}</p>
-                            <p class="mt-1 text-sm text-text-2">{{ $tour['meeting_point'] }}</p>
-                        </div>
-                    @endif
+                        @if($tour['duration_label'] || $tour['difficulty'] || $tour['meeting_point'])
+                            <dl class="mt-6 flex flex-col gap-4 border-t border-line-soft pt-5 text-sm">
+                                @if($tour['duration_label'])
+                                    <div class="flex items-start gap-3">
+                                        <span class="mt-0.5 text-action">{!! $iconClock !!}</span>
+                                        <div>
+                                            <dt class="font-medium text-ink">{{ __('site.tours.show.duration_label') }}</dt>
+                                            <dd class="text-text-2">{{ $tour['duration_label'] }}</dd>
+                                        </div>
+                                    </div>
+                                @endif
+                                @if($tour['difficulty'])
+                                    <div class="flex items-start gap-3">
+                                        <span class="mt-0.5 text-action">{!! $iconGauge !!}</span>
+                                        <div>
+                                            {{-- El valor es App\Enums\TourDifficulty (Tour::$casts),
+                                                 nunca un string: por eso ->value. Ver el comentario
+                                                 largo del lote en el historial de este archivo. --}}
+                                            <dt class="font-medium text-ink">{{ __('site.tours.show.difficulty_label') }}</dt>
+                                            <dd class="text-text-2">{{ __('tours.difficulty.'.$tour['difficulty']->value) }}</dd>
+                                        </div>
+                                    </div>
+                                @endif
+                                @if($tour['meeting_point'])
+                                    <div class="flex items-start gap-3">
+                                        <span class="mt-0.5 text-action">{!! $iconPin !!}</span>
+                                        <div>
+                                            <dt class="font-medium text-ink">{{ __('site.tours.show.meeting_point_title') }}</dt>
+                                            <dd class="text-text-2">{{ $tour['meeting_point'] }}</dd>
+                                        </div>
+                                    </div>
+                                @endif
+                            </dl>
+                        @endif
+                    </div>
                 </div>
+            </aside>
             </div>
         </div>
     </section>
@@ -176,8 +198,9 @@
 
     {{-- ============ ITINERARIO ============ --}}
     @if(!empty($tour['itinerary']))
-        <section class="bg-ground">
-            <div class="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+        <section class="weave bg-sand">
+            <div class="shell section">
+              <div class="mx-auto max-w-3xl">
                 <x-ui.section-title as="h2">{{ __('site.tours.show.itinerary_title') }}</x-ui.section-title>
 
                 <x-ui.content-fallback-notice :locale="$itineraryFallbackLocale" />
@@ -190,6 +213,7 @@
                         <x-ui.faq-item :question="$day['title']">{!! RichTextSanitizer::sanitize($day['description']) !!}</x-ui.faq-item>
                     @endforeach
                 </div>
+              </div>
             </div>
         </section>
     @endif
@@ -197,10 +221,11 @@
     {{-- ============ INCLUYE / NO INCLUYE ============ --}}
     @if(!empty($tour['inclusions']) || !empty($tour['exclusions']))
         <section class="bg-surface">
-            <div class="mx-auto grid max-w-4xl gap-8 px-4 py-12 sm:grid-cols-2 sm:px-6 lg:px-8">
+            <div class="shell section">
+              <div class="mx-auto grid max-w-4xl gap-6 sm:grid-cols-2">
                 @if(!empty($tour['inclusions']))
-                    <div @if($inclusionsLangAttr) lang="{{ $inclusionsLangAttr }}" @endif>
-                        <h2 class="font-display text-xl font-semibold text-ink">{{ __('site.tours.show.inclusions_title') }}</h2>
+                    <div class="rounded-panel border border-line bg-surface p-6 shadow-e1" @if($inclusionsLangAttr) lang="{{ $inclusionsLangAttr }}" @endif>
+                        <h2 class="font-display text-h3 font-semibold text-ink">{{ __('site.tours.show.inclusions_title') }}</h2>
                         <x-ui.content-fallback-notice :locale="$inclusionsFallbackLocale" />
                         <ul class="mt-4 flex flex-col gap-3">
                             @foreach($tour['inclusions'] as $item)
@@ -211,8 +236,8 @@
                 @endif
 
                 @if(!empty($tour['exclusions']))
-                    <div @if($exclusionsLangAttr) lang="{{ $exclusionsLangAttr }}" @endif>
-                        <h2 class="font-display text-xl font-semibold text-ink">{{ __('site.tours.show.exclusions_title') }}</h2>
+                    <div class="rounded-panel border border-line bg-surface p-6 shadow-e1" @if($exclusionsLangAttr) lang="{{ $exclusionsLangAttr }}" @endif>
+                        <h2 class="font-display text-h3 font-semibold text-ink">{{ __('site.tours.show.exclusions_title') }}</h2>
                         <x-ui.content-fallback-notice :locale="$exclusionsFallbackLocale" />
                         <ul class="mt-4 flex flex-col gap-3">
                             @foreach($tour['exclusions'] as $item)
@@ -221,20 +246,22 @@
                         </ul>
                     </div>
                 @endif
+              </div>
             </div>
         </section>
     @endif
 
     {{-- ============ CTA: MÁS TOURS EN ESTE DESTINO ============ --}}
     @if($tour['destination'])
-        <section class="bg-ground">
-            <div class="mx-auto flex max-w-4xl flex-col items-start gap-4 px-4 py-12 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-                <p class="font-display text-xl font-semibold text-ink">
+        <section class="weave-dark bg-ink-surface">
+            <div class="shell section-tight flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-between">
+                <p class="max-w-xl font-display text-h3 font-semibold text-white">
                     {{ __('site.tours.show.cta_banner_title', ['destination' => $tour['destination']['name']]) }}
                 </p>
-                <x-ui.button variant="secondary" href="{{ route('tours.index', ['destino' => $tour['destination']['slug']]) }}" class="w-full justify-center sm:w-auto">
+                <a href="{{ route('tours.index', ['destino' => $tour['destination']['slug']]) }}" class="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-medium text-ink transition-colors hover:bg-brand-100 sm:w-auto">
                     {{ __('site.tours.show.cta_banner_button') }}
-                </x-ui.button>
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </a>
             </div>
         </section>
     @endif

@@ -66,33 +66,41 @@
     {{-- ============ MIGAS DE PAN + GALERÍA + DESCRIPCIÓN ============ --}}
     <x-seo.breadcrumb-jsonld :items="$breadcrumbItems" />
 
-    <section class="bg-surface">
-        <div class="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
-            <x-ui.breadcrumbs :items="$breadcrumbItems" />
-        </div>
+    {{-- ============ CABECERA ============
+         Antes la galeria iba primero y el h1 aparecia DEBAJO de una foto de
+         600px: la pagina se leia sin encabezado, con el titulo colgando en
+         medio. Ahora el titulo abre la ficha, igual que en los indices. --}}
+    {{-- Objetivo 2 (lote i18n): lang="es" honesto cuando este destino todavia no tiene su traduccion
+         al locale de la URL -- ver ResolvesBySlugByLocale. --}}
+    @php($fallbackLangAttr = $contentFallbackLocale ? str_replace('_', '-', $contentFallbackLocale) : null)
 
-        <div class="mx-auto max-w-5xl px-4 pb-10 pt-6 sm:px-6 lg:px-8">
-            <x-ui.gallery :images="$galleryImages" :label="__('site.ui.gallery.nav_label', ['title' => $destination['name']])" />
+    <section class="weave border-b border-sand-line bg-sand">
+        <div class="shell section-tight">
+            <x-ui.breadcrumbs :items="$breadcrumbItems" class="mb-6" />
 
-            {{-- Objetivo 2 (lote i18n): lang="es" honesto cuando este
-                 destino todavia no tiene su traduccion al locale de la URL
-                 -- ver ResolvesBySlugByLocale. --}}
-            @php($fallbackLangAttr = $contentFallbackLocale ? str_replace('_', '-', $contentFallbackLocale) : null)
-
-            <h1 class="mt-6 font-display text-3xl font-semibold text-ink sm:text-4xl" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>{{ $destination['name'] }}</h1>
+            <h1 class="max-w-3xl font-display text-h1 font-semibold text-ink" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>{{ $destination['name'] }}</h1>
             <x-ui.content-fallback-notice :locale="$contentFallbackLocale" />
-            <p class="mt-4 max-w-3xl text-base text-text-2 sm:text-lg" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>{{ $destination['description'] }}</p>
+            <p class="mt-4 max-w-2xl text-lead text-text-2" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>{{ $destination['description'] }}</p>
         </div>
     </section>
 
-    {{-- ============ TOURS EN ESTE DESTINO ============ --}}
-    <section class="bg-ground">
-        <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-            @if(!empty($relatedTours))
-                <x-ui.section-title as="h2">
-                    {{ __('site.destinations.show.related_tours_title', ['destination' => $destination['name']]) }}
-                </x-ui.section-title>
+    {{-- ============ GALERIA ============ --}}
+    <section class="bg-surface">
+        <div class="shell section">
+            <div class="mx-auto max-w-5xl">
+                <x-ui.gallery :images="$galleryImages" :label="__('site.ui.gallery.nav_label', ['title' => $destination['name']])" />
+            </div>
+        </div>
+    </section>
 
+    {{-- ============ TOURS RELACIONADOS ============ --}}
+    <section class="weave bg-sand">
+        <div class="shell section">
+            <x-ui.section-title as="h2">
+                {{ __('site.destinations.show.related_tours_title', ['destination' => $destination['name']]) }}
+            </x-ui.section-title>
+
+            @if(!empty($relatedTours))
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach($relatedTours as $tour)
                         <x-ui.tour-card
@@ -102,25 +110,29 @@
                             :summary="$tour['summary']"
                             :duration="$tour['duration_label']"
                             :category="$tour['experiences'][0]['name'] ?? null"
+                            :location="$tour['destination']['name'] ?? null"
                             :pen-cents="$tour['price_pen_cents']"
                             :usd-cents="$tour['price_usd_cents']"
                             :href="route('tours.show', $tour['slug'])"
+                            sizes="(min-width: 1024px) 24rem, (min-width: 640px) 45vw, 92vw"
                         />
                     @endforeach
                 </div>
             @else
-                <p class="text-sm text-text-2">{{ __('site.destinations.show.related_tours_empty') }}</p>
+                {{-- Antes era un <p> suelto de 14px perdido en la seccion.
+                     Mismo estado vacio que el resto del catalogo. --}}
+                <x-ui.empty-state>{{ __('site.destinations.show.related_tours_empty') }}</x-ui.empty-state>
             @endif
         </div>
     </section>
 
     {{-- ============ CTA: VER TODOS LOS TOURS ============ --}}
-    <section class="bg-surface">
-        <div class="mx-auto max-w-7xl px-4 py-8 text-center sm:px-6 lg:px-8">
-            <x-ui.button variant="secondary" href="{{ route('tours.index') }}">
+    <section class="weave-dark bg-ink-surface">
+        <div class="shell section-tight text-center">
+            <a href="{{ route('tours.index') }}" class="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-medium text-ink transition-colors hover:bg-brand-100">
                 {{ __('site.destinations.show.cta_all_tours') }}
-            </x-ui.button>
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
         </div>
     </section>
-
 </x-layout>
