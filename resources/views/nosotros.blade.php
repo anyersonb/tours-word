@@ -26,7 +26,7 @@
 
     $valueItems = __('site.nosotros.values.items');
 @endphp
-<x-layout title="{{ __('site.nav.about') }}" description="{{ __('site.nosotros.meta.description') }}">
+<x-layout :title="__('site.nav.about')" :description="__('site.nosotros.meta.description')">
 
     {{-- ============ MIGAS DE PAN + HERO PARTIDO ============ --}}
     {{--

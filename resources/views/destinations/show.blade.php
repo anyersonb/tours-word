@@ -55,7 +55,7 @@
         ->all();
 @endphp
 <x-layout
-    title="{{ $metaTitle }}"
+    :title="$metaTitle"
     :title-literal="$titleLiteral"
     :description="$metaDescription"
     :noindex="$noindex"

@@ -121,4 +121,28 @@ class TourMetaTagsTest extends TestCase
         $response->assertOk();
         $response->assertSee('<meta name="description" content="Resumen visible usado como respaldo."', false);
     }
+
+    /**
+     * Defecto 8 (docs/lote-3/seguridad-2026-09-14.md, Bajo, cosmético — no
+     * es XSS): `<x-layout title="{{ $metaTitle }}">` escapaba el título con
+     * {{ }} y lo pasaba ya escapado como prop; x-layout volvía a escaparlo
+     * con su propio {{ $pageTitle }} para el <title> real, duplicando
+     * entidades ("&" -> "&amp;amp;"). Fix: :title="$metaTitle" (bind de
+     * Blade), escapando una sola vez en el punto de salida.
+     */
+    public function test_the_title_tag_with_special_characters_is_escaped_exactly_once(): void
+    {
+        $tour = Tour::factory()->create([
+            'title' => ['es' => 'Camino Inca clasico'],
+            'meta_title' => ['es' => 'Tours & "Cusco" <especial>'],
+        ]);
+        $slug = $tour->getTranslation('slug', 'es', false);
+
+        $response = $this->get(route('tours.show', ['locale' => 'es', 'slug' => $slug]));
+
+        $response->assertOk();
+        $response->assertSee('<title>Tours &amp; &quot;Cusco&quot; &lt;especial&gt;</title>', false);
+        $response->assertDontSee('&amp;amp;', false);
+        $response->assertDontSee('&amp;quot;', false);
+    }
 }

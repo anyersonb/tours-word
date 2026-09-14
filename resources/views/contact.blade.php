@@ -53,7 +53,7 @@
 
     $heroIcons = [$iconHeadset, $iconShield, $iconLock];
 @endphp
-<x-layout title="{{ __('site.nav.contact') }}">
+<x-layout :title="__('site.nav.contact')">
 
     {{-- Fix 4 (auditoria SEO, lote SEO): FAQPage sobre las 5 preguntas
          reales de site.contacto.faq.items -- ver x-seo.faq-jsonld para el

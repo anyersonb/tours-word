@@ -162,6 +162,48 @@ class DestinationAndExperiencePublicCatalogRouteTest extends TestCase
         $response->assertDontSee('Meta SEO · '.config('app.name'), false);
     }
 
+    /**
+     * Defecto 8 (docs/lote-3/seguridad-2026-09-14.md, Bajo, cosmético — no
+     * es XSS). `<x-layout title="{{ $metaTitle }}">` escapaba el título
+     * (Blade corre e() dentro de {{ }}) y luego lo pasaba como STRING ya
+     * escapado al prop "title"; x-layout volvía a escaparlo con otro
+     * {{ $pageTitle }} para el <title> real -- un "&" o una comilla salían
+     * duplicados ("&amp;amp;"). El fix cambia a :title="$metaTitle" (bind
+     * de Blade, sin pasar por {{ }}), así que el escape ocurre una sola
+     * vez, en el punto de salida real.
+     */
+    public function test_a_destination_title_with_special_characters_is_escaped_exactly_once(): void
+    {
+        Destination::factory()->create([
+            'slug' => ['es' => 'destino-caracteres-especiales'],
+            'name' => ['es' => 'Cusco'],
+            'meta_title' => ['es' => 'Tours & "Cusco" <especial>'],
+        ]);
+
+        $response = $this->get('/es/destinos/destino-caracteres-especiales');
+
+        $response->assertOk();
+        $response->assertSee('<title>Tours &amp; &quot;Cusco&quot; &lt;especial&gt;</title>', false);
+        $response->assertDontSee('&amp;amp;', false);
+        $response->assertDontSee('&amp;quot;', false);
+    }
+
+    public function test_an_experience_title_with_special_characters_is_escaped_exactly_once(): void
+    {
+        Experience::factory()->create([
+            'slug' => ['es' => 'experiencia-caracteres-especiales'],
+            'name' => ['es' => 'Trekking'],
+            'meta_title' => ['es' => 'Treks & "Aventura" <especial>'],
+        ]);
+
+        $response = $this->get('/es/experiencias/experiencia-caracteres-especiales');
+
+        $response->assertOk();
+        $response->assertSee('<title>Treks &amp; &quot;Aventura&quot; &lt;especial&gt;</title>', false);
+        $response->assertDontSee('&amp;amp;', false);
+        $response->assertDontSee('&amp;quot;', false);
+    }
+
     public function test_an_experience_without_seo_metadata_falls_back_to_its_description_for_the_meta_tag(): void
     {
         Experience::factory()->create([

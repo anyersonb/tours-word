@@ -13,8 +13,8 @@
 {{-- noindex se queda puesto mientras el contenido sea de MUESTRA (seeder
      DemoTourSeeder); se quita cuando la clienta cargue experiencias reales. --}}
 <x-layout
-    title="{{ __('site.experiences.index.meta.title') }}"
-    description="{{ __('site.experiences.index.meta.description') }}"
+    :title="__('site.experiences.index.meta.title')"
+    :description="__('site.experiences.index.meta.description')"
     :noindex="true"
 >
 
