@@ -55,6 +55,12 @@
 @endphp
 <x-layout title="{{ __('site.nav.contact') }}">
 
+    {{-- Fix 4 (auditoria SEO, lote SEO): FAQPage sobre las 5 preguntas
+         reales de site.contacto.faq.items -- ver x-seo.faq-jsonld para el
+         escapado seguro (mismo mecanismo que las fichas de
+         destinos/experiencias). --}}
+    <x-seo.faq-jsonld :items="$faqItems" />
+
     {{-- ============ MIGAS DE PAN + HERO PARTIDO ============ --}}
     {{--
         C8: hero partido (2 columnas, foto confinada a la mitad derecha),
