@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Support\Locale;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
@@ -42,16 +43,18 @@ class LocalePrefixRoutingTest extends TestCase
     }
 
     /**
-     * "en" SÍ está en el esquema (config('cms.locales')) pero no en
-     * config('cms.active_locales') todavía. Decisión documentada: 404, no
-     * redirección a /es/ -- redirigir simularía que /en/ ya existe.
+     * "pt_BR" SÍ está en el esquema (config('cms.locales')) pero no en
+     * config('cms.active_locales') -- lote i18n (2026-09-14) activó "en",
+     * así que "pt_BR" es ahora el único locale del esquema que sigue
+     * inactivo, y quien prueba este caso. Decisión documentada: 404, no
+     * redirección a /es/ -- redirigir simularía que /pt-br/ ya existe.
      */
     public function test_a_schema_locale_not_yet_active_is_a_404_not_a_redirect(): void
     {
-        $this->assertContains('en', array_keys(config('cms.locales')));
-        $this->assertNotContains('en', config('cms.active_locales'));
+        $this->assertContains('pt_BR', array_keys(config('cms.locales')));
+        $this->assertNotContains('pt_BR', config('cms.active_locales'));
 
-        $response = $this->get('/en/');
+        $response = $this->get('/pt-br/');
 
         $response->assertNotFound();
         $response->assertHeaderMissing('Location');
@@ -61,6 +64,34 @@ class LocalePrefixRoutingTest extends TestCase
     {
         $this->get('/nosotros')->assertNotFound();
         $this->get('/contacto')->assertNotFound();
+    }
+
+    /**
+     * Objetivo 5 (lote i18n, 2026-09-14): "/ES/nosotros" respondía 200
+     * porque Locale::fromSegment() ya normaliza a minúsculas antes de
+     * comparar -- misma familia de fallo que un duplicado www/no-www (ver
+     * feedback_www_csp_assets_bloqueados en otro proyecto de la casa). Debe
+     * ser 301 a la URL canónica en minúsculas, nunca 200 con el mismo
+     * contenido servido dos veces.
+     */
+    public function test_an_uppercase_locale_segment_redirects_permanently_to_the_lowercase_url(): void
+    {
+        $response = $this->get('/ES/nosotros');
+
+        $response->assertStatus(301);
+        $response->assertRedirect('/es/nosotros');
+    }
+
+    /**
+     * El 301 debe preservar el resto del path y el query string tal cual
+     * -- no basta con mandar siempre a la home del locale corregido.
+     */
+    public function test_the_uppercase_redirect_preserves_the_rest_of_the_path_and_query_string(): void
+    {
+        $response = $this->get('/EN/tours?destino=cusco');
+
+        $response->assertStatus(301);
+        $response->assertRedirect('/en/tours?destino=cusco');
     }
 
     /**
@@ -98,8 +129,8 @@ class LocalePrefixRoutingTest extends TestCase
         // Ambos son 404 hoy (pt_BR no está activo), pero por razones
         // distintas: "pt-br" es un locale reconocido e inactivo,
         // "pt_BR" (con guion bajo) ni siquiera es un segmento válido.
-        $this->assertSame('pt_BR', \App\Support\Locale::fromSegment('pt-br'));
-        $this->assertNull(\App\Support\Locale::fromSegment('pt_BR'));
+        $this->assertSame('pt_BR', Locale::fromSegment('pt-br'));
+        $this->assertNull(Locale::fromSegment('pt_BR'));
     }
 
     /**

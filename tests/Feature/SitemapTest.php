@@ -41,7 +41,14 @@ class SitemapTest extends TestCase
         $this->assertNotFalse($xml, 'sitemap.xml debe ser XML válido');
     }
 
-    public function test_sitemap_lists_exactly_the_three_indexable_spanish_pages(): void
+    /**
+     * Lote i18n (2026-09-14): "en" paso a activo por defecto
+     * (config('cms.active_locales')), asi que las 3 paginas indexables
+     * indexan en AMBOS locales activos hoy -- 6 URLs, no 3. El mecanismo
+     * dinamico se sigue probando aparte, con un locale que SI sigue
+     * inactivo (ver test_activating_a_new_locale_adds_its_urls_below).
+     */
+    public function test_sitemap_lists_exactly_the_six_indexable_pages_in_spanish_and_english(): void
     {
         $response = $this->get('/sitemap.xml');
 
@@ -54,6 +61,9 @@ class SitemapTest extends TestCase
             "{$base}/es",
             "{$base}/es/nosotros",
             "{$base}/es/contacto",
+            "{$base}/en",
+            "{$base}/en/nosotros",
+            "{$base}/en/contacto",
         ], $locs);
     }
 
@@ -70,14 +80,16 @@ class SitemapTest extends TestCase
     }
 
     /**
-     * Si el día de mañana se activa "en" en config('cms.active_locales'),
-     * el sitemap debe listar también sus 3 URLs sin que nadie reescriba el
-     * controlador -- esto es lo que hace que el mecanismo sea "dinámico" y
-     * no una lista cableada.
+     * Lote i18n (2026-09-14): "en" ya esta activo por defecto, asi que este
+     * test usa "pt_BR" -- el unico locale del ESQUEMA que sigue inactivo --
+     * para seguir probando el mecanismo DINAMICO ("si se activa un locale,
+     * el sitemap lista sus URLs solo, sin tocar el controlador"), no una
+     * lista cableada. Si se usara "en" ahora seria una tautologia (ya esta
+     * activo por defecto y no probaria nada).
      */
     public function test_activating_a_new_locale_adds_its_urls_without_touching_the_mechanism(): void
     {
-        config(['cms.active_locales' => ['es', 'en']]);
+        config(['cms.active_locales' => ['es', 'en', 'pt_BR']]);
 
         $response = $this->get('/sitemap.xml');
 
@@ -86,10 +98,10 @@ class SitemapTest extends TestCase
 
         $base = rtrim(config('app.url'), '/');
 
-        $this->assertContains("{$base}/en", $locs);
-        $this->assertContains("{$base}/en/nosotros", $locs);
-        $this->assertContains("{$base}/en/contacto", $locs);
-        $this->assertCount(6, $locs);
+        $this->assertContains("{$base}/pt-br", $locs);
+        $this->assertContains("{$base}/pt-br/nosotros", $locs);
+        $this->assertContains("{$base}/pt-br/contacto", $locs);
+        $this->assertCount(9, $locs);
     }
 
     /**
