@@ -87,7 +87,10 @@
 
                 <h1 class="font-display text-hero font-semibold text-white">
                     {{ __('site.home.hero.title_before') }}
-                    <span class="text-brand-100">{{ __('site.home.hero.title_highlight') }}</span>
+                    {{-- Defecto D: el acento era text-brand-100 y se perdía
+                         sobre la zona clara de la montaña. Ver .accent-on-photo
+                         en app.css, con los contrastes medidos. --}}
+                    <span class="accent-on-photo">{{ __('site.home.hero.title_highlight') }}</span>
                     {{ __('site.home.hero.title_after') }}
                 </h1>
 

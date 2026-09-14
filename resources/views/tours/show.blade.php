@@ -81,11 +81,29 @@
 
     <section class="bg-surface">
         <div class="shell section">
-            <div class="grid gap-10 lg:grid-cols-[3fr_2fr] lg:items-start lg:gap-14">
+            {{--
+                Defecto C (validacion de la clienta, 2026-09-14): en movil el
+                precio y "Reservar" caian DESPUES de los cuatro parrafos de
+                descripcion, a 1266px del inicio del documento (medido a 360;
+                1293px en ingles). Casi dos pantallas de scroll antes de saber
+                cuanto cuesta.
+
+                La ficha pasa a TRES items de rejilla en vez de dos, para que
+                el orden del DOM -- el que oyen lector de pantalla y tabulador
+                -- coincida con el orden visual en movil:
+
+                    galeria + titulo + resumen  ->  PRECIO + CTA  ->  descripcion
+
+                En escritorio se recolocan con col-start/row-start, asi que la
+                columna lateral se queda exactamente donde estaba. El hueco
+                vertical baja a 0 en lg y la descripcion recupera su mt-6 de
+                siempre, para no introducir un espaciado nuevo.
+            --}}
+            <div class="grid gap-x-10 gap-y-10 lg:grid-cols-[3fr_2fr] lg:items-start lg:gap-x-14 lg:gap-y-0">
             {{-- min-w-0: sin esto el item de rejilla toma el min-content de la
                  tira de miniaturas (5 x 80px + huecos = 440px) y la ficha
                  desbordaba 96px a 360. Medido con getBoundingClientRect. --}}
-            <div class="min-w-0">
+            <div class="min-w-0 lg:col-start-1 lg:row-start-1">
                 <x-ui.gallery :images="$galleryImages" :label="__('site.ui.gallery.nav_label', ['title' => $tour['title']])" />
 
                 {{-- Objetivo 2 (lote i18n): lang="es" honesto en cada bloque
@@ -107,23 +125,17 @@
 
                 <p class="mt-4 max-w-2xl text-lead text-text-2" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>{{ $tour['summary'] }}</p>
 
-                {{-- Defecto 1 (auditoria cliente, 2026-09-14): "description"
-                     se edita con Filament\Forms\Components\RichEditor (ver
-                     TourForm) -- es HTML de la clienta, no texto plano.
-                     Se escapaba y mostraba los tags en pantalla;
-                     App\Support\Html\RichTextSanitizer lo limpia (whitelist
-                     exacta de la toolbar del editor) antes de imprimirlo. --}}
-                <div class="prose-pv mt-6 max-w-2xl text-base leading-relaxed text-text-2" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>
-                    {!! RichTextSanitizer::sanitize($tour['description']) !!}
-                </div>
             </div>
 
             {{-- Panel de reserva. Antes era una caja casi vacia (precio +
                  boton) que dejaba una columna entera en blanco, mientras
                  duracion, dificultad y punto de encuentro estaban repartidos
                  por la columna izquierda. Ahora viven aca, que es donde se
-                 decide la compra. --}}
-            <aside class="min-w-0 lg:sticky lg:top-24">
+                 decide la compra.
+
+                 El id lo usa la barra de reserva de movil del final de esta
+                 vista para saber si este panel ya esta en pantalla. --}}
+            <aside id="panel-reserva" class="min-w-0 lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:sticky lg:top-24">
                 <div class="overflow-hidden rounded-panel border border-line bg-surface shadow-e3">
                     <div class="border-b border-line-soft bg-brand-50 px-6 py-5">
                         <x-ui.money
@@ -184,6 +196,20 @@
                     </div>
                 </div>
             </aside>
+
+            {{-- Descripcion larga. Tercer item de la rejilla: en movil va
+                 DESPUES del panel de precio (ver el comentario de la rejilla),
+                 en escritorio vuelve a la columna izquierda, bajo el resumen,
+                 con el mismo mt-6 de antes.
+
+                 "description" se edita con Filament\Forms\Components\RichEditor
+                 (ver TourForm) -- es HTML de la clienta, no texto plano. Se
+                 escapaba y mostraba los tags en pantalla;
+                 App\Support\Html\RichTextSanitizer lo limpia (whitelist exacta
+                 de la toolbar del editor) antes de imprimirlo. --}}
+            <div class="prose-pv min-w-0 max-w-2xl text-base leading-relaxed text-text-2 lg:col-start-1 lg:row-start-2 lg:mt-6" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>
+                {!! RichTextSanitizer::sanitize($tour['description']) !!}
+            </div>
             </div>
         </div>
     </section>
@@ -273,5 +299,59 @@
             </div>
         </section>
     @endif
+
+    {{--
+        Defecto C, segunda mitad. Reordenar sube el precio de 1266px a ~570px
+        en movil, pero sigue por debajo del pliegue: la clienta dice que su
+        gente "no ve ni cuanto cuesta", y eso solo se resuelve si el precio
+        esta en pantalla desde el primer momento.
+
+        Por que una barra fija y no duplicar el panel en el flujo:
+        - No hay dos bloques compitiendo en la pagina: la barra se esconde en
+          cuanto el panel de reserva de verdad entra en pantalla, y tambien al
+          llegar al pie, para no taparlo.
+        - No añade ninguna parada de tabulador ni una segunda lectura para el
+          lector de pantalla: es un atajo VISUAL a un control que ya existe
+          antes en el documento y es alcanzable por teclado. De ahi
+          aria-hidden + tabindex="-1" (sin el tabindex, un enlace enfocable
+          dentro de aria-hidden si seria un defecto de accesibilidad).
+        - Solo movil y tablet (lg:hidden): en escritorio el panel lateral ya
+          esta visible al cargar y la clienta lo aprobo tal cual.
+        - Sin JS la barra se queda visible: sigue cumpliendo su funcion.
+
+        Destino y rotulo salen de las MISMAS fuentes que el CTA del panel
+        ($reserveUrl, que arma TourController::show, y la clave de idioma
+        cta_reserve): no hay una segunda URL que se pueda quedar atras.
+    --}}
+    <div
+        x-data="{ panelVisible: false, pieVisible: false }"
+        x-init="
+            const mirar = (sel, margen, fn) => {
+                const el = document.querySelector(sel);
+                if (!el) return;
+                new IntersectionObserver(([e]) => fn(e.isIntersecting), { rootMargin: margen }).observe(el);
+            };
+            mirar('#panel-reserva', '0px', (v) => panelVisible = v);
+            mirar('footer', '0px 0px 96px 0px', (v) => pieVisible = v);
+        "
+        x-show="!panelVisible && !pieVisible"
+        x-transition.opacity.duration.150ms
+        aria-hidden="true"
+        class="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 shadow-e3 backdrop-blur-sm lg:hidden"
+    >
+        <div class="shell flex items-center gap-4 py-3">
+            <x-ui.money
+                :pen-cents="$tour['price_pen_cents']"
+                :usd-cents="$tour['price_usd_cents']"
+                :prefix="__('site.tours.show.price_prefix')"
+                class="min-w-0 font-display text-h3 font-semibold text-ink"
+            />
+            <x-ui.button
+                :href="$reserveUrl"
+                tabindex="-1"
+                class="ml-auto shrink-0 px-5 py-2.5"
+            >{{ __('site.tours.show.cta_reserve') }}</x-ui.button>
+        </div>
+    </div>
 
 </x-layout>

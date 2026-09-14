@@ -221,6 +221,38 @@
         text-transform: uppercase;
     }
 
+    /* Fragmento acentuado de un titular que va SOBRE FOTO.
+     *
+     * Defecto D (validación de la clienta, 2026-09-14): el acento del h1 de
+     * portada era un `text-brand-100` — rgb(215,234,226), un verde casi
+     * blanco. Medido fragmento a fragmento contra el peor píxel de la foto
+     * que tiene debajo:
+     *
+     *     "de Perú" (brand-100)   4.47:1 a 360 · 4.54:1 a 768 · 8.04:1 a 1440
+     *     resto del h1 (blanco)   5.85:1 a 360 · 6.14:1 a 768 · 10.87:1 a 1440
+     *
+     * El acento era SIEMPRE el fragmento más débil del titular, y a 360 se
+     * quedaba por debajo del 4.5:1 que cumple el resto del texto del sitio.
+     * Y no tiene arreglo por color: sobre esta foto ni el blanco puro llega a
+     * 6:1 a 360, así que cualquier tinte de marca mide por debajo del blanco
+     * que tiene al lado; aclararlo hasta que pase lo vuelve indistinguible
+     * del blanco, que es tanto como no tener acento.
+     *
+     * Así que el énfasis deja de ser de COLOR y pasa a ser de PESO: los glifos
+     * van en blanco, como el resto del titular, y el fragmento sube de 600 a
+     * 700 (Fraunces se carga variable 300..700, así que no añade descarga).
+     * El peso no gasta contraste — al contrario, un trazo más grueso se lee
+     * mejor sobre foto — y no necesita espacio vertical.
+     *
+     * Descartado un subrayado de marca bajo la línea base: el titular va con
+     * line-height 1.08, así que el trazo caía dentro de la caja de la línea
+     * siguiente, y el acento parte en dos líneas a 768 y 1440 en inglés
+     * ("of / Peru"), lo que dejaba dos trazos sueltos. Medido, no supuesto. */
+    .accent-on-photo {
+        color: var(--on-dark);
+        font-weight: 700;
+    }
+
     /* Regla fina de marca bajo los títulos de sección. */
     .rule-brand {
         display: block; height: .25rem; width: 3rem;
