@@ -147,7 +147,11 @@ return [
             'email_label' => 'Correo electrónico',
             'email_placeholder' => 'Ingresa tu correo electrónico',
             'submit' => 'Suscribirme',
-            'unavailable' => 'Newsletter — próximamente, sin envío real todavía',
+            // DEF-B: "sin envío real todavía" es una nota sobre NUESTRA
+            // implementación, y se renderiza en title/aria-label del campo
+            // deshabilitado de la home (home.blade.php). "Próximamente" dice
+            // lo mismo al visitante sin confesar un sitio a medio montar.
+            'unavailable' => 'Boletín — próximamente',
         ],
 
         'empty' => [
@@ -199,12 +203,34 @@ return [
             ],
             'message_label' => 'Mensaje',
             'message_placeholder' => 'Cuéntanos cómo podemos ayudarte...',
+            // DEF-B (docs/lote-3/validacion-visual-2026-09-14.md, punto 5).
+            // Antes: "política de privacidad (en preparación por la clienta)"
+            // -- una nota interna del estudio publicada en una página del
+            // sitio. Ahora hay DOS redacciones completas y ninguna habla de
+            // nuestro proceso de trabajo:
+            //   * con documento publicado (Setting privacy_policy_url):
+            //     privacy_pre + enlace + privacy_post.
+            //   * sin documento: privacy_no_policy, una frase entera que ni
+            //     enlaza ni nombra una política que no existe, y que sigue
+            //     siendo un consentimiento válido y acotado a su finalidad
+            //     (Ley 29733). Mismo criterio que "info.empty", que la
+            //     clienta aprobó: decir la verdad sin enseñar el andamio.
+            // "unavailable" se eliminó: era una clave muerta (el formulario
+            // envía de verdad desde el 2026-09-02) cuyo texto anunciaba que
+            // el sitio estaba a medio hacer.
             'privacy_pre' => 'Acepto la',
             'privacy_link' => 'política de privacidad',
-            'privacy_pending' => 'política de privacidad (en preparación por la clienta)',
             'privacy_post' => 'y el tratamiento de mis datos.',
+            'privacy_no_policy' => 'Acepto que mis datos se usen únicamente para responder a esta consulta.',
             'submit' => 'Enviar mensaje',
-            'unavailable' => 'Formulario de contacto — próximamente, sin envío real todavía',
+
+            // DEF-A: copy de la misma página cuando se llega desde la ficha
+            // de un tour (/contacto?tour=<slug>). Ver App\Support\RequestedTour.
+            'booking_eyebrow' => 'Solicitud de reserva',
+            'booking_title' => 'Solicita tu reserva',
+            'booking_description' => 'Cuéntanos fechas y número de personas. Te respondemos con la disponibilidad y las formas de pago para cerrar la reserva.',
+            'booking_tour_label' => 'Tour seleccionado',
+            'booking_tour_link' => 'Ver la ficha del tour',
         ],
 
         'info' => [
@@ -241,7 +267,11 @@ return [
                 ],
                 [
                     'question' => '¿Cuál es la política de cancelación?',
-                    'answer' => 'Todavía no publicamos esta política — la clienta debe redactarla y aprobarla antes de habilitar reservas en línea. Mientras tanto, contáctanos directamente si necesitas cancelar o reprogramar.',
+                    // DEF-B: la versión anterior contaba quién de nuestro
+                    // lado tiene que redactar el documento y de qué depende.
+                    // Se conserva la parte honesta (no hay política general
+                    // publicada) y se quita el andamio.
+                    'answer' => 'Todavía no publicamos una política de cancelación general. Si necesitas cancelar o reprogramar, escríbenos lo antes posible y te confirmamos las condiciones de tu reserva.',
                 ],
             ],
         ],
@@ -258,7 +288,9 @@ return [
             'visit_us' => 'Visítanos en nuestra oficina',
             'cta' => 'Ver en Google Maps',
             'cta_new_tab' => '(se abre en una pestaña nueva)',
-            'missing' => 'Todavía no configuramos una dirección. En cuanto la clienta la confirme, vas a poder ver cómo llegar acá.',
+            // DEF-B: decía "en cuanto la clienta la confirme". Misma
+            // redacción que "info.empty", que la clienta aprobó.
+            'missing' => 'Todavía no configuramos una dirección de oficina. Vuelve pronto.',
         ],
     ],
 
@@ -362,7 +394,16 @@ return [
         'show' => [
             'breadcrumb_index' => 'Tours',
             'price_prefix' => 'Desde',
-            'cta_reserve' => 'Reservar este tour',
+            // DEF-A (docs/lote-3/validacion-visual-2026-09-14.md, punto 4):
+            // decía "Reservar este tour" y llevaba a un formulario de
+            // consulta. No hay motor de reservas (ni fechas, ni número de
+            // personas, ni cobro) en el alcance de este lote, así que la
+            // promesa se alinea hacia abajo -- el botón pide lo que el sitio
+            // sabe hacer hoy -- y el destino dice qué pasa después
+            // (site.contacto.form.booking_*). Construir el motor es una
+            // decisión de producto, no un arreglo de copy.
+            'cta_reserve' => 'Solicitar reserva',
+            'cta_reserve_hint' => 'Te respondemos con disponibilidad y formas de pago para cerrar la reserva.',
             'duration_label' => 'Duración',
             'difficulty_label' => 'Dificultad',
             'meeting_point_title' => 'Punto de encuentro',

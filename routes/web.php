@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\DestinationController;
 use App\Http\Controllers\ExperienceController;
@@ -51,9 +52,11 @@ Route::prefix('{locale}')
         // esos componentes. El nombre de ruta NO cambió al agregar el
         // prefijo (mandato del lote): route('contact') sigue generando la
         // URL correcta gracias a URL::defaults() en SetLocaleFromUrl.
-        Route::get('/contacto', function () {
-            return view('contact');
-        })->name('contact');
+        // DEF-A (docs/lote-3/validacion-visual-2026-09-14.md, punto 4): deja
+        // de ser un closure. La pagina ahora lee ?tour=<slug> para saber de
+        // que ficha llego el visitante, y ese valor hay que validarlo y
+        // resolverlo antes de la vista (ver App\Support\RequestedTour).
+        Route::get('/contacto', [ContactController::class, 'show'])->name('contact');
 
         // Envío real del formulario de contacto (lote 3 adelantado a lote
         // 1, Anyerson 2026-09-02). Límite de tasa como antispam sin CAPTCHA

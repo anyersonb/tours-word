@@ -28,7 +28,30 @@ class NewContactMessageReceived extends Mailable
     public function build(): self
     {
         return $this
-            ->subject('Nuevo mensaje de contacto: '.$this->contactMessage->name)
+            ->subject($this->subjectLine())
             ->markdown('emails.contact-message');
+    }
+
+    /**
+     * DEF-A (docs/lote-3/validacion-visual-2026-09-14.md, punto 4): the tour
+     * goes in the SUBJECT LINE, not just in the body. The client's complaint
+     * was literally about what she reads in her inbox ("me llegará un correo
+     * que dice 'quiero información' sin decir de qué"), and the subject is
+     * the only part visible without opening the message.
+     *
+     * Reads the tour_title SNAPSHOT stored with the message, never
+     * $contactMessage->tour->title: the tour can be renamed or deleted after
+     * the fact, and the notification must keep saying what the visitor
+     * actually asked about.
+     */
+    private function subjectLine(): string
+    {
+        $message = $this->contactMessage;
+
+        if (filled($message->tour_title)) {
+            return 'Solicitud de reserva: '.$message->tour_title.' — '.$message->name;
+        }
+
+        return 'Nuevo mensaje de contacto: '.$message->name;
     }
 }

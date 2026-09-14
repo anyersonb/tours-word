@@ -11,6 +11,14 @@ use Illuminate\Validation\Rule;
  * handled in the controller by silently pretending success, never by
  * surfacing a validation error that would tip off a bot. See
  * App\Http\Controllers\ContactMessageController::store().
+ *
+ * DEF-A: the hidden "tour" field (App\Support\RequestedTour::PARAM) is also
+ * deliberately NOT validated here. A deep link that no longer resolves — a
+ * renamed slug, an unpublished tour, a tampered value — must never cost the
+ * agency a real lead by bouncing the whole form with a validation error the
+ * visitor can't act on. It is normalised and resolved in the controller via
+ * RequestedTour (same validator, but failures are dropped instead of
+ * surfaced) and the message is saved either way, just without a tour.
  */
 class StoreContactMessageRequest extends FormRequest
 {

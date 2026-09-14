@@ -30,6 +30,14 @@ class ContactMessagesTable
                 TextColumn::make('subject')
                     ->label('Asunto')
                     ->formatStateUsing(fn (?string $state): string => $state ? __('site.contacto.form.subject_options.'.$state) : ''),
+                // DEF-A: instantánea del tour, buscable. Sin esto la bandeja
+                // no distingue una solicitud de reserva del Camino Inca de
+                // una consulta genérica.
+                TextColumn::make('tour_title')
+                    ->label('Tour consultado')
+                    ->placeholder('—')
+                    ->searchable()
+                    ->toggleable(),
                 TextColumn::make('status')
                     ->label('Estado')
                     ->badge()

@@ -135,9 +135,17 @@
                     </div>
 
                     <div class="p-6">
-                        <x-ui.button href="{{ route('contact') }}" class="w-full justify-center px-6 py-3 text-base">
+                        {{-- DEF-A: el enlace lleva el tour (?tour=<slug>) y
+                             el ancla al formulario; la línea de abajo cierra
+                             la brecha entre lo que promete el botón y lo que
+                             ocurre al pulsarlo (no hay motor de reservas en
+                             este alcance). Ver TourController::show(). --}}
+                        <x-ui.button :href="$reserveUrl" class="w-full justify-center px-6 py-3 text-base">
                             {{ __('site.tours.show.cta_reserve') }}
                         </x-ui.button>
+                        <p class="mt-2 text-center text-xs text-text-2">
+                            {{ __('site.tours.show.cta_reserve_hint') }}
+                        </p>
 
                         @if($tour['duration_label'] || $tour['difficulty'] || $tour['meeting_point'])
                             <dl class="mt-6 flex flex-col gap-4 border-t border-line-soft pt-5 text-sm">

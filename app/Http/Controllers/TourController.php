@@ -8,6 +8,7 @@ use App\Models\Tour;
 use App\Models\TourSlugHistory;
 use App\Support\Locale;
 use App\Support\LocaleAlternates;
+use App\Support\RequestedTour;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -156,6 +157,21 @@ class TourController extends Controller
             // itinerario solo en español.
             return view('tours.show', [
                 'tour' => $tour,
+                // DEF-A (docs/lote-3/validacion-visual-2026-09-14.md, punto
+                // 4): el CTA de reserva llevaba a "/es/contacto" a secas y
+                // la ficha se perdía por el camino. Ahora viaja el slug
+                // (?tour=) y el ancla al formulario, para no dejar al
+                // visitante arriba de la página de contacto.
+                //
+                // $slug es el canónico de este idioma: si la URL hubiera
+                // llegado con el slug de otro, arriba ya respondimos 301.
+                // Sale del controller y no de la vista porque es él quien
+                // tiene el registro y su slug -- mismo criterio que
+                // LocaleAlternates (DEF-01).
+                'reserveUrl' => route('contact', [
+                    'locale' => $locale,
+                    RequestedTour::PARAM => $slug,
+                ]).'#formulario',
                 'contentFallbackLocale' => $tour->isContentFallbackFor($internalLocale, 'title')
                     ? $fallbackLocale
                     : null,

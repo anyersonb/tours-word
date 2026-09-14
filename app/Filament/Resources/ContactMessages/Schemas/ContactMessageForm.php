@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ContactMessages\Schemas;
 
 use App\Enums\ContactMessageStatus;
+use App\Models\ContactMessage;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -32,6 +33,16 @@ class ContactMessageForm
                             ->label('Asunto')
                             ->disabled()
                             ->formatStateUsing(fn (?string $state): string => $state ? __('site.contacto.form.subject_options.'.$state) : ''),
+                        // DEF-A: qué tour miraba el visitante al escribir.
+                        // Es el texto guardado con el mensaje (instantánea),
+                        // no el título actual del tour: si la clienta renombra
+                        // o borra el tour, el mensaje sigue diciendo por cuál
+                        // preguntaron. Se oculta cuando el mensaje llegó del
+                        // formulario genérico, para no mostrar un campo vacío.
+                        TextInput::make('tour_title')
+                            ->label('Tour consultado')
+                            ->disabled()
+                            ->visible(fn (?ContactMessage $record): bool => filled($record?->tour_title)),
                         Textarea::make('message')
                             ->label('Mensaje')
                             ->disabled()

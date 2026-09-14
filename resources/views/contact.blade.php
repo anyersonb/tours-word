@@ -29,6 +29,18 @@
         ? 'https://www.google.com/maps/search/?api=1&query='.urlencode($contactAddress)
         : null;
 
+    /**
+     * DEF-A (docs/lote-3/validacion-visual-2026-09-14.md, punto 4). Los tres
+     * los pasa App\Http\Controllers\ContactController y son null salvo que se
+     * haya llegado desde la ficha de un tour con ?tour=<slug> que resuelva a
+     * un tour publicado. El valor CRUDO de la URL no llega nunca hasta acá:
+     * lo único que se imprime es $requestedTour->title, leído de la base.
+     */
+    $requestedTour = $requestedTour ?? null;
+    $requestedTourSlug = $requestedTourSlug ?? null;
+    $requestedTourUrl = $requestedTourUrl ?? null;
+    $isBookingRequest = $requestedTour !== null;
+
     $subjectOptions = __('site.contacto.form.subject_options');
     $faqItems = __('site.contacto.faq.items');
     $heroAttributes = __('site.contacto.hero.attributes');
@@ -121,9 +133,37 @@
     <section class="weave bg-sand">
         <div class="shell section grid gap-8 lg:grid-cols-[3fr_2fr]">
 
-            <div class="rounded-panel border border-line bg-surface p-6 shadow-e2 sm:p-8">
-                <x-ui.section-title as="h2">{{ __('site.contacto.form.title') }}</x-ui.section-title>
-                <p class="-mt-4 mb-6 text-sm text-text-2">{{ __('site.contacto.form.description') }}</p>
+            {{-- DEF-A: "formulario" es el destino del ancla del CTA de la
+                 ficha de tour (TourController::show -> reserveUrl). El id es
+                 el mismo en todos los idiomas a propósito: no es copy, es un
+                 destino de enlace. scroll-mt deja sitio a la cabecera fija. --}}
+            <div id="formulario" class="scroll-mt-28 rounded-panel border border-line bg-surface p-6 shadow-e2 sm:p-8">
+                @if($isBookingRequest)
+                    <x-ui.eyebrow class="mb-3">{{ __('site.contacto.form.booking_eyebrow') }}</x-ui.eyebrow>
+                @endif
+
+                <x-ui.section-title as="h2">
+                    {{ $isBookingRequest ? __('site.contacto.form.booking_title') : __('site.contacto.form.title') }}
+                </x-ui.section-title>
+                <p class="-mt-4 mb-6 text-sm text-text-2">
+                    {{ $isBookingRequest ? __('site.contacto.form.booking_description') : __('site.contacto.form.description') }}
+                </p>
+
+                {{-- DEF-A: el visitante tiene que VER que el sitio lo entendió.
+                     Un campo oculto solo no basta (lo pidió la clienta de
+                     forma explícita). El título sale de la base de datos, no
+                     de la URL. --}}
+                @if($isBookingRequest)
+                    <div class="mb-6 rounded-xl border border-line bg-brand-50 p-4">
+                        <p class="text-xs font-medium uppercase tracking-wide text-text-2">{{ __('site.contacto.form.booking_tour_label') }}</p>
+                        <p class="mt-1 font-display text-lg font-semibold text-ink">{{ $requestedTour->title }}</p>
+                        @if($requestedTourUrl)
+                            <a href="{{ $requestedTourUrl }}" class="mt-1 inline-block text-sm font-medium text-brand-text underline underline-offset-2 hover:text-action-hover">
+                                {{ __('site.contacto.form.booking_tour_link') }}
+                            </a>
+                        @endif
+                    </div>
+                @endif
 
                 @if(session('contact_success'))
                     <div class="mb-6 rounded-xl border border-green-200 bg-green-50 p-4 text-sm font-medium text-green-800" role="status">
@@ -156,6 +196,16 @@
                         <label for="field-website">Deja este campo vacío</label>
                         <input type="text" id="field-website" name="website" tabindex="-1" autocomplete="off">
                     </div>
+
+                    {{-- DEF-A: acompaña al bloque visible de arriba, nunca lo
+                         sustituye. Es el que hace que el tour llegue al correo
+                         de la agencia aunque el visitante no escriba su
+                         nombre en el mensaje. Se revalida en el servidor
+                         (App\Support\RequestedTour): un valor manipulado se
+                         descarta, nunca bloquea el envío. --}}
+                    @if($requestedTourSlug)
+                        <input type="hidden" name="tour" value="{{ $requestedTourSlug }}">
+                    @endif
 
                     <div class="grid gap-5 sm:grid-cols-2">
                         <x-ui.form.input
@@ -191,7 +241,11 @@
                             :label="__('site.contacto.form.subject_label')"
                             :placeholder="__('site.contacto.form.subject_placeholder')"
                             :options="$subjectOptions"
-                            :value="old('subject')"
+                            {{-- DEF-A: llegando desde una ficha, el asunto ya
+                                 viene puesto en "Reserva de un tour". old()
+                                 manda si el visitante ya eligió otro y la
+                                 validación lo devolvió. --}}
+                            :value="old('subject', $isBookingRequest ? 'reserva' : null)"
                             :error="$errors->first('subject')"
                             required
                         />
@@ -215,19 +269,29 @@
                         controller guarda cuándo se aceptó, no solo que la
                         validación pasó.
                     --}}
+                    {{--
+                        DEF-B (docs/lote-3/validacion-visual-2026-09-14.md,
+                        punto 5): sin política publicada, esto decía "política
+                        de privacidad (en preparación por la clienta)" — una
+                        nota interna nuestra en una página pública. Ya no se
+                        arma media frase alrededor de un documento que no
+                        existe: son dos redacciones completas y excluyentes.
+                        Ni se enlaza a una política inexistente, ni se afirma
+                        que exista.
+                    --}}
                     <x-ui.form.checkbox name="privacy" required :error="$errors->first('privacy')">
-                        {{ __('site.contacto.form.privacy_pre') }}
                         @if(filled($privacyPolicyUrl))
+                            {{ __('site.contacto.form.privacy_pre') }}
                             <a
                                 href="{{ $privacyPolicyUrl }}"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 class="font-medium text-brand-text underline underline-offset-2 hover:text-action-hover"
                             >{{ __('site.contacto.form.privacy_link') }}</a>
+                            {{ __('site.contacto.form.privacy_post') }}
                         @else
-                            <span class="font-medium text-text-muted">{{ __('site.contacto.form.privacy_pending') }}</span>
+                            {{ __('site.contacto.form.privacy_no_policy') }}
                         @endif
-                        {{ __('site.contacto.form.privacy_post') }}
                     </x-ui.form.checkbox>
 
                     <div>

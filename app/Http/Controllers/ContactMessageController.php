@@ -6,6 +6,7 @@ use App\Enums\ContactMessageStatus;
 use App\Http\Requests\StoreContactMessageRequest;
 use App\Mail\NewContactMessageReceived;
 use App\Models\ContactMessage;
+use App\Support\RequestedTour;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -25,8 +26,22 @@ class ContactMessageController extends Controller
             return back()->with('contact_success', true);
         }
 
+        // DEF-A (docs/lote-3/validacion-visual-2026-09-14.md, punto 4): the
+        // tour the visitor came from, carried in a hidden field. Resolved
+        // (and silently dropped if malformed or gone) by RequestedTour --
+        // never a validation error, a lead is worth more than the deep link
+        // that produced it. "tour_title" is stored as a SNAPSHOT so the
+        // agency keeps knowing WHICH tour was asked about even if the tour is
+        // later renamed, unpublished or deleted.
+        $tour = RequestedTour::resolve(
+            RequestedTour::slugFrom($request->all()),
+            (string) $request->route('locale')
+        );
+
         $contactMessage = ContactMessage::create([
             ...$request->safe()->only(['name', 'email', 'phone', 'subject', 'message']),
+            'tour_id' => $tour?->id,
+            'tour_title' => $tour?->title,
             'status' => ContactMessageStatus::Nuevo,
             'channel' => 'web',
             'ip_address' => $request->ip(),

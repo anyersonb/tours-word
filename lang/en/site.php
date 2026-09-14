@@ -147,7 +147,8 @@ return [
             'email_label' => 'Email address',
             'email_placeholder' => 'Enter your email address',
             'submit' => 'Subscribe',
-            'unavailable' => 'Newsletter — coming soon, no real submission yet',
+            // DEF-B: see the Spanish file.
+            'unavailable' => 'Newsletter — coming soon',
         ],
 
         'empty' => [
@@ -199,12 +200,21 @@ return [
             ],
             'message_label' => 'Message',
             'message_placeholder' => 'Tell us how we can help you...',
+            // DEF-B: see the Spanish file for the full reasoning. No public
+            // string may describe our own production process.
             'privacy_pre' => 'I accept the',
             'privacy_link' => 'privacy policy',
-            'privacy_pending' => 'privacy policy (being drafted by the client)',
             'privacy_post' => 'and the processing of my data.',
+            'privacy_no_policy' => 'I agree that my details will only be used to reply to this enquiry.',
             'submit' => 'Send message',
-            'unavailable' => 'Contact form — coming soon, no real submission yet',
+
+            // DEF-A: copy for this same page when the visitor arrives from a
+            // tour page (/contacto?tour=<slug>).
+            'booking_eyebrow' => 'Booking request',
+            'booking_title' => 'Request your booking',
+            'booking_description' => 'Tell us your dates and group size. We\'ll reply with availability and payment options to confirm your booking.',
+            'booking_tour_label' => 'Selected tour',
+            'booking_tour_link' => 'View the tour page',
         ],
 
         'info' => [
@@ -241,7 +251,8 @@ return [
                 ],
                 [
                     'question' => 'What is your cancellation policy?',
-                    'answer' => 'We haven\'t published this policy yet — the client needs to draft and approve it before online bookings are enabled. In the meantime, contact us directly if you need to cancel or reschedule.',
+                    // DEF-B: see the Spanish file.
+                    'answer' => 'We haven\'t published a general cancellation policy yet. If you need to cancel or reschedule, write to us as soon as possible and we\'ll confirm the terms of your booking.',
                 ],
             ],
         ],
@@ -258,7 +269,8 @@ return [
             'visit_us' => 'Visit us at our office',
             'cta' => 'View on Google Maps',
             'cta_new_tab' => '(opens in a new tab)',
-            'missing' => 'We haven\'t set up an address yet. As soon as the client confirms it, you\'ll be able to see how to get here.',
+            // DEF-B: see the Spanish file.
+            'missing' => 'We haven\'t set up an office address yet. Check back soon.',
         ],
     ],
 
@@ -360,7 +372,9 @@ return [
         'show' => [
             'breadcrumb_index' => 'Tours',
             'price_prefix' => 'From',
-            'cta_reserve' => 'Book this tour',
+            // DEF-A: see the Spanish file.
+            'cta_reserve' => 'Request booking',
+            'cta_reserve_hint' => 'We\'ll reply with availability and payment options to confirm your booking.',
             'duration_label' => 'Duration',
             'difficulty_label' => 'Difficulty',
             'meeting_point_title' => 'Meeting point',

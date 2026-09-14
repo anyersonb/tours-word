@@ -9,6 +9,10 @@ Llegó un mensaje nuevo desde el formulario de contacto del sitio.
 **Teléfono / WhatsApp:** {{ $contactMessage->phone }}
 @endif
 **Asunto:** {{ __('site.contacto.form.subject_options.'.$contactMessage->subject) }}
+@if($contactMessage->tour_title)
+
+**Tour consultado:** {{ $contactMessage->tour_title }}
+@endif
 
 **Mensaje:**
 
