@@ -71,7 +71,12 @@ class SitemapTest extends TestCase
             'Este test simula BAJAR la bandera; si ya viene abajo desde config/cms.php, revisar el grupo "bandera arriba" de este archivo, que quedó sin probar nada.'
         );
 
-        config(['cms.catalog_demo_content' => false]);
+        // is_staging_mirror declarado explícito (M-1, config/cms.php): desde
+        // que la bandera falla CERRADA, "no declararla" ya no equivale a
+        // false -- este helper simula contenido real publicado en el
+        // dominio propio de Pacha Viva, así que necesita la declaración
+        // explícita para seguir probando el estado "ambas banderas abajo".
+        config(['cms.catalog_demo_content' => false, 'cms.is_staging_mirror' => false]);
     }
 
     // -----------------------------------------------------------------

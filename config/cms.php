@@ -68,6 +68,63 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Espejo de staging (bandera dedicada, NO reutilizar catalog_demo_content)
+    |--------------------------------------------------------------------------
+    |
+    | Receta SEO `docs/rediseno-2026/02-seo.md` ## 6.2. Este build se publica
+    | como demo en `limaviewtours.com/tour-word/` -- un subdirectorio del
+    | dominio de OTRO cliente, que ya sufrió en julio 2026 un incidente real
+    | de staging indexado. Cero margen para repetirlo.
+    |
+    | A propósito una bandera DISTINTA de "catalog_demo_content": esa se
+    | apaga el día que la clienta cargue contenido real (otro ciclo de vida,
+    | decisión de negocio sobre el catálogo). Esta se apaga el día que el
+    | build deje de vivir en el subdirectorio del dominio ajeno (decisión de
+    | infraestructura/despliegue). Si compartieran la bandera, apagar una
+    | apagaría la otra sin que nadie lo decidiera a propósito -- el día que
+    | el catálogo pase a real, el staging quedaría indexable sin control.
+    |
+    | Solo se enciende con IS_STAGING_MIRROR=true en el .env DEL DESPLIEGUE
+    | de /tour-word/, nunca en el .env del dominio real de Pacha Viva.
+    |
+    | FALLA CERRADA a propósito (hallazgo M-1, corregido tras
+    | docs/rediseno-2026/04-seguridad.md ##5). Hasta este fix la clave era
+    | `env('IS_STAGING_MIRROR', false)`: CUALQUIER valor falsy de PHP --
+    | clave ausente por un .env perdido, un typo en el nombre de la
+    | variable, una cadena vacía, o "0" -- se leía igual que un "false"
+    | explícito y dejaba el espejo INDEXABLE. Medido en vivo por
+    | security-engineer: cinco modos de fallo, los cinco silenciosos, los
+    | cinco indexables -- justo el incidente que esta bandera existe para
+    | prevenir (staging duplicado indexado en el dominio de otro cliente,
+    | julio 2026).
+    |
+    | Ahora: solo IS_STAGING_MIRROR=false ESCRITO A PROPÓSITO (que Laravel
+    | castea a bool(false)) produce `false`. Cualquier otro estado -- key
+    | ausente, ".env" perdido, typo, vacío, "0", o cualquier cosa que no
+    | sea exactamente la palabra "false" -- cae al default `true`
+    | (noindex). Ante la duda, no indexable.
+    |
+    | Costo que hay que aceptar a cambio: el .env de producción REAL de
+    | Pacha Viva (su propio dominio, NO el espejo) tiene que declarar
+    | IS_STAGING_MIRROR=false EXPLÍCITO -- ya no basta con omitir la
+    | variable. Ese fallo es ruidoso y barato (se nota en la primera
+    | revisión de SEO, se arregla con una línea); el anterior era
+    | silencioso y caro (se nota cuando el sitio de otro cliente ya está
+    | en Google).
+    |
+    | App\Support\Indexability::siteIsIndexable() combina esta bandera con
+    | catalog_demo_content comparando ambas contra `false` en estricto:
+    | hace falta que las DOS resuelvan a `false` explícito para que el
+    | sitio sea indexable. Todo lo que cuelga de esa clase (meta robots del
+    | layout, sitemap.xml, "Sitemap:" de robots.txt) hereda el
+    | comportamiento sin tocar ningún otro archivo.
+    |
+    */
+
+    'is_staging_mirror' => env('IS_STAGING_MIRROR', true) !== false,
+
+    /*
+    |--------------------------------------------------------------------------
     | Moneda
     |--------------------------------------------------------------------------
     |

@@ -175,8 +175,10 @@
      * (--photo-tint) unifica fotos de banco de temperaturas distintas. */
     .photo { position: relative; overflow: hidden; background-color: var(--surface-2); }
     /* :is() cubre tanto <img> suelto como el <img> dentro de <picture>
-     * que emite <x-ui.picture>. */
-    .photo > picture { display: contents; }
+     * que emite <x-ui.picture>. Descendiente (no hijo directo): el pase de
+     * parallax mete un .parallax-frame entre .photo y <picture> en algunas
+     * pantallas, y esta regla tiene que seguir alcanzándolo. */
+    .photo picture { display: contents; }
     .photo :is(img) { display: block; width: 100%; height: 100%; object-fit: cover; }
     .photo::after {
         content: ''; position: absolute; inset: 0; pointer-events: none;
@@ -257,6 +259,140 @@
     .rule-brand {
         display: block; height: .25rem; width: 3rem;
         border-radius: 9999px; background-color: var(--action);
+    }
+
+    /* ============================================================================
+     * PASE CINEMATOGRÁFICO (2026-09-18) — infraestructura de animación.
+     * Reutilizable por la pasada B (fichas de tour): slider de hero, Ken
+     * Burns, parallax por capas y revelados al hacer scroll. Cero librerías
+     * nuevas — Alpine 3 (ya instalado) + CSS + IntersectionObserver/rAF
+     * nativos. El detalle de cada pieza va en su comentario.
+     * ========================================================================= */
+
+    /* --- Slider de hero -------------------------------------------------
+     * Diapositivas apiladas (position:absolute inset:0 dentro de un
+     * contenedor position:relative) que cambian por fundido de opacidad.
+     * pointer-events:none porque el slide es puramente decorativo — el
+     * contenido interactivo (título, botones) vive aparte, por encima. */
+    .hero-slide {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 1.1s ease;
+    }
+    .hero-slide.is-active {
+        opacity: 1;
+        z-index: 1;
+    }
+    /* Respaldo sin JS: mientras heroSlider() no haya corrido (Alpine no
+     * cargó, o el visitante tiene JS desactivado), la diapositiva 1 se ve
+     * igual — no depende de la clase is-active, que solo la pone Alpine.
+     * En cuanto init() marca #hero[data-hero-ready], esta regla deja de
+     * aplicar y manda solo is-active (ver heroSlider() en app.js). Las
+     * diapositivas 2 y 3 nunca necesitan este respaldo: su <picture> vive
+     * dentro de <template>, así que sin JS no hay nada que mostrar ahí. */
+    #hero:not([data-hero-ready]) .hero-slide:first-child {
+        opacity: 1;
+        z-index: 1;
+    }
+
+    /* Ken Burns: solo con motion permitido, y solo en la diapositiva activa.
+     * Dos variantes de dirección alternadas por posición para que las tres
+     * fotos no repitan el mismo barrido. La imagen ya vive dentro de un
+     * .photo con overflow:hidden, así que la escala nunca se sale de caja. */
+    @media (prefers-reduced-motion: no-preference) {
+        .hero-slide.is-active .hero-slide__img {
+            animation: pv-kenburns-a 17s ease-in-out infinite alternate;
+        }
+        .hero-slide:nth-of-type(2).is-active .hero-slide__img {
+            animation-name: pv-kenburns-b;
+        }
+        .hero-slide:nth-of-type(3).is-active .hero-slide__img {
+            animation-name: pv-kenburns-c;
+        }
+    }
+    @keyframes pv-kenburns-a {
+        from { transform: scale(1) translate3d(0, 0, 0); }
+        to   { transform: scale(1.09) translate3d(-1.4%, -1%, 0); }
+    }
+    @keyframes pv-kenburns-b {
+        from { transform: scale(1.05) translate3d(1%, 0, 0); }
+        to   { transform: scale(1.12) translate3d(-1%, -1.6%, 0); }
+    }
+    @keyframes pv-kenburns-c {
+        from { transform: scale(1) translate3d(-0.6%, 0.4%, 0); }
+        to   { transform: scale(1.09) translate3d(1.2%, -0.8%, 0); }
+    }
+
+    /* Indicadores del slider: pastilla-punto sobre foto, mismo lenguaje que
+     * el resto del sitio (ver carousel-shell) pero en tono claro, para leerse
+     * sobre cualquiera de las tres fotos. */
+    .hero-dot {
+        display: flex; align-items: center; justify-content: center;
+        height: 1.5rem; width: 1.5rem; border-radius: 9999px;
+    }
+    .hero-dot__mark {
+        height: .5rem; width: .5rem; border-radius: 9999px;
+        background-color: hsl(0 0% 100% / .5);
+        transition: all .3s ease;
+    }
+    .hero-dot.is-active .hero-dot__mark {
+        width: 1.5rem;
+        background-color: #fff;
+    }
+
+    /* Botón "desplázate" al pie del hero. El rebote es puramente decorativo
+     * (aria-hidden en el ícono) y se anula con reduced-motion. */
+    @media (prefers-reduced-motion: no-preference) {
+        .hero-scroll-cue__icon { animation: pv-bounce 2s ease-in-out infinite; }
+    }
+    @keyframes pv-bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(.4rem); }
+    }
+
+    /* --- Parallax por capas ---------------------------------------------
+     * .parallax-frame vive DENTRO de un .photo (position:relative,
+     * overflow:hidden) y se extiende más allá de la caja en alto: así, el
+     * translateY que aplica JS (clamp a esa holgura) nunca descubre un
+     * hueco. background-attachment:fixed queda descartado a propósito — se
+     * rompe en iOS Safari. El transform lo pone JS en runtime; acá solo la
+     * holgura y el will-change.
+     *
+     * Holgura subida de 14% a 26% (2026-09-18, QA NO APTO sobre el primer
+     * intento): con 14% el tope de JS (antes calculado sobre el alto del
+     * PROPIO marco, 1.28x el de .photo) ya superaba por 4-9px la holgura
+     * real disponible — un bug preexistente, casi invisible porque casi
+     * siempre ocurría fuera de pantalla o bajo el scrim, pero real (medido
+     * con playwright-core, get BoundingClientRect del marco vs. de .photo).
+     * clampedDelta() en app.js ahora calcula el tope sobre el alto de
+     * .photo (no del marco) y deja 4 puntos porcentuales de margen bajo
+     * esta holgura — nunca deberían tocarse. Subir la holgura por encima
+     * de 26% escala más la foto dentro del marco (más zoom/recorte); no
+     * subir sin volver a medir el encuadre de las 4 fotos. */
+    .parallax-frame {
+        position: absolute;
+        inset: -26% 0;
+        will-change: transform;
+    }
+
+    /* --- Revelados al entrar en viewport ----------------------------------
+     * Por defecto TODO es visible (sin JS, o con prefers-reduced-motion, o
+     * si IntersectionObserver no existe, el contenido nunca se esconde). El
+     * estado oculto solo se activa cuando app.js confirma soporte + motion
+     * permitido y marca <html class="js-reveal-ready">. Una vez revelado,
+     * queda — el JS deja de observar el elemento. */
+    html.js-reveal-ready [data-reveal] {
+        opacity: 0;
+        transform: translateY(1.25rem);
+        transition: opacity .7s cubic-bezier(.16, .84, .44, 1),
+                    transform .7s cubic-bezier(.16, .84, .44, 1);
+        transition-delay: var(--reveal-delay, 0ms);
+    }
+    html.js-reveal-ready [data-reveal].is-revealed {
+        opacity: 1;
+        transform: none;
     }
 
     /* --- Motivo geométrico de marca -----------------------------------

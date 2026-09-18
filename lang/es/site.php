@@ -32,6 +32,11 @@ return [
             'nav_label' => 'Galería de fotos de :title',
             'thumbnails_group' => 'Miniaturas de :title',
             'show_photo' => 'Ver foto :position de :total',
+            // Lightbox (pasada B, 2026-09-18).
+            'expand' => 'Ver foto a pantalla completa',
+            'close' => 'Cerrar',
+            'previous' => 'Foto anterior',
+            'next' => 'Foto siguiente',
         ],
 
         // R (lote 3): x-ui.tour-card traía "Ver tour" y el prefijo "Desde"
@@ -100,7 +105,32 @@ return [
             'subtitle' => 'Diseñamos experiencias auténticas e inolvidables en los destinos más increíbles del Perú.',
             'cta_primary' => 'Explorar tours',
             'cta_secondary' => 'Ver destinos',
-            'photo_alt' => 'Viajera contemplando el paisaje andino',
+            // Pase cinematográfico (2026-09-18): el hero pasó de una foto fija
+            // a un slider de 3. Cada diapositiva necesita su propio alt (foto
+            // real de public/images/site/) y una etiqueta corta para el botón
+            // indicador — nunca "Diapositiva 1/2/3" a secas, que no dice nada
+            // a un lector de pantalla sobre QUÉ va a ver.
+            'slides' => [
+                [
+                    'alt' => 'Amanecer sobre la ciudadela de Machu Picchu, con el Huayna Picchu al fondo',
+                    'label' => 'Machu Picchu al amanecer',
+                ],
+                [
+                    'alt' => 'Vista panorámica del Valle Sagrado de los Incas desde un mirador',
+                    'label' => 'Valle Sagrado',
+                ],
+                [
+                    'alt' => 'Río andino serpenteando entre pastizales dorados frente a una cordillera nevada',
+                    'label' => 'Cordillera y río andino',
+                ],
+            ],
+            'carousel_label' => 'Fotografías destacadas de Perú',
+            'go_to_slide' => 'Ir a la foto: :label',
+            'pause' => 'Pausar el avance automático de fotos',
+            'play' => 'Reanudar el avance automático de fotos',
+            'prev' => 'Foto anterior',
+            'next' => 'Foto siguiente',
+            'scroll_cue' => 'Desplázate para ver más',
             'trust' => [
                 'safe' => 'Viajes 100% seguros',
                 'guides' => 'Guías locales expertos',
@@ -111,16 +141,19 @@ return [
         ],
 
         'featured_tours' => [
+            'eyebrow' => 'Selección Pacha Viva',
             'title' => 'Tours destacados',
             'cta' => 'Ver todos los tours',
         ],
 
         'destinations' => [
+            'eyebrow' => 'Tu próximo mapa',
             'title' => 'Destinos imperdibles',
             'cta' => 'Ver todos',
         ],
 
         'why_us' => [
+            'eyebrow' => 'Nuestro compromiso',
             'title_before' => '¿Por qué elegir viajar con',
             'title_highlight' => 'nosotros',
             'title_after' => '?',
@@ -136,6 +169,7 @@ return [
         ],
 
         'experiences' => [
+            'eyebrow' => 'Vive Perú',
             'title' => 'Experiencias únicas',
             'cta' => 'Ver todas',
         ],

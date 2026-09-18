@@ -115,7 +115,7 @@ class DemoCatalogImageSeeder extends Seeder
     {
         // tour-camino-inca-*: the bank has no porter/campsite photos for this
         // tour (see CREDITOS.md) -- none of the alt text below claims either.
-        $this->wireTour('muestra-camino-inca-4-dias', 'tour-camino-inca.jpg', [
+        $this->wireTour('camino-inca-machu-picchu-4-dias', 'tour-camino-inca.jpg', [
             'es' => 'Caminante recorriendo el sendero del Camino Inca',
             'en' => 'A hiker walking the Inca Trail',
         ], [
@@ -125,7 +125,7 @@ class DemoCatalogImageSeeder extends Seeder
             ['tour-camino-inca-galeria-04.jpg', 'Las ruinas circulares de Runkurakay entre las nubes', 'The circular ruins of Runkurakay among the clouds'],
         ]);
 
-        $this->wireTour('muestra-tour-gastronomico-arequipa', 'tour-gastronomia-arequipa.jpg', [
+        $this->wireTour('ruta-de-picanterias-arequipa', 'tour-gastronomia-arequipa.jpg', [
             'es' => 'Anticuchos, choclo y mariscos a la parrilla, platos típicos de la gastronomía peruana',
             'en' => 'Anticuchos, corn, and grilled seafood, typical dishes of Peruvian cuisine',
         ], [
@@ -137,7 +137,7 @@ class DemoCatalogImageSeeder extends Seeder
             ['tour-gastronomia-arequipa-galeria-04.jpg', 'Papas andinas servidas con queso y salsa de huacatay', 'Andean potatoes served with cheese and huacatay sauce'],
         ]);
 
-        $this->wireTour('muestra-tour-valle-sagrado', 'tour-valle-sagrado.jpg', [
+        $this->wireTour('valle-sagrado-pisac-maras-moray', 'tour-valle-sagrado.jpg', [
             'es' => 'Andenes circulares de Moray, en el Valle Sagrado',
             'en' => 'The circular terraces of Moray, in the Sacred Valley',
         ], [

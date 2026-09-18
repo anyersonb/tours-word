@@ -81,6 +81,13 @@
      *   (acá), así que bajarla devuelve el sitio entero a indexable sin tocar
      *   código — por eso los tres índices de catálogo dejaron de cablear
      *   `:noindex="true"`.
+     *   Receta SEO `## 6.2` (2026-09-18): `$isNoindex` ya NO lee
+     *   `config('cms.catalog_demo_content')` directo -- pasa por
+     *   `App\Support\Indexability::siteIsIndexable()`, que combina esa
+     *   bandera con `cms.is_staging_mirror` (espejo de staging en
+     *   limaviewtours.com/tour-word/, dominio de otro cliente). Fuente
+     *   única: `SitemapController`/`RobotsController` ya leían esa misma
+     *   clase, así que este cambio no les exige nada nuevo.
      */
     $pageTitle = match (true) {
         $titleLiteral && filled($title) => $title,
@@ -91,7 +98,7 @@
     $canonicalUrl = $canonical ?? url()->current();
     $ogImageUrl = $ogImage ?? asset('images/site/og-default.jpg');
 
-    $isNoindex = $noindex || config('cms.catalog_demo_content');
+    $isNoindex = $noindex || ! \App\Support\Indexability::siteIsIndexable();
 
     $currentRouteName = \Illuminate\Support\Facades\Route::currentRouteName();
     $currentRouteParams = \Illuminate\Support\Facades\Route::current()?->parameters() ?? [];

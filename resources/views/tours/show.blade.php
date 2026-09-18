@@ -39,6 +39,21 @@
     $iconClock = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>';
     $iconGauge = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><path d="m12 14 3-5"/><circle cx="12" cy="14" r="1"/><path d="M4 15a8 8 0 1 1 16 0"/></svg>';
     $iconPin = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>';
+
+    // Pase cinematográfico (pasada B, 2026-09-18): hero de ficha con la
+    // foto PRINCIPAL del tour (la primera de tour_images, no un placeholder
+    // estirado a pantalla completa — ver la nota larga junto al hero, más
+    // abajo, para el caso sin foto). $hasRealPhoto se calcula sobre la
+    // relación cargada ($tour['images']), NUNCA sobre $galleryImages (esa sí
+    // cae al placeholder de 1 foto para que la galería nunca quede vacía —
+    // ver más abajo — así que usarla acá habría hecho creer que TODO tour
+    // "tiene foto").
+    $hasRealPhoto = $tour['images']->isNotEmpty();
+    $heroImage = $hasRealPhoto ? $tour['images']->first() : null;
+
+    // Adelantado desde más abajo (antes vivía junto al bloque de galería):
+    // el hero también imprime el H1, así que necesita este atributo antes.
+    $fallbackLangAttr = $contentFallbackLocale ? str_replace('_', '-', $contentFallbackLocale) : null;
 @endphp
 {{-- Defecto 1 (cierre lote SEO, 2026-09-14): la ficha de tour era la unica
      de las 3 fichas de catalogo sin BreadcrumbList/hreflang/noindex por
@@ -70,12 +85,90 @@
     :hreflang-urls="$hreflangUrls"
 >
 
-    {{-- ============ MIGAS DE PAN + GALERÍA + PRECIO/CTA ============ --}}
+    {{-- ============ HERO ============
+         Pase cinematográfico (2026-09-18). Antes: banda plana --sand con
+         solo las migas de pan; título/resumen vivían más abajo, dentro de
+         la rejilla. Ahora: hero a sangre con la foto PRINCIPAL del tour,
+         migas, título, duración/dificultad (avance rápido) y precio — el
+         detalle completo (CTA, punto de encuentro, resumen) sigue
+         exactamente donde estaba, debajo. Nunca dos <h1>: el título vive
+         SOLO acá; la columna de la rejilla ya no repite el suyo.
+
+         Con foto: mismo tratamiento que la cabecera cinematográfica del
+         índice (--scrim-hero + parallax sutil, apagado bajo 1024px/puntero
+         grueso/reduced-motion vía la infraestructura existente).
+
+         Sin foto (caso frecuente en este catálogo — ver el aviso del
+         encargo): NUNCA el placeholder SVG estirado a pantalla completa.
+         Se resuelve con el tratamiento gráfico de marca que ya usa el resto
+         del sitio para bloques oscuros sin foto (.weave-dark +
+         --ink-surface, el mismo que la banda CTA de "más tours en este
+         destino" más abajo) — geometría abstracta derivada de --brand-h,
+         nunca una foto que no existe. --}}
     <x-seo.breadcrumb-jsonld :items="$breadcrumbItems" />
 
-    <section class="border-b border-sand-line bg-sand">
-        <div class="shell py-4">
-            <x-ui.breadcrumbs :items="$breadcrumbItems" />
+    <section
+        @class([
+            'relative isolate flex flex-col justify-end overflow-hidden bg-ink-surface',
+            'min-h-[62svh] sm:min-h-[70svh] lg:min-h-[76svh]' => $hasRealPhoto,
+            'weave-dark min-h-[46svh] sm:min-h-[52svh]' => ! $hasRealPhoto,
+        ])
+    >
+        @if($hasRealPhoto)
+            <div class="photo scrim-hero absolute inset-0" aria-hidden="true">
+                {{-- Velocidad subida de 0.1 a 0.2 (2026-09-18): la cabecera
+                     ocupa casi todo el viewport, así que la ventana de scroll
+                     donde el visitante la ve completa es corta; con 0.1 el
+                     desplazamiento en ese tramo era casi nulo. El clamp del
+                     12% del alto del marco no cambia. --}}
+                <div class="parallax-frame" data-parallax="0.2">
+                    <x-ui.picture
+                        src="{{ $heroImage['src'] }}"
+                        alt=""
+                        sizes="100vw"
+                        loading="eager"
+                        fetchpriority="high"
+                        decoding="sync"
+                        position="center 45%"
+                        imgClass="h-full w-full object-cover"
+                    />
+                </div>
+            </div>
+        @endif
+
+        <div class="shell relative z-10 pb-10 pt-24 sm:pb-14 sm:pt-28 lg:pb-16">
+            <x-ui.breadcrumbs :items="$breadcrumbItems" tone="dark" class="mb-6" />
+
+            @if($tour['destination'])
+                <a href="{{ route('destinations.show', $tour['destination']['slug']) }}" class="inline-flex items-center gap-1.5 text-sm font-medium text-on-dark-2 transition-colors hover:text-white">
+                    {!! $iconPin !!}{{ $tour['destination']['name'] }}
+                </a>
+            @endif
+
+            <h1 class="mt-3 max-w-3xl font-display text-hero font-semibold text-white" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>{{ $tour['title'] }}</h1>
+
+            @if($tour['duration_label'] || $tour['difficulty'])
+                <div class="mt-5 flex flex-wrap items-center gap-3">
+                    @if($tour['duration_label'])
+                        <span class="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-sm text-white ring-1 ring-white/25 backdrop-blur-sm">
+                            {!! $iconClock !!}<span class="sr-only">{{ __('site.tours.show.duration_label') }}:</span> {{ $tour['duration_label'] }}
+                        </span>
+                    @endif
+                    @if($tour['difficulty'])
+                        <span class="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-sm text-white ring-1 ring-white/25 backdrop-blur-sm">
+                            {!! $iconGauge !!}<span class="sr-only">{{ __('site.tours.show.difficulty_label') }}:</span> {{ __('tours.difficulty.'.$tour['difficulty']->value) }}
+                        </span>
+                    @endif
+                </div>
+            @endif
+
+            <x-ui.money
+                :pen-cents="$tour['price_pen_cents']"
+                :usd-cents="$tour['price_usd_cents']"
+                :prefix="__('site.tours.show.price_prefix')"
+                tone="dark"
+                class="mt-7 font-display text-h2 font-semibold text-white"
+            />
         </div>
     </section>
 
@@ -92,7 +185,11 @@
                 el orden del DOM -- el que oyen lector de pantalla y tabulador
                 -- coincida con el orden visual en movil:
 
-                    galeria + titulo + resumen  ->  PRECIO + CTA  ->  descripcion
+                    galeria + resumen  ->  PRECIO + CTA  ->  descripcion
+
+                (el titulo se mudo al hero de arriba en el pase
+                cinematografico, 2026-09-18 -- un solo H1 por pagina, nunca
+                dos.)
 
                 En escritorio se recolocan con col-start/row-start, asi que la
                 columna lateral se queda exactamente donde estaba. El hueco
@@ -110,20 +207,13 @@
                      de contenido de catalogo cuando este tour todavia no
                      tiene su traduccion al locale de la URL -- nunca se
                      finge que este texto esta en el idioma de la pagina.
-                     Ver ResolvesBySlugByLocale y el aviso de abajo. --}}
-                @php($fallbackLangAttr = $contentFallbackLocale ? str_replace('_', '-', $contentFallbackLocale) : null)
-
-                @if($tour['destination'])
-                    <a href="{{ route('destinations.show', $tour['destination']['slug']) }}" class="mt-8 inline-flex items-center gap-1.5 text-sm font-medium text-brand-text transition-colors hover:text-action hover:underline">
-                        {!! $iconPin !!}{{ $tour['destination']['name'] }}
-                    </a>
-                @endif
-
-                <h1 class="mt-3 font-display text-h1 font-semibold text-ink" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>{{ $tour['title'] }}</h1>
-
+                     Ver ResolvesBySlugByLocale y el aviso de abajo.
+                     $fallbackLangAttr ahora se calcula arriba, junto al
+                     resto del @php de cabecera (lo necesita tambien el H1
+                     del hero). --}}
                 <x-ui.content-fallback-notice :locale="$contentFallbackLocale" />
 
-                <p class="mt-4 max-w-2xl text-lead text-text-2" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>{{ $tour['summary'] }}</p>
+                <p class="mt-6 max-w-2xl text-lead text-text-2" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>{{ $tour['summary'] }}</p>
 
             </div>
 
@@ -207,7 +297,7 @@
                  escapaba y mostraba los tags en pantalla;
                  App\Support\Html\RichTextSanitizer lo limpia (whitelist exacta
                  de la toolbar del editor) antes de imprimirlo. --}}
-            <div class="prose-pv min-w-0 max-w-2xl text-base leading-relaxed text-text-2 lg:col-start-1 lg:row-start-2 lg:mt-6" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>
+            <div class="prose-pv min-w-0 max-w-2xl text-base leading-relaxed text-text-2 lg:col-start-1 lg:row-start-2 lg:mt-6" data-reveal @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>
                 {!! RichTextSanitizer::sanitize($tour['description']) !!}
             </div>
             </div>
@@ -235,7 +325,7 @@
         <section class="weave bg-sand">
             <div class="shell section">
               <div class="mx-auto max-w-3xl">
-                <x-ui.section-title as="h2">{{ __('site.tours.show.itinerary_title') }}</x-ui.section-title>
+                <x-ui.section-title as="h2" data-reveal>{{ __('site.tours.show.itinerary_title') }}</x-ui.section-title>
 
                 <x-ui.content-fallback-notice :locale="$itineraryFallbackLocale" />
 
@@ -243,8 +333,19 @@
                     @foreach($tour['itinerary'] as $day)
                         {{-- Mismo criterio que "description" arriba: HTML de
                              la clienta (RichEditor), saneado antes de
-                             imprimirse. --}}
-                        <x-ui.faq-item :question="$day['title']">{!! RichTextSanitizer::sanitize($day['description']) !!}</x-ui.faq-item>
+                             imprimirse. Revelado escalonado directo sobre el
+                             <details> (no envuelto en un div propio: envolver
+                             cada item rompe los selectores first:/last: que
+                             usa x-ui.faq-item para el borde y el padding,
+                             porque cada <details> pasaría a ser hijo único de
+                             su propio contenedor). Tope en 5 pasos, igual que
+                             Home: con itinerarios largos el retraso no crece
+                             sin límite. --}}
+                        <x-ui.faq-item
+                            :question="$day['title']"
+                            data-reveal
+                            style="--reveal-delay:{{ min($loop->index, 5) * 70 }}ms"
+                        >{!! RichTextSanitizer::sanitize($day['description']) !!}</x-ui.faq-item>
                     @endforeach
                 </div>
               </div>
@@ -258,7 +359,7 @@
             <div class="shell section">
               <div class="mx-auto grid max-w-4xl gap-6 sm:grid-cols-2">
                 @if(!empty($tour['inclusions']))
-                    <div class="rounded-panel border border-line bg-surface p-6 shadow-e1" @if($inclusionsLangAttr) lang="{{ $inclusionsLangAttr }}" @endif>
+                    <div class="rounded-panel border border-line bg-surface p-6 shadow-e1" data-reveal @if($inclusionsLangAttr) lang="{{ $inclusionsLangAttr }}" @endif>
                         <h2 class="font-display text-h3 font-semibold text-ink">{{ __('site.tours.show.inclusions_title') }}</h2>
                         <x-ui.content-fallback-notice :locale="$inclusionsFallbackLocale" />
                         <ul class="mt-4 flex flex-col gap-3">
@@ -270,7 +371,7 @@
                 @endif
 
                 @if(!empty($tour['exclusions']))
-                    <div class="rounded-panel border border-line bg-surface p-6 shadow-e1" @if($exclusionsLangAttr) lang="{{ $exclusionsLangAttr }}" @endif>
+                    <div class="rounded-panel border border-line bg-surface p-6 shadow-e1" data-reveal style="--reveal-delay:80ms" @if($exclusionsLangAttr) lang="{{ $exclusionsLangAttr }}" @endif>
                         <h2 class="font-display text-h3 font-semibold text-ink">{{ __('site.tours.show.exclusions_title') }}</h2>
                         <x-ui.content-fallback-notice :locale="$exclusionsFallbackLocale" />
                         <ul class="mt-4 flex flex-col gap-3">

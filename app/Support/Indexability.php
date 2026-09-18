@@ -26,18 +26,39 @@ namespace App\Support;
  * baje a false en config/cms.php, el sitemap vuelve a anunciar sus URLs y
  * robots.txt vuelve a declararlo, sin tocar una línea de código -- que es
  * exactamente el criterio con el que la bandera se extrajo a config.
+ *
+ * Receta SEO `docs/rediseno-2026/02-seo.md` ## 6.2 (staging en
+ * limaviewtours.com/tour-word/, dominio de otro cliente): segunda bandera
+ * independiente, `cms.is_staging_mirror`, con su PROPIO ciclo de vida --
+ * se apaga cuando el build deja de vivir en ese subdirectorio, no cuando
+ * el catálogo pasa a contenido real. A propósito NO se reutiliza
+ * `catalog_demo_content` para esto: son dos motivos distintos para no
+ * indexar y algún día se apagará uno sin el otro.
+ *
+ * FALLA CERRADA a propósito (hallazgo M-1, docs/rediseno-2026/04-seguridad.md
+ * ##5.4): antes esta comprobación negaba directamente el valor de config
+ * (`! config(...)`), así que cualquier valor falsy -- null por clave
+ * ausente, "" o "0" por una variable de entorno mal escrita -- se leía
+ * como "no es espejo / no es demo" y dejaba el sitio indexable. Ahora se
+ * compara cada bandera contra `=== false` en estricto, con `true` como
+ * default del propio config() (que solo aplica si la clave está AUSENTE
+ * del array resuelto -- el caso de una `bootstrap/cache/config.php` vieja,
+ * generada antes de que esta clave existiera). Ante la duda, no indexable.
  */
 class Indexability
 {
     /**
      * ¿Alguna URL pública de este sitio es indexable hoy?
      *
-     * false mientras el catálogo siga siendo contenido de muestra: en ese
-     * estado el layout marca noindex a nivel de SITIO, así que no queda
-     * ninguna URL que valga la pena anunciar.
+     * Solo `true` si las DOS banderas resuelven a `false` EXPLÍCITO:
+     * `catalog_demo_content` (ya no es contenido de muestra) Y
+     * `is_staging_mirror` (este build no es el espejo en el dominio ajeno).
+     * Cualquier otro estado de cualquiera de las dos -- true, ausente,
+     * vacío, mal escrito -- basta para que el sitio entero salga noindex.
      */
     public static function siteIsIndexable(): bool
     {
-        return ! config('cms.catalog_demo_content');
+        return config('cms.catalog_demo_content', true) === false
+            && config('cms.is_staging_mirror', true) === false;
     }
 }

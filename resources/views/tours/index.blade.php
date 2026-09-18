@@ -27,7 +27,18 @@
              igual que en home, nosotros y contacto, y las tres traen texto.
              Un alt="" acá dejaba la cabecera muda para un lector de pantalla. --}}
         :image-alt="__('site.tours.index.hero.photo_alt')"
-        position="center 55%"
+        position="center 46%"
+        {{-- Pase cinematográfico (pasada B): foto a sangre más alta con
+             --scrim-hero en vez de la banda plana --scrim-band. Es la MISMA
+             foto que una de las 3 diapositivas del hero de Home
+             (hero-cordillera-rio.jpg) — el contraste de --scrim-hero contra
+             ESTA foto ya está medido ahí, no se inventa uno nuevo acá. --}}
+        cinematic
+        {{-- Amplitud subida de 0.1 (default del componente) a 0.2 (2026-09-18)
+             para igualar la del hero de ficha de tour y el resto de fotos con
+             parallax del sitio — a 0.1 el desplazamiento en la ventana de
+             scroll real era casi nulo. --}}
+        parallax-speed="0.2"
     />
 
     {{-- ============ FILTROS + REJILLA ============ --}}
@@ -95,6 +106,13 @@
                                  sección intermedia, así que tampoco hay H2
                                  que inventar para tapar el hueco. --}}
                             heading-level="2"
+                            {{-- Revelado escalonado al entrar en viewport
+                                 (misma infraestructura que Home). El hover
+                                 de la tarjeta (zoom de foto + elevación) ya
+                                 vive en x-ui.tour-card via transform, así
+                                 que nunca desplaza el layout. --}}
+                            data-reveal
+                            style="--reveal-delay:{{ min($loop->index % 6, 5) * 80 }}ms"
                         />
                     @endforeach
                 </div>

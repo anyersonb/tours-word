@@ -28,7 +28,11 @@ class CatalogSeoIndexabilityTest extends TestCase
 
     public function test_a_destination_with_a_real_english_translation_is_indexable_under_english_with_reciprocal_hreflang(): void
     {
-        config(['cms.catalog_demo_content' => false]);
+        // is_staging_mirror declarado explícito (M-1, config/cms.php): desde
+        // que la bandera falla CERRADA, "no declararla" ya no equivale a
+        // false -- este test simula contenido real publicado en el dominio
+        // propio de Pacha Viva, así que necesita la declaración explícita.
+        config(['cms.catalog_demo_content' => false, 'cms.is_staging_mirror' => false]);
 
         Destination::factory()->create([
             'slug' => ['es' => 'cusco-bilingue', 'en' => 'cusco-bilingual'],
@@ -54,7 +58,11 @@ class CatalogSeoIndexabilityTest extends TestCase
 
     public function test_a_destination_without_english_translation_is_noindex_with_no_english_alternate_and_stays_out_of_the_sitemap(): void
     {
-        config(['cms.catalog_demo_content' => false]);
+        // is_staging_mirror declarado explícito (M-1, config/cms.php): desde
+        // que la bandera falla CERRADA, "no declararla" ya no equivale a
+        // false -- este test simula contenido real publicado en el dominio
+        // propio de Pacha Viva, así que necesita la declaración explícita.
+        config(['cms.catalog_demo_content' => false, 'cms.is_staging_mirror' => false]);
 
         Destination::factory()->create([
             'slug' => ['es' => 'cusco-solo-espanol'],
@@ -83,7 +91,11 @@ class CatalogSeoIndexabilityTest extends TestCase
 
     public function test_an_experience_without_english_translation_is_noindex_with_no_english_alternate(): void
     {
-        config(['cms.catalog_demo_content' => false]);
+        // is_staging_mirror declarado explícito (M-1, config/cms.php): desde
+        // que la bandera falla CERRADA, "no declararla" ya no equivale a
+        // false -- este test simula contenido real publicado en el dominio
+        // propio de Pacha Viva, así que necesita la declaración explícita.
+        config(['cms.catalog_demo_content' => false, 'cms.is_staging_mirror' => false]);
 
         Experience::factory()->create([
             'slug' => ['es' => 'trekking-solo-espanol'],
@@ -110,7 +122,11 @@ class CatalogSeoIndexabilityTest extends TestCase
      */
     public function test_a_tour_with_a_real_english_translation_is_indexable_under_english_with_reciprocal_hreflang(): void
     {
-        config(['cms.catalog_demo_content' => false]);
+        // is_staging_mirror declarado explícito (M-1, config/cms.php): desde
+        // que la bandera falla CERRADA, "no declararla" ya no equivale a
+        // false -- este test simula contenido real publicado en el dominio
+        // propio de Pacha Viva, así que necesita la declaración explícita.
+        config(['cms.catalog_demo_content' => false, 'cms.is_staging_mirror' => false]);
 
         Tour::factory()->create([
             'slug' => ['es' => 'camino-inca-bilingue', 'en' => 'inca-trail-bilingual'],
@@ -140,7 +156,11 @@ class CatalogSeoIndexabilityTest extends TestCase
 
     public function test_a_tour_without_english_translation_is_noindex_with_no_english_alternate(): void
     {
-        config(['cms.catalog_demo_content' => false]);
+        // is_staging_mirror declarado explícito (M-1, config/cms.php): desde
+        // que la bandera falla CERRADA, "no declararla" ya no equivale a
+        // false -- este test simula contenido real publicado en el dominio
+        // propio de Pacha Viva, así que necesita la declaración explícita.
+        config(['cms.catalog_demo_content' => false, 'cms.is_staging_mirror' => false]);
 
         Tour::factory()->create([
             'slug' => ['es' => 'camino-inca-solo-espanol'],

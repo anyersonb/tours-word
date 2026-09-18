@@ -32,6 +32,11 @@ return [
             'nav_label' => ':title photo gallery',
             'thumbnails_group' => ':title thumbnails',
             'show_photo' => 'Show photo :position of :total',
+            // Lightbox (pasada B, 2026-09-18).
+            'expand' => 'View photo full screen',
+            'close' => 'Close',
+            'previous' => 'Previous photo',
+            'next' => 'Next photo',
         ],
 
         // R (lote 3): x-ui.tour-card had "Ver tour" and the "Desde" prefix
@@ -100,7 +105,29 @@ return [
             'subtitle' => 'We design authentic, unforgettable experiences in Peru\'s most amazing destinations.',
             'cta_primary' => 'Explore tours',
             'cta_secondary' => 'View destinations',
-            'photo_alt' => 'Traveler taking in the Andean landscape',
+            // See the Spanish file for context: cinematic pass (2026-09-18),
+            // the hero moved from one fixed photo to a 3-slide slider.
+            'slides' => [
+                [
+                    'alt' => 'Sunrise over the Machu Picchu citadel, with Huayna Picchu in the background',
+                    'label' => 'Machu Picchu at sunrise',
+                ],
+                [
+                    'alt' => 'Panoramic view of the Sacred Valley of the Incas from a viewpoint',
+                    'label' => 'Sacred Valley',
+                ],
+                [
+                    'alt' => 'Andean river winding through golden grassland in front of a snow-capped range',
+                    'label' => 'Mountain range and river',
+                ],
+            ],
+            'carousel_label' => 'Featured photos of Peru',
+            'go_to_slide' => 'Go to photo: :label',
+            'pause' => 'Pause automatic photo slideshow',
+            'play' => 'Resume automatic photo slideshow',
+            'prev' => 'Previous photo',
+            'next' => 'Next photo',
+            'scroll_cue' => 'Scroll to see more',
             'trust' => [
                 'safe' => '100% safe travel',
                 'guides' => 'Expert local guides',
@@ -111,16 +138,19 @@ return [
         ],
 
         'featured_tours' => [
+            'eyebrow' => 'Pacha Viva selection',
             'title' => 'Featured tours',
             'cta' => 'View all tours',
         ],
 
         'destinations' => [
+            'eyebrow' => 'Your next map',
             'title' => 'Must-see destinations',
             'cta' => 'View all',
         ],
 
         'why_us' => [
+            'eyebrow' => 'Our commitment',
             'title_before' => 'Why travel with',
             'title_highlight' => 'us',
             'title_after' => '?',
@@ -136,6 +166,7 @@ return [
         ],
 
         'experiences' => [
+            'eyebrow' => 'Live Peru',
             'title' => 'Unique experiences',
             'cta' => 'View all',
         ],

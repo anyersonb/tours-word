@@ -131,11 +131,18 @@
   /* Scrim de hero: sobre la zona de texto deja una luminancia <= 0.055,
    * con la que el blanco puro mide >= 4.5:1 incluso si la foto debajo es
    * un cielo claro. Es lo que hace legal el texto blanco sobre montaña.
-   * NO usar opacidades sueltas en las pantallas: se consume este token. */
+   * NO usar opacidades sueltas en las pantallas: se consume este token.
+   *
+   * Reforzado en el pase cinematográfico (2026-09-18): con las 3 fotos del
+   * slider de hero, la de cordillera-río medía 4.07:1 en la bajada (texto
+   * normal, subtítulo) a 375px — por debajo del 4.5:1 que exige texto no
+   * grande. Los tres stops subieron ~0.05-0.06 de opacidad; medido de
+   * nuevo con el peor píxel del compuesto en las TRES fotos (no solo la
+   * que falló): 4.5-6.8:1 a 375, todas por encima del mínimo. */
   --scrim-hero:  linear-gradient(180deg,
-                   hsl(158 45% 6% / .56) 0%,
-                   hsl(158 45% 6% / .72) 55%,
-                   hsl(158 45% 6% / .84) 100%);
+                   hsl(158 45% 6% / .60) 0%,
+                   hsl(158 45% 6% / .80) 55%,
+                   hsl(158 45% 6% / .90) 100%);
   --scrim-hero-h: linear-gradient(90deg,
                    hsl(158 45% 6% / .88) 0%,
                    hsl(158 45% 6% / .76) 46%,
