@@ -175,9 +175,21 @@
   --fs-h2:      clamp(1.5rem,  1.17rem + 1.48vw, 2.25rem);    /* 24 -> 36 */
   --fs-h3:      clamp(1.125rem, 1.02rem + 0.46vw, 1.375rem);  /* 18 -> 22 */
   --fs-lead:    clamp(1.0625rem, 0.99rem + 0.32vw, 1.25rem);  /* 17 -> 20 */
-  --lh-display: 1.08;
+  /* Opción tipográfica v2, elegida (2026-09-22, docs/rediseno-2026/14-tipografia-v2.md):
+   * Bodoni Moda es un Didone de contraste extremo -- sus trazos finos se
+   * cierran si se aprietan con tracking negativo (el -0.02em de Fraunces
+   * dejaba los remates de las serifas casi tocándose a tamaño hero). Se
+   * sube a 0 (sin tracking) y el line-height del display sube de 1.08 a
+   * 1.14: los ascendentes/descendentes de un Didone son más largos que los
+   * de Fraunces y a 1.08 el diacrítico de una mayúscula acentuada rozaba la
+   * línea de arriba en el h1 de dos líneas del hero.
+   * Otras dos parejas probadas en el mismo árbol y descartadas (documentadas
+   * en el informe para reconstruirlas): Lora sola -- lh-display 1.16,
+   * ls-display -0.008em; Archivo sola -- lh-display 1.02, ls-display
+   * -0.032em (y font-black en vez de font-semibold en el h1 del hero). */
+  --lh-display: 1.14;
   --lh-title:   1.18;
-  --ls-display: -0.02em;
+  --ls-display: 0em;
   --ls-eyebrow: 0.14em;
 
   /* --- 5. Ritmo vertical y radios ------------------------------------ */

@@ -48,8 +48,8 @@
                 @endforeach
             </div>
             <div class="mt-4 flex flex-wrap items-end gap-6">
-                <p class="font-display text-3xl font-semibold text-ink">Fraunces — font-display</p>
-                <p class="font-sans text-lg text-ink">Figtree — font-sans (texto de interfaz)</p>
+                <p class="font-display text-3xl font-semibold text-ink">Bodoni Moda — font-display</p>
+                <p class="font-sans text-lg text-ink">Public Sans — font-sans (texto de interfaz)</p>
                 <p class="font-script text-2xl text-brand-text">Caveat — font-script</p>
             </div>
         </section>

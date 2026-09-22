@@ -18,16 +18,27 @@
 @import './tokens.css';
 
 /*
- * Tipografía de marca — port Roavio (2026-09-20). Inter Tight (SIL OFL 1.1,
- * Google Fonts) y Fraunces (SIL OFL 1.1, ya estaba en el proyecto) sirven
- * AUTOALOJADAS desde public/fonts/ — nunca desde fonts.googleapis.com, que
- * es justo lo que dejó de cargarse para estas dos familias (ver
+ * Tipografía de marca — v2 (2026-09-22, docs/rediseno-2026/14-tipografia-v2.md).
+ * Reemplaza Inter Tight/Fraunces (port Roavio, 2026-09-20): esa pareja es
+ * justo la combinación por defecto de sitios generados con IA (Fraunces es
+ * el serif "wonky" de moda en startups, Inter la sans de interfaz por
+ * defecto de toda la industria) -- Anyerson la rechazó por tercera vez con
+ * "muy IA, poco profesional". Public Sans (SIL OFL 1.1, cuerpo/sans) y
+ * Bodoni Moda (SIL OFL 1.1, display) sirven AUTOALOJADAS desde
+ * public/fonts/ — nunca desde fonts.googleapis.com (ver
  * components/layout.blade.php: el <link> de Google Fonts que queda solo
  * sirve Caveat, la script de Nosotros, fuera de este lote).
  * Cada archivo es la variante "variable" (un solo .woff2 cubre todo el
  * rango de peso declarado), subset "latin" (cubre acentos y ñ del español:
  * U+0000-00FF), descargada una sola vez desde Google Fonts y servida en
  * disco — no hay build step que la regenere.
+ *
+ * Otras dos parejas se probaron en código real sobre este mismo árbol y se
+ * documentan en el informe para reconstruirlas (Lora sola -- serif
+ * humanista cálido en los dos roles -- y Archivo sola -- grotesca con
+ * jerarquía por peso/tracking). Se descartaron a favor de esta por el
+ * argumento del informe, no por defecto técnico: las tres cargan y
+ * renderizan correctamente.
  *
  * Fix subdirectorio (2026-09-21, docs/rediseno-2026/11-fix-fuentes-subdirectorio.md):
  * los @font-face vivían AQUÍ con `src: url('/fonts/...')` absoluto. Vite no
@@ -40,8 +51,8 @@
  * síntoma "plano, muy wordpress" que el cliente ya rechazó). Los
  * @font-face se movieron a un <style> en components/layout.blade.php,
  * construidos con asset() — el único punto que conoce el prefijo real de
- * despliegue. El @theme de abajo sigue mapeando 'Inter Tight' / 'Fraunces'
- * por font-family, así que no cambia nada más.
+ * despliegue. El @theme de abajo sigue mapeando 'Public Sans' / 'Bodoni
+ * Moda' por font-family, así que no cambia nada más.
  */
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -60,14 +71,18 @@
 @source '../**/*.js';
 
 @theme {
-    /* Tipografía de marca — port Roavio (2026-09-20): Figtree sale, Inter
-     * Tight entra como sans/cuerpo (self-hosted, ver @font-face arriba).
-     * Fraunces sigue de display, ahora también self-hosted. body/h1..h6 se
-     * resuelven desde ACÁ (--font-sans / --font-display), nunca desde SCSS
-     * suelto en una vista — es la regla del proyecto. */
-    --font-sans: 'Inter Tight', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    /* Tipografía v2 (2026-09-22, docs/rediseno-2026/14-tipografia-v2.md):
+     * Public Sans entra de sans/cuerpo, Bodoni Moda de display -- pareja
+     * editorial de alto contraste (serif Didone + grotesca neutral),
+     * elegida sobre Inter Tight/Fraunces (leía "plantilla de IA", tercer
+     * rechazo visual de Anyerson) y sobre otras dos parejas evaluadas en el
+     * mismo árbol (Lora sola / Archivo sola, documentadas en el informe
+     * para reconstruirlas). self-hosted, ver @font-face en layout.blade.php.
+     * body/h1..h6 se resuelven desde ACÁ (--font-sans / --font-display),
+     * nunca desde SCSS suelto en una vista — es la regla del proyecto. */
+    --font-sans: 'Public Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
-    --font-display: 'Fraunces', ui-serif, Georgia, 'Times New Roman', serif;
+    --font-display: 'Bodoni Moda', ui-serif, Georgia, 'Times New Roman', serif;
     --font-script: 'Caveat', cursive;
 
     /* Rampa de marca -> utilidades bg-brand-*, text-brand-*, border-brand-* */
@@ -326,7 +341,7 @@
      *
      * Así que el énfasis deja de ser de COLOR y pasa a ser de PESO: los glifos
      * van en blanco, como el resto del titular, y el fragmento sube de 600 a
-     * 700 (Fraunces se carga variable 300..700, así que no añade descarga).
+     * 700 (Bodoni Moda se carga variable 400..900, así que no añade descarga).
      * El peso no gasta contraste — al contrario, un trazo más grueso se lee
      * mejor sobre foto — y no necesita espacio vertical.
      *
@@ -528,8 +543,9 @@
 }
 
 @layer base {
-    /* Los display quedan con el tracking negativo del sistema; sin esto
-     * Fraunces a 48-64px se ve suelta. */
+    /* Los display quedan con el tracking del sistema (--ls-display, ver
+     * tokens.css); a tamaño hero Bodoni Moda necesita ese valor en 0 -- sus
+     * trazos finos de Didone se cierran con tracking negativo. */
     h1, h2, h3 { letter-spacing: var(--ls-display); }
 
     /* Evita el salto de layout mientras carga cada foto: el contenedor

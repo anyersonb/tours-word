@@ -188,17 +188,19 @@
     <meta name="twitter:image" content="{{ $ogImageUrl }}">
 
     {{--
-        Tipografías de marca — port Roavio (2026-09-20). Inter Tight
-        (sans/cuerpo) y Fraunces (display) son SIL OFL y ahora se sirven
-        AUTOALOJADAS desde public/fonts/ (ver @font-face en app.css) — nunca
-        desde fonts.googleapis.com. El preload es solo de esas dos: son las
-        que carga TODA página del sitio (body + h1..h6). Caveat (script, uso
-        puntual en Nosotros) es la única que queda en Google Fonts: no forma
-        parte de este lote y una sola familia de más no justifica bajarla y
-        mantenerla también en disco.
+        Tipografías de marca — v2 (2026-09-22, docs/rediseno-2026/14-tipografia-v2.md):
+        Public Sans (sans/cuerpo) y Bodoni Moda (display) reemplazan a Inter
+        Tight/Fraunces del port Roavio -- esa pareja leía "plantilla de IA"
+        (encargo de Anyerson, tercer rechazo visual del proyecto). Las dos
+        son SIL OFL 1.1 y se sirven AUTOALOJADAS desde public/fonts/ (ver
+        @font-face más abajo) — nunca desde fonts.googleapis.com. El preload
+        es solo de esas dos: son las que carga TODA página del sitio (body +
+        h1..h6). Caveat (script, uso puntual en Nosotros) es la única que
+        queda en Google Fonts: no forma parte de este lote y una sola
+        familia de más no justifica bajarla y mantenerla también en disco.
     --}}
-    <link rel="preload" href="{{ asset('fonts/inter-tight/InterTight-Variable.woff2') }}" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="{{ asset('fonts/fraunces/Fraunces-Variable.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ asset('fonts/public-sans/PublicSans-Variable.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ asset('fonts/bodoni-moda/BodoniModa-Variable.woff2') }}" as="font" type="font/woff2" crossorigin>
     {{--
         Fix subdirectorio (2026-09-21, docs/rediseno-2026/11-fix-fuentes-subdirectorio.md):
         estos @font-face vivían en resources/css/app.css con `url('/fonts/...')`
@@ -209,26 +211,27 @@
         sitio -> 404 -> fallback a fuente de sistema. Inline aquí, construido con
         asset(), que sí conoce el prefijo real de despliegue -- mismo mecanismo
         que ya usan los <link rel="preload"> de arriba. Se eligió inline en vez de
-        un public/fonts/fonts.css aparte para no sumar un request más a 112 KB de
-        fuente que ya compiten con el CSS de Vite. Conserva font-family, los
-        rangos de peso, font-style, font-display y los format() tal cual estaban.
+        un public/fonts/fonts.css aparte para no sumar un request más a la fuente
+        que ya compite con el CSS de Vite. Conserva font-family, los rangos de
+        peso, font-style, font-display y los format() tal cual estaban -- solo
+        cambian las dos familias (v2, 2026-09-22).
     --}}
     <style>
         @font-face {
-            font-family: 'Inter Tight';
+            font-family: 'Public Sans';
             font-style: normal;
             font-weight: 100 900;
             font-display: swap;
-            src: url('{{ asset('fonts/inter-tight/InterTight-Variable.woff2') }}') format('woff2-variations'),
-                 url('{{ asset('fonts/inter-tight/InterTight-Variable.woff2') }}') format('woff2');
+            src: url('{{ asset('fonts/public-sans/PublicSans-Variable.woff2') }}') format('woff2-variations'),
+                 url('{{ asset('fonts/public-sans/PublicSans-Variable.woff2') }}') format('woff2');
         }
         @font-face {
-            font-family: 'Fraunces';
+            font-family: 'Bodoni Moda';
             font-style: normal;
-            font-weight: 300 700;
+            font-weight: 400 900;
             font-display: swap;
-            src: url('{{ asset('fonts/fraunces/Fraunces-Variable.woff2') }}') format('woff2-variations'),
-                 url('{{ asset('fonts/fraunces/Fraunces-Variable.woff2') }}') format('woff2');
+            src: url('{{ asset('fonts/bodoni-moda/BodoniModa-Variable.woff2') }}') format('woff2-variations'),
+                 url('{{ asset('fonts/bodoni-moda/BodoniModa-Variable.woff2') }}') format('woff2');
         }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
