@@ -73,6 +73,8 @@ return [
         'contact_cta' => 'Contáctanos',
         'open_menu' => 'Abrir menú',
         'close_menu' => 'Cerrar menú',
+        // Port Roavio (2026-09-20): franja delgada sobre el header principal.
+        'topbar_tagline' => 'Agencia de turismo boutique en Cusco, Perú',
     ],
 
     'footer' => [
@@ -140,6 +142,13 @@ return [
             ],
         ],
 
+        // Port Roavio (2026-09-20): mosaico full-bleed de 6 fotos bajo el
+        // hero. Sin H2 visible (Roavio tampoco lo lleva ahí) — región con
+        // aria-label propio, ver home.blade.php.
+        'showcase' => [
+            'aria_label' => 'Vistazo fotográfico de nuestros destinos y experiencias',
+        ],
+
         'featured_tours' => [
             'eyebrow' => 'Selección Pacha Viva',
             'title' => 'Tours destacados',
@@ -168,10 +177,48 @@ return [
             'assistance_description' => 'Te acompañamos antes, durante y después de tu viaje.',
         ],
 
-        'experiences' => [
+        // Port Roavio, lote 1 (2026-09-21): antes "Experiencias únicas"
+        // (tarjeta con borde/sombra, ver x-ui.experience-card — sigue viva
+        // en /experiencias, sin tocar). Acá pasa a la rejilla de tiles
+        // planos de Roavio (mismo dato, $experiences, sin query nueva), así
+        // que el copy se alinea al nombre de la sección del encargo.
+        'activities' => [
             'eyebrow' => 'Vive Perú',
-            'title' => 'Experiencias únicas',
+            'title' => 'Actividades para vivir Perú',
             'cta' => 'Ver todas',
+        ],
+
+        // Port Roavio, lote 1: Swiper de 6 en Roavio -> acá, tira de scroll
+        // horizontal nativo (0 JS/librería nueva). CONTENIDO ESTÁTICO,
+        // quemado en la vista (ver home.blade.php) — no hay modelo de
+        // reseñas todavía (mismo motivo que documentaba B2). Sin foto de
+        // banco/IA: el avatar es la inicial del nombre sobre un cuadrado de
+        // color (ver x-ui.testimonial-card variant="tile").
+        'testimonials' => [
+            'eyebrow' => 'Voces de viajeros',
+            'title' => 'Lo que dicen nuestros viajeros',
+            // DEMO: pendiente modelo de reseñas. Nombre + inicial de
+            // apellido (nunca un nombre completo de una persona real sin
+            // consentimiento) y ciudad de origen; el avatar es la inicial
+            // sobre un cuadrado de color, no una foto.
+            'items' => [
+                ['quote' => 'Machu Picchu al amanecer, sin las multitudes de media mañana: la guía se notó desde la primera coordinación por WhatsApp.', 'name' => 'Valeria M.', 'origin' => 'Lima, Perú'],
+                ['quote' => 'Organizaron el Valle Sagrado completo en un día y aun así tuvimos tiempo de sobra en cada parada. Todo a tiempo, sin apuros.', 'name' => 'James K.', 'origin' => 'Toronto, Canadá'],
+                ['quote' => 'El trekking fue exigente pero el guía conocía cada tramo del camino. Nos sentimos acompañados, no solo llevados.', 'name' => 'Sofía R.', 'origin' => 'Buenos Aires, Argentina'],
+                ['quote' => 'Reservamos con poca anticipación y aun así encontraron cupo para el circuito de Cusco. Respuesta rápida por correo.', 'name' => 'Lucas B.', 'origin' => 'São Paulo, Brasil'],
+                ['quote' => 'La ruta gastronómica nos llevó a lugares que nunca hubiéramos encontrado solos. Vale la pena ir con locales.', 'name' => 'Hannah W.', 'origin' => 'Berlín, Alemania'],
+                ['quote' => 'Somos de Cusco y aun así aprendimos historia nueva del Valle Sagrado con el guía. Recomendado también para locales.', 'name' => 'Diego P.', 'origin' => 'Cusco, Perú'],
+            ],
+        ],
+
+        // Port Roavio, lote 1: 21 logos en Roavio -> acá, aliados + sellos
+        // oficiales (RNAVT/MINCETUR). SIN ARCHIVOS REALES en el proyecto
+        // (ni logos de aliados ni el sello oficial): se maqueta el
+        // mecanismo (marquee en bucle CSS) con placeholders explícitos,
+        // nunca con un logo inventado ni un sello con apariencia oficial.
+        'partners' => [
+            'eyebrow' => 'Confían en nosotros',
+            'title' => 'Aliados y certificaciones',
         ],
 
         'newsletter' => [

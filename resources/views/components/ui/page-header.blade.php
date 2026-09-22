@@ -24,6 +24,15 @@
     // tours/index.blade.php la sube a '0.2' para igualar la amplitud del
     // resto de heroes del sitio — ver home.blade.php y tours/show.blade.php.
     'parallaxSpeed' => '0.1',
+    // Prop aditiva (lote 2, listados Roavio): ancho del contenedor interno.
+    // Default 'shell' = EXACTO el comportamiento anterior (1280, el único
+    // que tenía este componente hasta hoy). Los 3 únicos consumidores de
+    // x-ui.page-header son los 3 índices de catálogo (tours/destinations/
+    // experiences) — cada uno pasa su propio ancho Roavio (shell-boxed/
+    // shell-narrow/shell-bleed) para que la cabecera NO comparta ancho con
+    // la rejilla de abajo (regla del encargo: "no uses el mismo ancho en
+    // toda la pantalla").
+    'containerClass' => 'shell',
 ])
 {{--
     Cabecera única de las pantallas interiores (índices y fichas).
@@ -57,7 +66,7 @@
             </div>
         </div>
 
-        <div class="shell relative z-10 pb-12 pt-28 sm:pb-16 sm:pt-32 lg:pb-20">
+        <div class="{{ $containerClass }} relative z-10 pb-12 pt-28 sm:pb-16 sm:pt-32 lg:pb-20">
             @if(filled($breadcrumbs))
                 <x-ui.breadcrumbs :items="$breadcrumbs" tone="dark" class="mb-6" />
             @endif
@@ -91,7 +100,7 @@
             />
         </div>
 
-        <div class="shell section-tight relative z-10">
+        <div class="{{ $containerClass }} section-tight relative z-10">
             @if(filled($breadcrumbs))
                 <x-ui.breadcrumbs :items="$breadcrumbs" tone="dark" class="mb-6" />
             @endif
@@ -113,7 +122,7 @@
     </section>
 @else
     <section class="weave border-b border-sand-line bg-sand">
-        <div class="shell section-tight">
+        <div class="{{ $containerClass }} section-tight">
             @if(filled($breadcrumbs))
                 <x-ui.breadcrumbs :items="$breadcrumbs" class="mb-6" />
             @endif

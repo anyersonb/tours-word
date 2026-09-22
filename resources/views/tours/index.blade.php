@@ -41,9 +41,15 @@
         parallax-speed="0.2"
     />
 
-    {{-- ============ FILTROS + REJILLA ============ --}}
+    {{-- ============ FILTROS + REJILLA ============
+         Puerto Roavio (lote 2): .shell-boxed (1392), no .shell (1280) —
+         distinto del ancho de la cabecera de arriba (regla del encargo:
+         "no uses el mismo ancho en toda la pantalla"), y el mismo que ya
+         usa "Tours destacados" en la Home para las tarjetas variant="flat",
+         así el catálogo completo se ve como una continuación de esa
+         sección y no como una pantalla aparte. --}}
     <section class="bg-surface">
-        <div class="shell section">
+        <div class="shell-boxed section">
             {{-- La barra de filtros se apoya sobre el borde superior de la
                  seccion (margen negativo + z-index propio): se lee como un
                  control de la cabecera y no como una caja suelta flotando en
@@ -87,9 +93,24 @@
             @if($tours->isEmpty())
                 <x-ui.empty-state>{{ __('site.tours.index.empty') }}</x-ui.empty-state>
             @else
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {{-- auto-fit, no grid-cols-4 fijo: con grid-cols-4 fijo y
+                     solo 3 tours publicados (todo el catálogo de hoy), la
+                     4ta columna quedaba vacía en vez de colapsar — medido
+                     con getBoundingClientRect (318px en blanco a la derecha
+                     a 1440). auto-fit es el MISMO truco que ya usan
+                     Destinos/Actividades/Tours-destacados de Home: colapsa
+                     columnas sin contenido y reparte el ancho completo
+                     entre las tarjetas reales; con 4+ tours simplemente
+                     agrega columnas hasta el tope de 18rem. --}}
+                <div class="grid gap-6 [grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr))]">
                     @foreach($tours as $tour)
                         <x-ui.tour-card
+                            {{-- Puerto Roavio (lote 2): variant="flat" (radio
+                                 10px, CERO box-shadow) — el mismo tratamiento
+                                 que "Tours destacados" en Home, en vez del
+                                 variant="card" (radio grande + sombra) que
+                                 traía este índice desde el pase anterior. --}}
+                            variant="flat"
                             :image="$tour['images'][0]['src'] ?? PlaceholderImage::svg(480, 360, $tour['title'], '2c6fa8')"
                             :image-alt="$tour['images'][0]['alt'] ?? $tour['title']"
                             :title="$tour['title']"
@@ -100,7 +121,7 @@
                             :pen-cents="$tour['price_pen_cents']"
                             :usd-cents="$tour['price_usd_cents']"
                             :href="route('tours.show', $tour['slug'])"
-                            sizes="(min-width: 1024px) 24rem, (min-width: 640px) 45vw, 92vw"
+                            sizes="(min-width: 1280px) 20rem, (min-width: 640px) 45vw, 92vw"
                             {{-- Nivel 2: en un índice cada tarjeta cuelga
                                  directamente del H1 de la pantalla. No hay
                                  sección intermedia, así que tampoco hay H2

@@ -188,15 +188,20 @@
     <meta name="twitter:image" content="{{ $ogImageUrl }}">
 
     {{--
-        Único lugar del sitio donde se cargan las tipografías de marca (A2).
-        Fraunces (display), Figtree (sans/cuerpo), Caveat (script, uso puntual
-        en Nosotros). No hay archivos locales servibles en public/fonts más
-        allá de las de Filament, así que se usa Google Fonts como en
-        docs/lote-0/identidad/muestra.html.
+        Tipografías de marca — port Roavio (2026-09-20). Inter Tight
+        (sans/cuerpo) y Fraunces (display) son SIL OFL y ahora se sirven
+        AUTOALOJADAS desde public/fonts/ (ver @font-face en app.css) — nunca
+        desde fonts.googleapis.com. El preload es solo de esas dos: son las
+        que carga TODA página del sitio (body + h1..h6). Caveat (script, uso
+        puntual en Nosotros) es la única que queda en Google Fonts: no forma
+        parte de este lote y una sola familia de más no justifica bajarla y
+        mantenerla también en disco.
     --}}
+    <link rel="preload" href="{{ asset('fonts/inter-tight/InterTight-Variable.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ asset('fonts/fraunces/Fraunces-Variable.woff2') }}" as="font" type="font/woff2" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..700&family=Figtree:wght@400;500;600;700&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&display=swap" rel="stylesheet">
 
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
 

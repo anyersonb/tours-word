@@ -23,9 +23,18 @@
     // (nivel 3, el de por defecto). El nivel NO decide el tamaño de letra:
     // ese sale siempre de text-h3, así que la tarjeta se ve igual en las dos.
     'headingLevel' => 3,
+    // Prop aditiva (lote 1, port Roavio): 'card' es el look de siempre
+    // (radius-card, shadow-e1/e3) que usan tours/index y demás listados —
+    // NO SE TOCA. 'flat' es el tratamiento Roavio de la rejilla de la home
+    // (radius-tile, cero box-shadow en cualquier sitio): solo lo pide quien
+    // coloca la tarjeta, nunca cambia el valor por defecto.
+    'variant' => 'card',
 ])
 @php
     $hl = max(2, min(4, (int) $headingLevel));
+    $surfaceClasses = $variant === 'flat'
+        ? 'rounded-tile border border-line bg-surface transition-transform duration-300 hover:-translate-y-1 focus-within:-translate-y-1'
+        : 'rounded-card border border-line bg-surface shadow-e1 transition-[box-shadow,transform] duration-300 hover:-translate-y-1 hover:shadow-e3 focus-within:-translate-y-1 focus-within:shadow-e3';
 @endphp
 {{--
     Tarjeta de tour. Toda la superficie es enlace (::before del <a> cubre la
@@ -33,7 +42,7 @@
     botón; el botón se mantiene visible porque es la afordancia que la gente
     busca, y queda por encima con su propio z-index.
 --}}
-<article {{ $attributes->class(['group relative flex h-full flex-col overflow-hidden rounded-card border border-line bg-surface shadow-e1 transition-[box-shadow,transform] duration-300 hover:-translate-y-1 hover:shadow-e3 focus-within:-translate-y-1 focus-within:shadow-e3']) }}>
+<article {{ $attributes->class(['group relative flex h-full flex-col overflow-hidden', $surfaceClasses]) }}>
     <div class="photo photo-zoom aspect-[4/3] w-full">
         <x-ui.picture :src="$image" :alt="$imageAlt" :sizes="$sizes" />
         @if($badge)

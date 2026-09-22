@@ -19,9 +19,18 @@
     // Mismo contrato que x-ui.tour-card: el nivel lo decide la pantalla que
     // coloca la tarjeta (2 en un índice, 3 dentro de una sección con su H2).
     'headingLevel' => 3,
+    // Prop aditiva (lote 2, port Roavio): 'card' es el look de siempre
+    // (radius-card, shadow-e1/e3) que sigue usando la Home ("Destinos
+    // imperdibles") y /_styleguide — NO SE TOCA. 'flat' es el tratamiento
+    // Roavio (radius-tile, CERO box-shadow en cualquier sitio) que estrena
+    // destinations/index.blade.php — mismo patrón que x-ui.tour-card.
+    'variant' => 'card',
 ])
 @php
     $hl = max(2, min(4, (int) $headingLevel));
+    $surfaceClasses = $variant === 'flat'
+        ? 'rounded-tile transition-transform duration-300 hover:-translate-y-1 focus-visible:-translate-y-1'
+        : 'rounded-card shadow-e1 transition-shadow duration-300 hover:shadow-e3';
 @endphp
 {{--
     Tarjeta-retrato de destino: foto a sangre con el rótulo encima. El
@@ -32,7 +41,7 @@
 --}}
 <a
     href="{{ $href }}"
-    {{ $attributes->class(['group relative block aspect-[4/5] overflow-hidden rounded-card shadow-e1 transition-shadow duration-300 hover:shadow-e3']) }}
+    {{ $attributes->class(['group relative block aspect-[4/5] overflow-hidden', $surfaceClasses]) }}
 >
     <span class="photo photo-zoom scrim-card absolute inset-0 block">
         <x-ui.picture :src="$image" :alt="$imageAlt" :sizes="$sizes" />

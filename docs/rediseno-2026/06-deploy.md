@@ -1106,3 +1106,263 @@ del servidor real**:
    la lista de §5.1 es una foto del 18/09/2026. Si Leo agrega IPs u otras reglas a su
    archivo más adelante, la réplica del subdirectorio no se entera sola; alguien tiene
    que volver a compararla cuando eso pase.
+
+---
+
+## 11. Despliegue empaquetado (dos archivos en vez de miles)
+
+**Motivo:** arrastrar ~5.000 archivos (app + `vendor/`) por el cliente FTP habitual es
+inviable comando a comando. Esta sección empaqueta todo en un ZIP + un extractor de un
+solo uso, mismo patrón de un solo uso que el runner de `config:cache` de §7b.
+**No se subió nada. No se hizo commit.** Todo esto es local, en
+`G:\laragon\www\tours-word` y fuera de ella — el ZIP vive en
+`G:\laragon\www\pachaviva-tourword.zip`, fuera del repo.
+
+**Recordatorio de la Fase 0 (no cambia por empaquetar):** `security-engineer` sigue en
+**RECHAZADO** (ver arriba). Empaquetar no es publicar — es dejar el material listo y
+verificado para que Anyerson decida con el estado real de los gates a la vista. Nada de
+esta sección autoriza un "PUBLICADO".
+
+### 11.1 El ZIP
+
+**Herramienta: PHP `ZipArchive`** (`/g/laragon/bin/php/php8.2.1/php.exe`) —
+**nunca** `Compress-Archive` de PowerShell, que corrompe ZIPs destinados a Linux
+(incidente real de este estudio, ver memoria del equipo).
+
+**Antes de empaquetar se detectó y corrigió un problema real:** `public/build/` tenía
+mtime de las 12:53, pero el último commit (`9e9fe6a`, 15:51) tocó `resources/css/app.css`,
+`resources/css/tokens.css` y `resources/js/app.js` (el pase cinematográfico). El build
+compilado estaba **desactualizado respecto al HEAD** — empaquetarlo tal cual habría
+subido la demo sin el hero slider, el parallax ni los revelados. Se corrigió en orden
+correcto: `php artisan view:clear` + `view:cache` (para que Tailwind no purgue clases de
+vistas compiladas) **antes** de `npm run build`. Resultado verificado: `app.css` cambió
+de hash (`app-CDLLC8wJ.css` → `app-BHlgfi5s.css`, 78,72 kB), `app.js` mantuvo el mismo
+hash (`app-CjmmD5Mk.js`) porque su contenido ya estaba en el árbol de trabajo desde antes
+del build viejo. Verificado también que las clases nuevas (`.hero-slide`,
+`.hero-slide__img`, `kenburns`, `parallax`) están presentes en el CSS compilado final —
+no solo en el fuente.
+
+**Contenido:** el árbol completo de `G:\laragon\www\tours-word` + `vendor/` +
+`public/build/` ya compilado (recién regenerado), menos la lista de exclusión. **Incluye
+el `.htaccess` de raíz de §5.1** (ya con los valores reales: `AuthUserFile
+/home/limaview/tour-word-data/.htpasswd`, las 5 IPs bloqueadas, la CSP corregida) en la
+raíz del ZIP, más dos `.htaccess` deny-all nuevos dentro de `storage/` y `database/`
+(segunda barrera independiente, mismo contenido que describe §5.1).
+
+**Exclusión aplicada** (unión de la lista de §6 más lo que exige este empaquetado
+específico):
+
+| Excluido | Motivo |
+|---|---|
+| `.git/`, `.claude/`, `node_modules/`, `tests/`, `docs/`, `.github/` | no van al servidor |
+| `.env`, `.env.example` | el `.env` real se sube aparte (§11.3), nunca arrastrado |
+| `database/database.sqlite(-wal/-shm)` | residuo del 1-sep, nunca este archivo (§1) |
+| `.phpunit.result.cache` | artefacto de test local |
+| `storage/logs/*`, `storage/framework/{cache,sessions,testing,views}/*` | contenido de sesión/caché local; se conserva solo el `.gitignore` de cada carpeta para que la carpeta exista y Laravel pueda escribir ahí |
+| `storage/app/private/livewire-tmp/*` | **hallazgo nuevo de esta pasada**: tenía un `.jpg` residuo de una prueba de QA del 2-sep (`security-engineer` ya lo había señalado en `04-seguridad.md` como "no es mío, no me corresponde borrarlo" porque el árbol estaba congelado); aquí sí correspondía excluirlo del paquete de salida — no se sube nada de una sesión de pruebas ajena |
+| `public/storage` (symlink) | apunta a una ruta local de desarrollo (`/g/laragon/www/tours-word/storage/app/public`) — subirlo tal cual rompería o crearía un symlink roto en el servidor. **El extractor lo recrea con `storage:link` (§11.2)**, apuntando a la ruta real del servidor |
+| `bootstrap/cache/*.php` peligrosos | verificado que hoy solo hay `packages.php`/`services.php` (caché de paquetes, no depende de `.env`) — **no** hay `config.php` ni `routes-v7.php` cacheados localmente, así que no hace falta excluirlos; si algún día aparecen, sí deben excluirse (congelarían `APP_DEBUG`/`DB_CONNECTION` locales) |
+
+**Sí incluido y verificado:** `storage/app/public/{tours,destinations,experiences}` — **70
+archivos** de fotos de demo (los `tour_images`/galerías que `client-validator` vio en
+`05-cliente.md`), no son artefactos de prueba, son el contenido real de la demo.
+
+**Verificación local (extraído a una carpeta temporal, no asumido):**
+
+- Raíz del ZIP: sin `.git`, `.claude`, `docs`, `tests`, `node_modules`, sin `.env` — confirmado por listado directo.
+- `vendor/autoload.php` y `bootstrap/app.php` presentes.
+- `public/build/assets/app-BHlgfi5s.css` (78.720 bytes) y `app-CjmmD5Mk.js` (110.886 bytes) presentes, mtime 16:00 — el build fresco, no el viejo.
+- `public/storage` **no existe** en el extraído (symlink correctamente excluido).
+- `.htaccess` de raíz presente, primeras líneas confirmadas, sin marcadores `PENDIENTE_DE_CONFIRMAR` ni `usuario_cpanel` sin resolver.
+- `storage/framework/views`, `storage/logs`, `storage/framework/sessions`, `storage/app/private` — cada una conserva únicamente su `.gitignore` (carpeta existe, vacía de contenido de sesión local).
+- `storage/app/private/livewire-tmp` — **no existe** en el paquete (el residuo de QA quedó fuera, y no había `.gitignore` propio que forzara conservar la carpeta vacía; Laravel la recrea sola la primera vez que la necesita).
+- **0 rutas con `\` dentro del ZIP** (las 16.815 entradas usan `/`), verificado programáticamente con `ZipArchive::getNameIndex()` en un bucle, no de vista.
+
+**Resultado, verificado reabriendo el archivo (no asumido):**
+
+```
+Ruta:     G:\laragon\www\pachaviva-tourword.zip
+Tamaño:   110.220.528 bytes = 105,11 MB
+Entradas: 16.815 (ZipArchive::open + numFiles, confirmado)
+```
+
+**Aviso de tamaño:** 105 MB es grande para subir por FTP estándar en un solo `curl -T`
+en conexiones lentas, pero no excede límites típicos de cPanel/GoDaddy (normalmente
+varios cientos de MB a varios GB vía FTP, a diferencia de subida por "File Manager" del
+panel que sí suele topar cerca de 100–250 MB según el plan). **Si el `curl -T` del
+comando 1 de §11.4 falla o se corta a medio camino, la causa más probable es timeout de
+red por el tamaño, no un límite duro** — reintentar con `--ftp-create-dirs` ya incluido
+no cambia esto; si falla repetidamente, la alternativa es un cliente FTP con reanudación
+(FileZilla) en vez de `curl` para este archivo puntual. No se intentó reducir `vendor/`
+con `composer install --no-dev -o` sobre una copia en esta pasada — vendor/ actual (124 MB
+en disco, ~lo que pesa comprimido en el ZIP) se empaquetó tal cual para no bloquear la
+entrega; es una optimización pendiente, no un defecto.
+
+### 11.2 El extractor de un solo uso
+
+Archivo local ya escrito y verificado con `php -l` (sin errores de sintaxis), listo para
+subir. Vive en el scratchpad de esta sesión, nombre literal
+`extractor-758c42895fda04859d918d64cf8013bf.php`. El token del nombre y el token del
+código son el mismo valor real, generado con `bin2hex(random_bytes(16))` — no es un
+marcador de ejemplo.
+
+**Ubicación, distinta de la del runner de §7b:** va en la **raíz** de
+`/public_html/tour-word/` (junto al ZIP), **no** dentro de `public/`. El runner de §7b
+asume que la app y el `.htaccess` de §5.1 ya están instalados. Este extractor corre
+**antes** de que exista nada de eso — todavía no hay `public/` ni `.htaccess` propio —
+así que debe ser alcanzable por su ruta real y directa.
+
+**Riesgo abierto, heredado de §5.2, no nuevo:** si el `.htaccess` vivo del anfitrión
+tiene un catch-all sin comprobar si el archivo ya existe, una petición al extractor
+podría caer ahí y dar 404 antes de llegar al script real — la misma incógnita que §5.2 ya
+dejó anotada para `/tour-word/es`, sin forma de resolverla sin el contenido literal de
+ese archivo. El comando 5 de §11.4 es la prueba de esto.
+
+**Qué hace, en una sola ejecución y en este orden:**
+
+1. Verifica el token (`404 Not found` si no coincide).
+2. Busca `pachaviva-tourword.zip` en su propio directorio.
+3. Lo extrae ahí mismo con `ZipArchive::extractTo()` — crea de una vez `app/`,
+   `bootstrap/`, `vendor/`, `public/` y el `.htaccess` nuevo.
+4. Verifica que `vendor/autoload.php` y `bootstrap/app.php` quedaron en disco antes de
+   seguir; si la extracción falló a medias, no borra el ZIP y no corre nada más.
+5. Borra el ZIP.
+6. Carga el autoload y el kernel recién extraídos, y corre en el mismo request:
+   `config:clear` → `config:cache` → `route:cache` → `storage:link` (recrea el symlink
+   de `public/storage` que el ZIP excluyó a propósito en §11.1, ahora apuntando a la
+   ruta real del servidor).
+7. Si los cuatro comandos terminan en código `0`, imprime la cadena literal
+   verificable: `OK: config:clear, config:cache, route:cache y storage:link
+   ejecutados.` Si alguno falla, imprime `PARCIAL: fallaron estos pasos -> ...` con el
+   detalle. `storage:link` puede fallar si el hosting deshabilitó la función de enlaces
+   simbólicos — caso real en algunos planes compartidos; si pasa, las imágenes de
+   galería darán 404 hasta resolverlo con el hosting, pero no debe frenar el resto del
+   checklist.
+8. Se autoborra. Si el borrado falla, imprime la instrucción explícita de borrarlo a
+   mano en el mismo minuto, con la ruta exacta.
+
+**Cómo se comprueba que quedó cerrado:** la respuesta HTTP al dispararlo debe contener
+literalmente la cadena de éxito de arriba (comando 5 de §11.4) — no un 404 del propio
+archivo (riesgo de arriba, o no subió bien) ni un 500 de PHP (revisar `error_log` de
+cPanel: falta de memoria al extraer ~16.800 archivos es la sospecha más probable; el
+script ya sube el límite de memoria y de tiempo de ejecución para esta corrida, pero un
+hosting compartido puede imponer un techo duro que ningún ajuste del script puede saltar).
+
+### 11.3 El `.env` de producción
+
+**Nota de manejo:** este documento se commitea al repo (ver `git show --stat 9e9fe6a`,
+`docs/rediseno-2026/` ya viaja en el árbol). Por eso **ningún secreto real** (APP_KEY,
+hash de `.htpasswd`, contraseñas) se reproduce aquí — solo en los archivos sueltos del
+scratchpad, fuera del repo, listos para subir. Esta sección describe estructura y
+ubicación, no el valor.
+
+Archivo local ya escrito y listo para subir tal cual:
+
+```
+C:\Users\USUARI~1\AppData\Local\Temp\claude\C--Users-USUARIO-WEBTILIA\3490999d-273c-4dbd-a2c3-a67991cba4e3\scratchpad\env-produccion-tourword.txt
+```
+
+**Estructura (34 líneas, volcada del archivo real — valores sensibles no reproducidos
+aquí, ver nota de arriba):**
+
+| Bloque | Claves | Valor / criterio |
+|---|---|---|
+| Identidad app | `APP_NAME`, `APP_ENV`, `APP_DEBUG`, `APP_URL`, `APP_TIMEZONE`, `APP_LOCALE`, `APP_FALLBACK_LOCALE` | `"Pacha Viva"`, `production`, `false`, `https://www.limaviewtours.com/tour-word`, `America/Lima`, `es`/`es` |
+| `APP_KEY` | 1 línea | **Nueva, no la del `.env` local** — generada con `php artisan key:generate --show` (ese flag no escribe el `.env`; verificado después: `.env` local sigue con su clave original, distinta). Cumple el punto 1 de §4 sin que Anyerson tenga que generarla a mano en el servidor. Valor real solo en el archivo del scratchpad |
+| `EXTRA_TRUSTED_HOSTS` | 1 línea | `www.limaviewtours.com,limaviewtours.com` |
+| Logs | `LOG_CHANNEL`, `LOG_LEVEL` | `stack`, `error` |
+| BD | `DB_CONNECTION`, `DB_DATABASE` | `sqlite`, `/home/limaview/tour-word-data/pachaviva-demo.sqlite` — coincide con la ruta real que confirma §11.3bis y §11.4 |
+| Sesión (A-4, punto 2 de §4) | `SESSION_DRIVER`, `SESSION_COOKIE`, `SESSION_PATH`, `SESSION_DOMAIN`, `SESSION_SECURE_COOKIE`, `SESSION_HTTP_ONLY`, `SESSION_SAME_SITE`, `SESSION_ENCRYPT` | `database`, `pachaviva_demo_session`, `/tour-word`, `www.limaviewtours.com`, `true`, `true`, `lax`, `true` — cookie propia con path propio, para no chocar con la de Lima View |
+| Caché/colas | `CACHE_STORE`, `QUEUE_CONNECTION` | `database`, `sync` |
+| Correo (M-2) | `MAIL_MAILER` | `log` — `CONTACT_NOTIFY_EMAIL` a propósito **sin declarar** (falla cerrado en vez de caer al dominio del anfitrión, ver `04-seguridad.md` §4.4) |
+| Bandera de demo (M-1 capa 2) | `IS_STAGING_MIRROR` | `true` — junto con `config:cache` en el mismo paso del extractor (§11.2), no separado |
+
+**Verificación de que no quedó ningún marcador sin resolver**, corrida sobre el archivo
+real: `grep -inE "PENDIENTE|CAMBIAR|PON_TU|GENERAR_UNA_NUEVA|usuario_cpanel|RUTA_ABSOLUTA"`
+→ **0 coincidencias**.
+
+**Ruta exacta de destino en el servidor:** `/public_html/tour-word/.env` — se sube directo
+con ese nombre (§11.4, comando 3), nunca arrastrado desde la carpeta local del desarrollador
+(§4).
+
+### 11.3bis El `.htpasswd` (corrección 3 de §8.9 — era el único punto sin resolver)
+
+**Generado en esta pasada**, no delegado a "decidirá Anyerson", porque bloqueaba cerrar
+la lista de comandos de §11.4. Procedimiento real ejecutado (§5.1bis), con el mismo
+binario que usó `security-engineer`: `htpasswd.exe -c -m -b` sobre un archivo del
+scratchpad, usuario `pachaviva-demo`, contraseña generada con `random_bytes(18)` +
+`base64_encode` en PHP (no reusada de ningún otro sistema del estudio ni del cliente).
+
+**Formato verificado leyendo el archivo resultante:** empieza por `usuario:$apr1$...` —
+el formato portable entre Apache y LiteSpeed que pedía §5.1bis. Valor real no reproducido
+aquí (nota de manejo de §11.3): es un hash `apr1`, no la contraseña en claro, pero este
+documento se commitea y la política es no incrustar ningún material de credenciales en
+el repo, hash incluido.
+
+**Dónde vive cada cosa, y por qué no están en el mismo lugar:**
+
+| Archivo | Va al repo/doc | Va al servidor |
+|---|---|---|
+| `htpasswd-pachaviva.txt` (el hash) | No — solo esta descripción | **Sí**, a `/home/limaview/tour-word-data/.htpasswd` (§11.4, comando 4) |
+| Contraseña en claro (archivo aparte, nombre con `CREDENCIALES` y `NO-COMMITEAR` en el propio nombre) | **Nunca** | No aplica — se la entrega alguien del estudio a Anyerson fuera de banda (no por este documento, no por el repo); el archivo local se borra una vez confirmada la entrega |
+
+Esto respeta el criterio que ya fijaba §5.1bis: "la contraseña la elige y la conoce
+Anyerson... nunca una clave que quede escrita en un archivo que puede terminar
+commiteado" — aquí se generó (en vez de esperar a que Anyerson la elija) porque el
+encargo pedía cerrar la lista de comandos ahora, pero se mantuvo la separación: el hash
+va al servidor, la contraseña en claro no entra en ningún archivo del repo ni de este
+documento.
+
+**Alternativa no usada:** Directory Privacy de cPanel (§5.1bis) — descartada para esta
+entrega porque genera su propio `.htpasswd` en el momento de crearlo desde el panel, y
+eso requiere que el código ya esté subido; el procedimiento de arriba no depende de ese
+orden y ya está listo antes de la subida.
+
+### 11.4 Comandos finales para Anyerson
+
+**Corrección de ruta del SQLite, verificada por mí en esta pasada, no copiada de un
+informe anterior:** la ruta que citaba una versión previa de este documento
+(`...\AppData\Local\Temp\claude\...`) es **incorrecta**. La ruta real, confirmada
+listando el archivo directamente, es la misma carpeta de scratchpad de esta sesión pero
+**sin** el segmento `Temp` (`...\AppData\Local\claude\...`, no
+`...\AppData\Local\Temp\claude\...`) — distinto del resto de artefactos de esta sesión.
+
+Verificado en esta pasada, directamente sobre el archivo (no copiado del documento
+anterior): tamaño 192.512 bytes. Coincide exacto con el archivo **bueno** de §1/§2 (14
+`tour_images`, seeder ya corregido) y **no** con el archivo descartado que había
+verificado `security-engineer` antes de detectarse ese defecto (`tour_images = 0`). El
+hash MD5 de verificación completo va en el archivo de comandos de abajo, no repetido aquí
+para no acumular varios valores con forma de credencial en el mismo documento commiteado.
+
+**Texto literal listo para pegar en PowerShell, en archivo aparte** — no en este
+documento, que se commitea; siete comandos con la contraseña FTP repetida siete veces
+más el MD5 del SQLite es exactamente el patrón que conviene no acumular en un archivo
+versionado:
+
+```
+scratchpad de esta sesión / comandos-finales-tourword.txt
+```
+
+Son **siete comandos, uno por línea, cada uno empieza literalmente por `curl.exe`, sin
+`&&`**, con la misma credencial FTP que ya usa el resto de este documento en §9.
+
+**Qué hace cada uno, en orden** (texto literal en el archivo de arriba):
+
+1. **Sube el ZIP** (105,11 MB) a `/public_html/tour-word/pachaviva-tourword.zip`.
+2. **Sube el extractor** a la raíz de `tour-word/` (junto al ZIP, no dentro de
+   `public/` — ver §11.2).
+3. **Sube el `.env`** de §11.3, renombrado a `.env` en el destino
+   (`/public_html/tour-word/.env`).
+4. **Sube el `.htpasswd`** de §11.3bis a `/tour-word-data/.htpasswd` (fuera del
+   docroot, junto a donde va el SQLite).
+5. **Sube el SQLite** verificado arriba, a `/tour-word-data/pachaviva-demo.sqlite`.
+6. **Dispara el extractor y verifica en la misma corrida** que la respuesta contiene la
+   cadena de éxito literal del extractor (§11.2), vía `Select-String -Quiet`, no un
+   código `200`. Debe devolver `True`. Si da `False`, repetir sin el `| Select-String`
+   para ver la salida completa y diagnosticar en qué paso falló. Si no hay respuesta en
+   absoluto, es el riesgo de enrutado anotado en §11.2 (catch-all del anfitrión sin
+   comprobar archivo existente), no un fallo del script.
+7. **Borra el extractor por FTP** — **solo si el comando 6 no confirma que se
+   autoborró** (el script ya lo intenta solo al final; este paso es la red de seguridad
+   si ese `unlink` falló por permisos). Un extractor con el token en el nombre que queda
+   público, aunque ya haya corrido una vez, es una puerta que nadie pidió.

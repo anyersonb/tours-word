@@ -73,6 +73,8 @@ return [
         'contact_cta' => 'Contact us',
         'open_menu' => 'Open menu',
         'close_menu' => 'Close menu',
+        // Roavio port (2026-09-20): thin strip above the main header.
+        'topbar_tagline' => 'Boutique travel agency in Cusco, Peru',
     ],
 
     'footer' => [
@@ -137,6 +139,13 @@ return [
             ],
         ],
 
+        // Roavio port (2026-09-20): full-bleed 6-photo mosaic under the
+        // hero. No visible H2 (Roavio doesn't show one there either) — the
+        // region carries its own aria-label, see home.blade.php.
+        'showcase' => [
+            'aria_label' => 'A photographic glimpse of our destinations and experiences',
+        ],
+
         'featured_tours' => [
             'eyebrow' => 'Pacha Viva selection',
             'title' => 'Featured tours',
@@ -165,10 +174,37 @@ return [
             'assistance_description' => 'We are with you before, during and after your trip.',
         ],
 
-        'experiences' => [
+        // Roavio port, lote 1 (2026-09-21): see the Spanish file for context
+        // (same $experiences data, new flat-tile presentation).
+        'activities' => [
             'eyebrow' => 'Live Peru',
-            'title' => 'Unique experiences',
+            'title' => 'Activities to experience Peru',
             'cta' => 'View all',
+        ],
+
+        // Roavio port, lote 1: see the Spanish file for context (static demo
+        // content, no reviews model yet, no stock/AI faces).
+        'testimonials' => [
+            'eyebrow' => 'Traveler voices',
+            'title' => 'What our travelers say',
+            // DEMO: pending a reviews model. First name + last initial and
+            // origin city; the avatar is the initial over a color square,
+            // never a photo.
+            'items' => [
+                ['quote' => 'Machu Picchu at sunrise, without the mid-morning crowds: the guide made the difference from the first WhatsApp message.', 'name' => 'Valeria M.', 'origin' => 'Lima, Peru'],
+                ['quote' => 'They fit the whole Sacred Valley into one day and we still had plenty of time at every stop. On schedule, never rushed.', 'name' => 'James K.', 'origin' => 'Toronto, Canada'],
+                ['quote' => 'The trek was demanding but the guide knew every stretch of the trail. We felt accompanied, not just led.', 'name' => 'Sofía R.', 'origin' => 'Buenos Aires, Argentina'],
+                ['quote' => 'We booked on short notice and they still found room on the Cusco circuit. Fast replies by email.', 'name' => 'Lucas B.', 'origin' => 'São Paulo, Brazil'],
+                ['quote' => 'The food route took us to places we never would have found on our own. Worth going with locals.', 'name' => 'Hannah W.', 'origin' => 'Berlin, Germany'],
+                ['quote' => 'We are from Cusco and still learned new history about the Sacred Valley from the guide. Recommended for locals too.', 'name' => 'Diego P.', 'origin' => 'Cusco, Peru'],
+            ],
+        ],
+
+        // Roavio port, lote 1: see the Spanish file for context (no real
+        // partner/seal assets in the project yet).
+        'partners' => [
+            'eyebrow' => 'Trusted by',
+            'title' => 'Partners & certifications',
         ],
 
         'newsletter' => [

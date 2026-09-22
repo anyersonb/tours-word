@@ -19,6 +19,58 @@
     $destinations = Destination::query()->where('is_published', true)->orderBy('order')->get();
     $experiences = Experience::query()->where('is_published', true)->orderBy('order')->get();
 
+    /**
+     * Mosaico Roavio (port fiel, 2026-09-20): 6 tiles con 3 anchos distintos
+     * bajo el hero. NO es contenido nuevo — son las mismas 3 primeras
+     * $destinations y las mismas 3 primeras $experiences que ya bajan a las
+     * secciones de abajo, sólo que acá se presentan como vistazo fotográfico
+     * a sangre completa. Cero @php de datos nuevos, cero contenido inventado.
+     *
+     * Posición por SLOT, no por nombre/slug: cada slot fija qué colección y
+     * qué índice de esa colección ocupa, con el object-position elegido
+     * mirando esa foto real en el navegador (nunca "center" a ciegas — ver
+     * encargo). Si el catálogo cambiara de orden, el slot sigue mostrando lo
+     * que hoy ocupe esa posición: no se buscan slugs concretos.
+     */
+    $mosaicSlots = [
+        // 'wide' (556x634 a 1440, la tile más grande) — Valle Sagrado: foto
+        // panorámica (2.80:1), es la más espectacular del banco; se le da el
+        // tile de mayor peso visual aunque igual se recorte a retrato.
+        ['col' => $destinations, 'type' => 'destination', 'i' => 1, 'position' => 'center 72%'],
+        // 'narrow' (296x634, la más angosta) — Cultura: composición
+        // diagonal/vertical (telar), lee bien en un hueco muy estrecho.
+        ['col' => $experiences, 'type' => 'experience', 'i' => 2, 'position' => '68% 45%'],
+        // Par apilado A (296x315 x2)
+        ['col' => $destinations, 'type' => 'destination', 'i' => 0, 'position' => 'center 58%'], // Cusco
+        ['col' => $experiences, 'type' => 'experience', 'i' => 0, 'position' => '76% 58%'],       // Trekking: grupo a la derecha del encuadre
+        // Par apilado B (276x315 x2)
+        ['col' => $destinations, 'type' => 'destination', 'i' => 2, 'position' => 'center 68%'], // Arequipa
+        ['col' => $experiences, 'type' => 'experience', 'i' => 1, 'position' => 'center 48%'],   // Gastronomía
+    ];
+    $mosaicTiles = collect($mosaicSlots)
+        ->map(function ($slot) {
+            $model = $slot['col']->get($slot['i']);
+
+            if (! $model) {
+                return null;
+            }
+
+            return [
+                'model' => $model,
+                'type' => $slot['type'],
+                'position' => $slot['position'],
+                'href' => $slot['type'] === 'destination'
+                    ? route('destinations.show', $model->slug)
+                    : route('experiences.show', $model->slug),
+            ];
+        })
+        ->filter()
+        ->values();
+    // Geometría completa solo con las 6 piezas reales; con menos, cae a una
+    // rejilla simple (mismo criterio que "Tours destacados": ninguna sección
+    // asume una cantidad fija de elementos).
+    $hasFullMosaic = $mosaicTiles->count() === 6;
+
     // Paleta cíclica SOLO para el placeholder decorativo, usado cuando el
     // registro todavía no tiene foto real cargada (D · lote 1/etapa D:
     // Destination/Experience ya tienen columna cover_image_path desde el
@@ -61,11 +113,29 @@
      * cielo muy claro justo detrás del titular; Cordillera centra los picos
      * nevados. El orden acá DEBE coincidir con site.home.hero.slides (mismo
      * índice = misma foto).
+     *
+     * "positionMobile" (cierre del hero, 2026-09-21): a 375 el marco de V2
+     * cae a 0.449:1 (836/375, medido) — mucho más angosto que el AR nativo
+     * de las 3 fotos (1.478 / 2.391 / 1.692), así que object-fit:cover
+     * SIEMPRE muestra el alto completo de la foto y recorta por los lados;
+     * el eje Y del "position" de escritorio queda inerte a este ancho (no
+     * hay margen vertical que mover) y el que manda es X. Se recalculó X
+     * mirando cada foto en el navegador a 375 (nunca reusando el valor de
+     * escritorio a ciegas — mismo criterio que el mosaico del lote 0):
+     *   - Machu Picchu: X 52% dentro de la franja visible (~30% del ancho
+     *     nativo) mete el pico de Huayna Picchu completo + el arranque de
+     *     las terrazas/ruinas a su derecha.
+     *   - Valle Sagrado: X 75% — a esta foto (panorámica 2.39:1) solo
+     *     queda visible un ~19% del ancho nativo; centrado (50%) caía en
+     *     una montaña genérica, 75% mete el pueblo + el valle cultivado +
+     *     el río, que es el contenido con más lectura de la foto.
+     *   - Cordillera-río: X 50% (centro) — el conjunto de picos nevados y
+     *     el río que converge hacia el centro ya caen ahí, sin ajuste.
      */
     $heroSlides = [
-        ['file' => 'hero-machupicchu-amanecer', 'position' => 'center 42%'],
-        ['file' => 'hero-valle-sagrado-panoramica', 'position' => 'center 60%'],
-        ['file' => 'hero-cordillera-rio', 'position' => 'center 46%'],
+        ['file' => 'hero-machupicchu-amanecer', 'position' => 'center 42%', 'positionMobile' => '52%'],
+        ['file' => 'hero-valle-sagrado-panoramica', 'position' => 'center 60%', 'positionMobile' => '75%'],
+        ['file' => 'hero-cordillera-rio', 'position' => 'center 46%', 'positionMobile' => 'center'],
     ];
     // ['alt' => ..., 'label' => ...] por diapositiva. "alt" queda sin usar en
     // el <img> (las tres fotos son decorativas: el titular ya dice de qué
@@ -74,6 +144,57 @@
     // lectura). Se deja declarado para que la pasada B lo reutilice donde la
     // foto SÍ sea contenido con significado propio.
     $heroSlideLabels = __('site.home.hero.slides');
+
+    /**
+     * Port Roavio, lote 1 (2026-09-21): testimonios y aliados/sellos.
+     * CONTENIDO ESTÁTICO QUEMADO EN LA VISTA a propósito — ninguno de los
+     * dos tiene modelo en el proyecto todavía (ver encargo: "no inventes un
+     * modelo ni una migración chiquita"). Cada bloque va marcado
+     * "DEMO: pendiente modelo" en su propio comentario más abajo.
+     *
+     * Testimonios: nombres genéricos (nombre + inicial de apellido) y
+     * ningún avatar de banco/IA — B2 (pase anterior) ya había descartado
+     * esta sección por eso mismo. Acá el avatar es la inicial sobre un
+     * cuadrado de color (x-ui.testimonial-card variant="tile"), nunca una
+     * cara inventada.
+     */
+    $testimonials = collect(__('site.home.testimonials.items'))
+        ->map(fn ($t, $i) => $t + ['tone' => $photoPalette[$i % count($photoPalette)]]);
+
+    /**
+     * APAGADA (2026-09-21, orden explícita de Anyerson: "deja el testimonio
+     * apagado"). La sección se había reactivado en el lote 1 con 6
+     * testimonios DEMO inventados (ver comentario arriba). Se apaga de
+     * nuevo -- MISMO criterio que la decisión original del proyecto (B2,
+     * antes del lote 1): sin modelo de reseñas reales, no se publica
+     * ninguna cara/nombre inventado, ni siquiera con avatar de inicial.
+     *
+     * La maqueta (markup, x-ui.testimonial-card variant="tile", el
+     * carrusel) NO se borra: sigue completa más abajo, envuelta en el
+     * @if($testimonialsEnabled) de la sección "6. LO QUE DICEN NUESTROS
+     * VIAJEROS". Para encenderla cuando la clienta entregue reseñas reales:
+     *   1. Cambiar $testimonialsEnabled a true.
+     *   2. Reemplazar $testimonials (arriba) por datos reales -- lo ideal
+     *      es un modelo Review con name/quote/origin/avatar, no seguir
+     *      quemando el array de lang/{es,en}/site.php#testimonials.items.
+     *   3. Borrar el comentario "DEMO: pendiente modelo de reseñas" de la
+     *      sección y de los lang files.
+     */
+    $testimonialsEnabled = false;
+
+    /**
+     * Aliados + sellos oficiales: SIN ARCHIVOS REALES en el proyecto (ni
+     * logos de aliados ni el sello RNAVT/MINCETUR — ver búsqueda en
+     * public/images, no hay ninguno). Se maqueta el hueco con un wordmark
+     * de texto neutro, nunca con un logo inventado ni un sello con
+     * apariencia oficial (regla dura del encargo). Los dos últimos son
+     * justamente los sellos regulatorios peruanos, marcados aparte.
+     */
+    $partners = [
+        ['label' => 'Aliado 01'], ['label' => 'Aliado 02'], ['label' => 'Aliado 03'],
+        ['label' => 'Aliado 04'], ['label' => 'Aliado 05'], ['label' => 'Aliado 06'],
+        ['label' => 'RNAVT', 'seal' => true], ['label' => 'MINCETUR', 'seal' => true],
+    ];
 @endphp
 <x-layout :title="__('site.home.meta.title')" :description="__('site.home.meta.description')">
 
@@ -113,11 +234,23 @@
     --}}
     <section
         id="hero"
-        {{-- min-h-[100svh] menos el alto del header (h-16 = 4rem, sticky:
-             ocupa su propio espacio en el flujo, no se superpone al hero) —
-             así el conjunto header+hero llena la pantalla completa en la
-             primera vista, que es el punto de "full-screen" del encargo. --}}
-        class="relative isolate flex min-h-[calc(100svh-4rem)] flex-col overflow-hidden bg-ink-surface"
+        {{--
+            Full-bleed real: sin .shell-boxed, sin radio, sin margen —
+            w-full a secas, hijo directo de <main>, así que ocupa el 100%
+            del ancho disponible sin el patrón 100vw (ese sí puede
+            desbordar si hay scrollbar vertical; w-full de un bloque normal
+            nunca lo hace, verificado con documentElement.scrollWidth a 375
+            — ver informe).
+
+            Alto: min-h 100svh menos el header. DECISIÓN DEL CLIENTE
+            (2026-09-21): "vamos con la versión V2 · Pantalla completa" —
+            cierra la ambigüedad "fullhero apaisado" que había dejado dos
+            variantes vivas en el código (V1, banda cinematográfica por
+            aspect-ratio, y V2, pantalla completa; ver
+            docs/rediseno-2026/08-lote0-roavio.md §4 para el historial). V1
+            se retiró del código — sigue en git si hace falta revisarla.
+        --}}
+        class="relative isolate flex w-full flex-col bg-ink-surface min-h-[calc(100svh-4rem)]"
         x-data="heroSlider({{ count($heroSlides) }})"
         x-init="init()"
         @keydown.left="prev()"
@@ -139,6 +272,7 @@
                                 fetchpriority="high"
                                 decoding="sync"
                                 :position="$slide['position']"
+                                :position-sm="$slide['positionMobile']"
                                 imgClass="hero-slide__img h-full w-full object-cover"
                             />
                         @else
@@ -151,6 +285,7 @@
                                     alt=""
                                     sizes="100vw"
                                     :position="$slide['position']"
+                                    :position-sm="$slide['positionMobile']"
                                     imgClass="hero-slide__img h-full w-full object-cover"
                                 />
                             </template>
@@ -168,6 +303,10 @@
             @endforeach
         </p>
 
+        {{-- Full-bleed real: la sección ya no pone su propio padding-inline
+             (no hay .shell-boxed), así que el gutter horizontal del
+             contenido vuelve a vivir en ESTE .shell, igual que antes del
+             port Roavio. --}}
         <div class="relative z-10 flex flex-1 flex-col justify-center py-28 sm:py-32 lg:py-24">
             <div class="shell">
                 <div class="max-w-xl lg:max-w-2xl">
@@ -272,10 +411,15 @@
             {{-- Cue de scroll: enlace real a la siguiente sección (funciona
                  sin JS), oculto desde el móvil más chico para no competir
                  por espacio vertical con la franja de confianza. El rebote
-                 se anula solo con prefers-reduced-motion (ver app.css). --}}
+                 se anula solo con prefers-reduced-motion (ver app.css).
+                 Port Roavio: apunta al mosaico (la sección que sigue de
+                 verdad ahora) en vez de saltárselo hacia "tours-destacados".
+                 Si el mosaico no tiene piezas y no se renderiza (catálogo
+                 vacío), el navegador simplemente no encuentra el ancla y no
+                 hace nada — no hace falta un condicional acá. --}}
             <div class="hidden justify-center pb-5 sm:flex">
                 <a
-                    href="#tours-destacados"
+                    href="#mosaico"
                     class="hero-scroll-cue inline-flex flex-col items-center gap-1 rounded-full px-2 py-1 text-white/80 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                 >
                     <span class="text-xs font-medium uppercase tracking-wide">{{ __('site.home.hero.scroll_cue') }}</span>
@@ -285,9 +429,121 @@
         </div>
     </section>
 
-    {{-- ============ 2. TOURS DESTACADOS ============ --}}
+    {{--
+        ============ 1b. MOSAICO (port Roavio, 2026-09-20) ============
+        La banda que rompe la planitud: a sangre completa (.shell-bleed,
+        1432px a 1440 de viewport — casi tocando el borde, justo después de
+        un hero BOXEADO. Ese contraste boxed→sangre es el 80% del efecto
+        Roavio, no un detalle (ver encargo).
+
+        6 tiles, 3 anchos: 1 angosta (296px a 1440), 1 ancha (556px), y dos
+        pares apilados (296px y 276px, dos filas de 315px cada una). Se logra
+        con UN SOLO grid: 4 columnas por fr literal (296fr/556fr/296fr/276fr
+        — el valor exacto medido en Roavio, no una fracción redondeada) y
+        row-span-2 en las dos columnas que van "altas". Cero JS.
+
+        Sin H2 visible: Roavio tampoco lleva uno ahí, es un respiro
+        fotográfico entre el hero y "Tours destacados" — pero sigue siendo
+        una región con nombre para lectores de pantalla.
+
+        Contenido: NO son fotos nuevas. Son las mismas 3 $destinations y las
+        mismas 3 $experiences que bajan a sus propias secciones más abajo
+        ($mosaicTiles arriba solo las reordena por slot) — cero contenido
+        inventado, cero query nueva.
+
+        Radio: rounded-tile (10px, --r-tile) en vez de rounded-card/panel
+        del resto del sitio — es el radio medido en Roavio (91% de sus
+        elementos), token nuevo en tokens.css que no reemplaza a los otros.
+    --}}
+    @if($mosaicTiles->isNotEmpty())
+    <section id="mosaico" aria-label="{{ __('site.home.showcase.aria_label') }}" class="bg-surface pb-10 pt-2 sm:pb-12 lg:pb-16">
+        <div class="shell-bleed">
+            @if($hasFullMosaic)
+                {{--
+                    Responsive en UN solo grid, sin duplicar markup:
+                    - <640: 2 columnas parejas, cada tile aspect-[3/4].
+                    - 640-1023: 3 columnas parejas (mismo aspecto).
+                    - >=1024: la retícula asimétrica de Roavio — 4 columnas
+                      por fr LITERAL (296/556/296/276, el valor medido, no
+                      una fracción redondeada) y las dos columnas "altas"
+                      (slot 0 = ancha, slot 1 = angosta) pasan a row-span-2
+                      SOLO en este breakpoint (lg:row-span-2, nunca
+                      row-span-2 a secas: a 2-3 columnas ese salto de fila
+                      dejaría huecos en la rejilla).
+                --}}
+                <div
+                    class="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-2.5 lg:gap-3 lg:[grid-template-columns:296fr_556fr_296fr_276fr] lg:[grid-template-rows:repeat(2,clamp(11.5rem,21.9vw,19.7rem))]"
+                >
+                    @foreach($mosaicTiles as $i => $tile)
+                        @php
+                            $isTallSlot = $i === 0 || $i === 1; // wide + narrow: cubren las 2 filas (solo en lg+)
+                            $fallbackSize = $tile['type'] === 'destination' ? [480, 600] : [480, 360];
+                        @endphp
+                        <x-ui.mosaic-tile
+                            :image="$tile['model']->coverImageUrl() ?? PlaceholderImage::svg($fallbackSize[0], $fallbackSize[1], $tile['model']->name, $photoPalette[$i % count($photoPalette)])"
+                            :image-alt="filled($tile['model']->cover_image_alt) ? $tile['model']->cover_image_alt : $tile['model']->name"
+                            :title="$tile['model']->name"
+                            :subtitle="\Illuminate\Support\Str::limit($tile['model']->description, 42)"
+                            :href="$tile['href']"
+                            :position="$tile['position']"
+                            sizes="(min-width: 1024px) 40vw, (min-width: 640px) 33vw, 50vw"
+                            :class="'aspect-[3/4] lg:aspect-auto '.($isTallSlot ? 'lg:row-span-2' : '')"
+                            data-reveal
+                            style="--reveal-delay:{{ min($i, 5) * 60 }}ms"
+                        />
+                    @endforeach
+                </div>
+            @elseif($mosaicTiles->isNotEmpty())
+                {{-- Menos de 6 piezas reales (p. ej. catálogo recién sembrado):
+                     la geometría asimétrica de Roavio no tiene sentido con
+                     menos elementos, así que cae a una rejilla simple con el
+                     mismo tratamiento de foto, en vez de dejar huecos vacíos
+                     en la retícula fija. --}}
+                <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-2.5 lg:gap-3">
+                    @foreach($mosaicTiles as $i => $tile)
+                        @php $fallbackSize = $tile['type'] === 'destination' ? [480, 600] : [480, 360]; @endphp
+                        <x-ui.mosaic-tile
+                            class="aspect-[3/4]"
+                            :image="$tile['model']->coverImageUrl() ?? PlaceholderImage::svg($fallbackSize[0], $fallbackSize[1], $tile['model']->name, $photoPalette[$i % count($photoPalette)])"
+                            :image-alt="filled($tile['model']->cover_image_alt) ? $tile['model']->cover_image_alt : $tile['model']->name"
+                            :title="$tile['model']->name"
+                            :subtitle="\Illuminate\Support\Str::limit($tile['model']->description, 42)"
+                            :href="$tile['href']"
+                            :position="$tile['position']"
+                            sizes="(min-width: 640px) 30vw, 45vw"
+                            data-reveal
+                            style="--reveal-delay:{{ min($i, 5) * 60 }}ms"
+                        />
+                    @endforeach
+                </div>
+            @endif
+        </div>
+    </section>
+    @endif
+
+    {{--
+        ============ 2. TOURS DESTACADOS — rejilla Roavio ============
+        Port Roavio (lote 1, 2026-09-21): en Roavio esta sección es una
+        rejilla estática de 8 tarjetas idénticas (col-xl-3, 358px), no un
+        carrusel. El carrusel salía porque el catálogo de hoy es chico (3
+        tours); auto-fit resuelve las dos cosas a la vez: con pocas tarjetas
+        colapsa las columnas vacías y las reparte a lo ancho del contenedor
+        (mismo truco que ya usan "Destinos" y "Actividades" más abajo), y
+        con 8 o más simplemente sigue agregando filas — cero JS, cero
+        carrusel que ocultar/mostrar según la cuenta.
+
+        Primera sección boxed después del mosaico a sangre (regla del
+        encargo): .shell-boxed, 1392px — contraste fuerte contra el
+        mosaico (a sangre) y contra "Destinos" (.shell, 1280) que sigue
+        justo debajo.
+
+        Tarjetas: x-ui.tour-card variant="flat" (radio 10px, SIN
+        box-shadow) — variante aditiva nueva del componente; tours/index.blade.php
+        y las fichas de tour siguen con el variant="card" de siempre
+        (radio grande + sombra), sin tocar.
+    --}}
     <section id="tours-destacados" class="bg-surface">
-        <div class="shell section">
+        <div class="shell-boxed section">
             <x-ui.eyebrow data-reveal class="mb-3">{{ __('site.home.featured_tours.eyebrow') }}</x-ui.eyebrow>
             <x-ui.section-title as="h2" data-reveal style="--reveal-delay:60ms">
                 <x-slot:action>
@@ -298,37 +554,11 @@
                 {{ __('site.home.featured_tours.title') }}
             </x-ui.section-title>
 
-            @if($featuredTours->count() >= 4)
-                {{-- Carrusel solo a partir de 4: con 2 o 3 tarjetas no hay
-                     nada que desplazar y el propio componente esconde sus
-                     controles, así que la sección se veía como una rejilla
-                     torcida. --}}
-                <x-ui.carousel-shell label="{{ __('site.home.featured_tours.title') }}">
-                    @foreach($featuredTours as $tour)
-                        <li class="w-[280px] shrink-0 snap-start sm:w-[340px]" data-reveal style="--reveal-delay:{{ min($loop->index, 5) * 80 }}ms">
-                            <x-ui.tour-card
-                                :image="optional($tour->images->first())->url() ?? PlaceholderImage::svg(480, 360, $tour->title, $photoPalette[$loop->index % count($photoPalette)])"
-                                :image-alt="$tour->title"
-                                :title="$tour->title"
-                                :summary="$tour->summary"
-                                :duration="$tour->duration_label"
-                                :category="optional($tour->experiences->first())->name"
-                                :location="optional($tour->destination)->name"
-                                :pen-cents="$tour->price_pen_cents"
-                                :usd-cents="$tour->price_usd_cents"
-                                href="{{ route('tours.show', $tour->slug) }}"
-                                sizes="340px"
-                            />
-                        </li>
-                    @endforeach
-                </x-ui.carousel-shell>
-            @elseif($featuredTours->isNotEmpty())
-                {{-- Rejilla que se centra sola: con un único tour destacado
-                     (el caso de hoy) la tarjeta queda centrada, no huérfana
-                     pegada al margen izquierdo como estaba. --}}
-                <div class="mx-auto grid max-w-6xl justify-center gap-6 [grid-template-columns:repeat(auto-fit,minmax(min(100%,17rem),24rem))]">
+            @if($featuredTours->isNotEmpty())
+                <div class="grid gap-6 [grid-template-columns:repeat(auto-fit,minmax(min(100%,17rem),1fr))]">
                     @foreach($featuredTours as $tour)
                         <x-ui.tour-card
+                            variant="flat"
                             :image="optional($tour->images->first())->url() ?? PlaceholderImage::svg(480, 360, $tour->title, $photoPalette[$loop->index % count($photoPalette)])"
                             :image-alt="$tour->title"
                             :title="$tour->title"
@@ -339,7 +569,7 @@
                             :pen-cents="$tour->price_pen_cents"
                             :usd-cents="$tour->price_usd_cents"
                             href="{{ route('tours.show', $tour->slug) }}"
-                            sizes="(min-width: 640px) 24rem, 90vw"
+                            sizes="(min-width: 1024px) 22vw, (min-width: 640px) 45vw, 90vw"
                             data-reveal
                             style="--reveal-delay:{{ min($loop->index, 5) * 80 }}ms"
                         />
@@ -352,7 +582,7 @@
     </section>
 
     {{-- ============ 3. DESTINOS IMPERDIBLES ============ --}}
-    <section class="weave bg-sand">
+    <section id="destinos" class="weave bg-sand">
         <div class="shell section">
             <x-ui.eyebrow data-reveal class="mb-3">{{ __('site.home.destinations.eyebrow') }}</x-ui.eyebrow>
             <x-ui.section-title as="h2" data-reveal style="--reveal-delay:60ms">
@@ -393,10 +623,20 @@
         </div>
     </section>
 
-    {{-- ============ 4. ¿POR QUÉ ELEGIR VIAJAR CON NOSOTROS? ============ --}}
-    <section class="bg-surface">
-        <div class="shell section">
-            <div class="grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
+    {{--
+        ============ 4. ¿POR QUÉ ELEGIR VIAJAR CON NOSOTROS? (about Roavio) ============
+        Port Roavio (lote 1, 2026-09-21): columnas 5/7, no 50/50 — el
+        zig-zag simétrico es tic de plantilla genérica (encargo). Contenedor
+        .shell-boxed (1392, no el .shell de 1280 de siempre) para que
+        contraste con "Destinos" justo arriba. Radio 10px y CERO
+        box-shadow en toda la sección (antes: rounded-panel/shadow-e3 en la
+        foto y la tarjeta flotante, del pase cinematográfico anterior a este
+        lote) — se ajustan acá para cumplir la regla dura del encargo; el
+        parallax, la holgura del marco y la velocidad NO se tocan.
+    --}}
+    <section id="about" class="bg-surface">
+        <div class="shell-boxed section">
+            <div class="grid gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-center lg:gap-16">
                 {{-- La foto va a la izquierda en pantallas grandes: ancla el
                      bloque y el texto deja de flotar. --}}
                 <div class="order-2 lg:order-1" data-reveal>
@@ -408,7 +648,7 @@
                          velocidad normal. Se apaga solo bajo 1024px, con
                          puntero "coarse" o con reduced-motion — ver
                          setupParallax() en app.js. --}}
-                    <div class="photo aspect-[4/3] rounded-panel shadow-e3">
+                    <div class="photo aspect-[4/3] rounded-tile">
                         {{-- Velocidad subida de 0.15 a 0.26 (2026-09-18): a 0.15 el
                              desplazamiento medido con playwright-core era real pero
                              quedaba por debajo del umbral de percepción humana dentro
@@ -421,7 +661,7 @@
                             <x-ui.picture
                                 src="{{ asset('images/site/nosotros-viajeros-ruta.jpg') }}"
                                 :alt="__('site.home.why_us.photo_alt')"
-                                sizes="(min-width: 1024px) 36rem, 92vw"
+                                sizes="(min-width: 1024px) 30rem, 92vw"
                                 position="center 40%"
                             />
                         </div>
@@ -430,7 +670,7 @@
                          z-index propio, no absolute dentro de un contenedor
                          con overflow oculto — así no se recorta ni empuja el
                          alto de la sección. --}}
-                    <div class="relative z-10 -mt-10 ml-4 mr-8 flex items-center gap-3 rounded-card border border-line bg-surface p-4 shadow-e3 sm:-mt-12 sm:ml-8 sm:mr-16">
+                    <div class="relative z-10 -mt-10 ml-4 mr-8 flex items-center gap-3 rounded-tile border border-line bg-surface p-4 sm:-mt-12 sm:ml-8 sm:mr-16">
                         <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-50 text-action" aria-hidden="true">
                             {!! $headsetIcon !!}
                         </span>
@@ -464,50 +704,155 @@
         </div>
     </section>
 
-    {{-- ============ 5. EXPERIENCIAS ÚNICAS ============ --}}
-    <section class="weave bg-sand">
-        <div class="shell section">
-            <x-ui.eyebrow data-reveal class="mb-3">{{ __('site.home.experiences.eyebrow') }}</x-ui.eyebrow>
-            <x-ui.section-title as="h2" data-reveal style="--reveal-delay:60ms">
-                <x-slot:action>
-                    <x-ui.button variant="link" href="{{ Route::has('experiences.index') ? route('experiences.index') : '#' }}">
-                        {{ __('site.home.experiences.cta') }} &rarr;
-                    </x-ui.button>
-                </x-slot:action>
-                {{ __('site.home.experiences.title') }}
-            </x-ui.section-title>
+    {{--
+        ============ 5. ACTIVIDADES — tiles Roavio (antes "Experiencias únicas") ============
+        Port Roavio (lote 1, 2026-09-21): en Roavio esta sección es una fila
+        de 5 tiles de actividad (foto + ícono + rótulo). MISMO DATO que
+        antes ($experiences, sin query nueva) — solo cambia la presentación,
+        de tarjeta con borde/sombra (x-ui.experience-card, que sigue viva en
+        /experiencias sin tocar) a tile plano a sangre completa
+        (x-ui.mosaic-tile: radio 10px, scrim-card, CERO box-shadow — el
+        mismo componente del mosaico bajo el hero, reutilizado a propósito
+        para que "Actividades" se lea como eco del mosaico).
+
+        Contenedor .shell-bleed (1432, a sangre) — contraste fuerte contra
+        el "about" boxed de arriba. Banda deliberadamente BAJA (tiles
+        aspect-video, no aspect-[3/4]) para que la sección sea corta frente
+        a "Tours"/"About": es la pieza que rompe la monotonía de alturas
+        (regla del encargo).
+    --}}
+    <section id="actividades" class="bg-surface pb-2 pt-2">
+        <div class="shell-bleed section-tight">
+            <div class="px-1">
+                <x-ui.eyebrow data-reveal class="mb-3">{{ __('site.home.activities.eyebrow') }}</x-ui.eyebrow>
+                <x-ui.section-title as="h2" data-reveal style="--reveal-delay:60ms">
+                    <x-slot:action>
+                        <x-ui.button variant="link" href="{{ Route::has('experiences.index') ? route('experiences.index') : '#' }}">
+                            {{ __('site.home.activities.cta') }} &rarr;
+                        </x-ui.button>
+                    </x-slot:action>
+                    {{ __('site.home.activities.title') }}
+                </x-ui.section-title>
+            </div>
 
             @if($experiences->isNotEmpty())
-                <div class="grid gap-5 [grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr))]">
+                <div class="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr))]">
                     @foreach($experiences as $i => $experience)
-                        {{-- D · lote 1/etapa D: mismo patrón que Destinos. --}}
-                        <x-ui.experience-card
+                        <x-ui.mosaic-tile
+                            class="aspect-video"
                             :image="$experience->coverImageUrl() ?? PlaceholderImage::svg(480, 360, $experience->name, $photoPalette[$i % count($photoPalette)])"
                             :image-alt="filled($experience->cover_image_alt) ? $experience->cover_image_alt : $experience->name"
                             :title="$experience->name"
-                            :description="$experience->description"
+                            :subtitle="\Illuminate\Support\Str::limit($experience->description, 60)"
                             :icon="$experienceIcons[$experience->slug] ?? $defaultExperienceIcon"
-                            href="{{ route('experiences.show', $experience->slug) }}"
+                            :href="route('experiences.show', $experience->slug)"
+                            sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
                             data-reveal
                             style="--reveal-delay:{{ min($i, 5) * 80 }}ms"
                         />
                     @endforeach
                 </div>
             @else
-                <x-ui.empty-state data-reveal>{{ __('site.home.empty.experiences') }}</x-ui.empty-state>
+                <x-ui.empty-state data-reveal class="mx-1">{{ __('site.home.empty.experiences') }}</x-ui.empty-state>
             @endif
         </div>
     </section>
 
     {{--
-        ============ 6. LO QUE DICEN NUESTROS VIAJEROS ============
-        B2: NO se renderiza en la Home. `reviews` no tiene migración (lote
-        4/5) y los 3 testimonios del mockup son reseñas falsas (caras de IA,
-        nombres inventados). El componente x-ui.testimonial-card existe y se
-        ve en /_styleguide con :sample="true", pero ninguna página real lo
-        instancia todavía — decisión tomada acá, en la página, no en el
-        componente (así lo documenta 00-sistema-diseno.md).
+        ============ 6. LO QUE DICEN NUESTROS VIAJEROS (testimonios Roavio) ============
+        Decisión anterior (B2): esta sección NO se renderizaba — `reviews` no
+        tiene migración y los 3 testimonios del mockup eran reseñas falsas
+        (caras de IA, nombres inventados). El encargo de este lote la anula
+        explícitamente: "Testimonios NO tienen modelo — maquétalos con
+        contenido estático quemado en la vista, con comentario DEMO en cada
+        uno" (ver el array $testimonials armado arriba, de
+        lang/es/site.php#testimonials.items — cada fila queda marcada
+        "DEMO: pendiente modelo" en el comentario del propio lang file).
+
+        El problema original de "caras de IA" NO vuelve: nombre + inicial de
+        apellido (no una identidad completa inventada) y CERO foto de
+        banco/IA — el avatar es la inicial sobre un cuadrado de color
+        (x-ui.testimonial-card variant="tile", 100x101, radio 0, el spec
+        exacto del encargo).
+
+        Roavio usa un Swiper de 6; acá, x-ui.carousel-shell (el mismo
+        carrusel real — scroll-snap + flechas + puntos — que ya usaba esta
+        página para tours, sin sumar una librería nueva). Contenedor
+        .shell-narrow (1290, el tercer ancho Roavio, sin consumidor hasta
+        este lote — ver tokens.css) para no repetir el .shell-bleed de
+        Actividades justo arriba.
     --}}
+    @if($testimonialsEnabled)
+    <section id="testimonios" class="bg-sand weave">
+        <div class="shell-narrow section">
+            <x-ui.eyebrow data-reveal class="mb-3">{{ __('site.home.testimonials.eyebrow') }}</x-ui.eyebrow>
+            <x-ui.section-title as="h2" data-reveal style="--reveal-delay:60ms">
+                {{ __('site.home.testimonials.title') }}
+            </x-ui.section-title>
+
+            <x-ui.carousel-shell label="{{ __('site.home.testimonials.title') }}">
+                @foreach($testimonials as $i => $t)
+                    <li class="w-[300px] shrink-0 snap-start sm:w-[360px]" data-reveal style="--reveal-delay:{{ min($i, 5) * 80 }}ms">
+                        {{-- DEMO: pendiente modelo de reseñas (ver comentario arriba). --}}
+                        <x-ui.testimonial-card
+                            variant="tile"
+                            class="h-full"
+                            :quote="$t['quote']"
+                            :name="$t['name']"
+                            :origin="$t['origin']"
+                            :avatar-tone="$t['tone']"
+                        />
+                    </li>
+                @endforeach
+            </x-ui.carousel-shell>
+        </div>
+    </section>
+    @endif
+
+    {{--
+        ============ 6b. ALIADOS Y CERTIFICACIONES (marquee Roavio) ============
+        Roavio lleva 21 logos; acá van aliados + los sellos oficiales
+        peruanos (RNAVT/MINCETUR — ver x-ui.mincetur-badge, que ya existe y
+        no imprime nada sin Setting::get('rnavt_number')). NINGÚN archivo
+        real en el proyecto todavía: ni un logo de aliado ni el sello oficial
+        (búsqueda en public/images/, sin resultados). Regla dura del
+        encargo: "si el sello no está, deja el hueco maquetado, nunca un
+        placeholder con aspecto de sello oficial" — por eso CADA tile, aliado
+        o sello, es el mismo wordmark de texto neutro (nada que se pueda
+        confundir con una certificación real). Pendiente anotado acá y en el
+        informe de cierre, no como copy visible en la página (mismo criterio
+        que el resto del sitio: nunca lenguaje de obra de cara al visitante).
+
+        Bucle CSS puro (.marquee-track, ver app.css): el array se recorre
+        DOS VECES seguidas para que el tramo duplicado entre justo cuando
+        sale el primero — nunca Swiper/JS nuevo. Contenedor .shell-bleed
+        (1432, a sangre) — la ficha de "logos en fila" pide ancho completo,
+        y contrasta con el .shell-narrow de Testimonios justo arriba.
+    --}}
+    <section id="aliados" aria-labelledby="aliados-title" class="border-y border-line-soft bg-surface py-10 sm:py-12">
+        <div class="shell-bleed">
+            <p id="aliados-title" class="eyebrow mb-6 text-center text-text-muted">{{ __('site.home.partners.eyebrow') }}</p>
+
+            {{-- aria-hidden: contenido decorativo (wordmarks placeholder,
+                 sin enlaces) duplicado para el bucle CSS — sin esto un
+                 lector de pantalla lo anunciaría dos veces seguidas. --}}
+            <div class="marquee-viewport overflow-hidden" data-reveal aria-hidden="true">
+                <div class="marquee-track">
+                    @foreach([...$partners, ...$partners] as $partner)
+                        <div
+                            @class([
+                                'mx-3 flex h-14 w-40 shrink-0 items-center justify-center rounded-tile border px-4 text-center text-xs font-semibold uppercase tracking-wide text-text-muted',
+                                'border-dashed border-line' => true,
+                            ])
+                            title="{{ ($partner['seal'] ?? false) ? 'Sello oficial — pendiente de archivo real' : 'Aliado — pendiente de logo real' }}"
+                        >
+                            {{ $partner['label'] }}
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </section>
 
     {{-- ============ 7. NEWSLETTER ============ --}}
     <section class="relative isolate overflow-hidden bg-ink-surface">

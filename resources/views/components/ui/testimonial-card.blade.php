@@ -5,6 +5,16 @@
     'rating' => 5,
     'avatar' => null,
     'sample' => false,
+    // Prop aditiva (lote 1, port Roavio): 'default' es el look que ya
+    // enseña /_styleguide (rounded-2xl, shadow-sm, avatar circular) — NO SE
+    // TOCA. 'tile' es el tratamiento Roavio de la home (radius-tile, cero
+    // box-shadow, avatar CUADRADO 100x101 sin radio, tal como mide el
+    // encargo). 'avatarInitial' sustituye una foto que no existe (ver
+    // comentario más abajo): una letra sobre un cuadrado de color, nunca
+    // una cara de banco/IA.
+    'variant' => 'default',
+    'avatarInitial' => null,
+    'avatarTone' => '1b6949',
 ])
 {{--
     Cero reseñas inventadas (regla dura del proyecto). Este componente NO
@@ -12,7 +22,13 @@
     (si no hay fuente verificable, la sección entera no se renderiza). Acá
     solo se exige marcar visualmente cualquier contenido de muestra.
 --}}
-<figure class="relative flex flex-col gap-4 rounded-2xl border border-line bg-surface p-6 shadow-sm">
+@php
+    $isTile = $variant === 'tile';
+    $surfaceClasses = $isTile
+        ? 'rounded-tile border border-line bg-surface p-6'
+        : 'rounded-2xl border border-line bg-surface p-6 shadow-sm';
+@endphp
+<figure {{ $attributes->class(['relative flex flex-col gap-4', $surfaceClasses]) }}>
     @if($sample)
         <span class="absolute right-4 top-4 rounded-full bg-surface-2 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-text-muted">Muestra</span>
     @endif
@@ -30,7 +46,21 @@
     <blockquote class="text-sm text-text-2">&ldquo;{{ $quote }}&rdquo;</blockquote>
 
     <figcaption class="flex items-center gap-3">
-        @if($avatar)
+        @if($isTile)
+            {{--
+                Sin foto de banco: los 3 testimonios que traía el mockup
+                original tenían caras generadas por IA y nombres inventados
+                (motivo por el que B2 decidió no renderizar la sección — ver
+                home.blade.php). El encargo Roavio pide un avatar CUADRADO
+                100x101 sin radio; se resuelve con la inicial del nombre
+                sobre un cuadrado de color, nunca con un retrato falso.
+            --}}
+            <span
+                class="flex h-[101px] w-[100px] shrink-0 items-center justify-center rounded-none text-2xl font-semibold text-white"
+                style="background-color:#{{ $avatarTone }}"
+                aria-hidden="true"
+            >{{ $avatarInitial ?? mb_substr($name, 0, 1) }}</span>
+        @elseif($avatar)
             <img src="{{ $avatar }}" alt="" loading="lazy" width="40" height="40" class="h-10 w-10 rounded-full object-cover">
         @endif
         <div>

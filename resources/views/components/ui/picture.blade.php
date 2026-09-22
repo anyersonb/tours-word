@@ -20,6 +20,14 @@
     // la pantalla; acá solo viaja lo que afecta a la imagen.
     'imgClass' => 'h-full w-full object-cover',
     'position' => null, // object-position, p. ej. "center 35%"
+    // Prop aditiva (lote 1, hero Roavio): valor de object-position SOLO
+    // para <640px, cuando el recorte de un breakpoint angosto necesita un
+    // foco distinto al de escritorio (ver hero: a 375 el marco cae a
+    // 0.449:1 y el eje que manda deja de ser Y para pasar a ser X — ver
+    // informe de cierre). Si no se pasa, cero cambio de comportamiento:
+    // sigue el `style="object-position"` de siempre en TODOS los demás
+    // llamadores (mosaico, tarjetas, destinos...).
+    'positionSm' => null,
 ])
 @php
     /**
@@ -98,6 +106,19 @@
         'width' => $intrinsicW,
         'height' => $intrinsicH,
     ], fn ($value) => $value !== null && $value !== '');
+
+    // positionSm presente -> responsive de verdad (custom properties + regla
+    // fija en app.css, .obj-pos-responsive; NO utilidades Tailwind, que no
+    // pueden ver un valor interpolado en runtime). Sin positionSm, EXACTO
+    // el mismo `style="object-position"` de siempre.
+    $imgClassFinal = $imgClass;
+    $imgStyle = null;
+    if ($positionSm) {
+        $imgClassFinal = trim($imgClass.' obj-pos-responsive');
+        $imgStyle = '--pos-sm: '.$positionSm.'; --pos-lg: '.($position ?? $positionSm).';';
+    } elseif ($position) {
+        $imgStyle = 'object-position: '.$position;
+    }
 @endphp
 @if($srcset)
     <picture {{ $attributes }}>
@@ -105,8 +126,8 @@
         <img
             src="{{ $src }}"
             alt="{{ $alt }}"
-            class="{{ $imgClass }}"
-            @if($position) style="object-position: {{ $position }}" @endif
+            class="{{ $imgClassFinal }}"
+            @if($imgStyle) style="{{ $imgStyle }}" @endif
             @foreach($imgAttributes as $name => $value) {{ $name }}="{{ $value }}" @endforeach
         >
     </picture>
@@ -114,8 +135,8 @@
     <img
         src="{{ $src }}"
         alt="{{ $alt }}"
-        class="{{ $imgClass }}"
-        @if($position) style="object-position: {{ $position }}" @endif
+        class="{{ $imgClassFinal }}"
+        @if($imgStyle) style="{{ $imgStyle }}" @endif
         @foreach($imgAttributes as $name => $value) {{ $name }}="{{ $value }}" @endforeach
         {{ $attributes }}
     >

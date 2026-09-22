@@ -198,3 +198,27 @@
                   0 4px 10px -4px hsl(var(--brand-h) 25% 12% / .10);
   --elev-ring:    inset 0 0 0 1px hsl(var(--brand-h) 20% 30% / .08);
 }
+
+/* ============================================================================
+ * DIRECCIÓN VISUAL — PORT FIEL DE ROAVIO (2026-09-20) — capa 3 de tokens.
+ *
+ * Decisión del cliente (rechazó dos veces la dirección propia): portar la
+ * composición de la plantilla comercial Roavio (Webtend), no reinventarla.
+ * Se AÑADEN tokens nuevos; ninguno de los de arriba se toca ni se renombra.
+ *
+ * 1. Tres anchos de contenedor alternados (medidos en Roavio a 1440px, no
+ *    vueltos a medir aquí): 1290 / 1392 / 1432. En rem con base 16:
+ *      1392px = 87rem EXACTO (hero boxed, con radio).
+ *      1432px = 89.5rem (banda a sangre completa — el mosaico).
+ *      1290px = 80.625rem (contenido denso/texto, disponible para más
+ *      adelante; no se consume en este lote).
+ * 2. Radio uniforme de Roavio: 10px en el 91% de sus elementos. Token propio
+ *    (--r-tile) para no reescribir --r-sm/md/lg/xl, que siguen sirviendo al
+ *    resto del sistema (tarjetas, paneles).
+ * ========================================================================= */
+:root {
+  --container-narrow: 80.625rem; /* 1290px */
+  --container-boxed:  87rem;     /* 1392px */
+  --container-bleed:  89.5rem;   /* 1432px */
+  --r-tile: 0.625rem;            /* 10px */
+}

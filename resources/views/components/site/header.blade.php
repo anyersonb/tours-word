@@ -1,4 +1,6 @@
 @php
+    use App\Models\Setting;
+
     /*
      * Pase visual 2026-09-14: 'active' estaba cableado a false en los cinco
      * ítems que no son Inicio, así que el sitio nunca marcaba dónde estabas.
@@ -37,7 +39,64 @@
     // pantallas sin slug sigue siendo la misma reconstrucción de antes.
     // Acá no se arma ninguna URL: si vuelve a armarse, vuelve el defecto.
     $localeAlternateUrls = collect(app(\App\Support\LocaleAlternates::class)->urls());
+
+    // Port Roavio (2026-09-20): franja delgada sobre el header. Mismo dato
+    // que ya lee el pie (Setting, sin cablear nada) — si la clienta no ha
+    // cargado teléfono/correo todavía, la franja de contacto simplemente no
+    // imprime esos dos <a>; nunca un "+51 000 000 000" de relleno.
+    $topbarPhone = Setting::get('contact_phone');
+    $topbarEmail = Setting::get('contact_email');
+    $topbarWhatsapp = filled($topbarPhone) ? 'https://wa.me/'.preg_replace('/\D+/', '', (string) $topbarPhone) : null;
+    $topbarInstagram = Setting::get('social_instagram_url');
+    $topbarFacebook = Setting::get('social_facebook_url');
+    $iconPhoneSmall = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3.5 w-3.5" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>';
+    $iconMailSmall = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3.5 w-3.5" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>';
+    $iconInstagramSmall = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3.5 w-3.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="0.6" fill="currentColor" stroke="none"/></svg>';
+    $iconFacebookSmall = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3.5 w-3.5" aria-hidden="true"><path d="M14 21v-7h3l1-4h-4V7.5A1.5 1.5 0 0 1 15.5 6H18V3h-3a4.5 4.5 0 0 0-4.5 4.5V10H8v4h2.5v7Z"/></svg>';
+    $hasTopbarContact = filled($topbarPhone) || filled($topbarEmail);
+    $hasTopbarSocial = filled($topbarInstagram) || filled($topbarFacebook);
 @endphp
+
+{{--
+    Topbar — port Roavio (2026-09-20): franja delgada, oscura, sobre el
+    header blanco. Roavio la usa para un mensaje de bienvenida + contacto +
+    idioma; acá va la tagline + los mismos datos reales de contacto que ya
+    imprime el pie, sin duplicar el selector de idioma (ese ya vive en el
+    header principal, no hace falta un segundo). Se oculta entera si no hay
+    NINGÚN dato de contacto/social — nunca una franja vacía con solo la
+    tagline flotando sin nada al lado.
+--}}
+@if($hasTopbarContact || $hasTopbarSocial)
+    <div class="hidden bg-ink-surface text-xs text-on-dark-2 lg:block">
+        <div class="mx-auto flex h-9 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-6 xl:px-8">
+            <p class="truncate">{{ __('site.header.topbar_tagline') }}</p>
+
+            <div class="flex shrink-0 items-center gap-4">
+                @if(filled($topbarPhone))
+                    <a href="{{ $topbarWhatsapp ?? 'tel:'.preg_replace('/\s+/', '', $topbarPhone) }}" class="inline-flex items-center gap-1.5 transition-colors hover:text-white">
+                        {!! $iconPhoneSmall !!}<span>{{ $topbarPhone }}</span>
+                    </a>
+                @endif
+                @if(filled($topbarEmail))
+                    <a href="mailto:{{ $topbarEmail }}" class="inline-flex items-center gap-1.5 transition-colors hover:text-white">
+                        {!! $iconMailSmall !!}<span>{{ $topbarEmail }}</span>
+                    </a>
+                @endif
+                @if($hasTopbarSocial)
+                    <span class="flex items-center gap-3 border-l border-on-dark-line pl-4" aria-label="{{ __('site.contacto.info.social_title') }}">
+                        @if(filled($topbarInstagram))
+                            <a href="{{ $topbarInstagram }}" target="_blank" rel="noopener noreferrer" aria-label="{{ __('site.contacto.info.social_instagram') }}" class="transition-colors hover:text-white">{!! $iconInstagramSmall !!}</a>
+                        @endif
+                        @if(filled($topbarFacebook))
+                            <a href="{{ $topbarFacebook }}" target="_blank" rel="noopener noreferrer" aria-label="{{ __('site.contacto.info.social_facebook') }}" class="transition-colors hover:text-white">{!! $iconFacebookSmall !!}</a>
+                        @endif
+                    </span>
+                @endif
+            </div>
+        </div>
+    </div>
+@endif
+
 <header
     x-data="{ mobileOpen: false, scrolled: false }"
     @keydown.escape.window="mobileOpen = false"

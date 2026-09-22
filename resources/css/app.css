@@ -17,6 +17,35 @@
  */
 @import './tokens.css';
 
+/*
+ * Tipografía de marca — port Roavio (2026-09-20). Inter Tight (SIL OFL 1.1,
+ * Google Fonts) y Fraunces (SIL OFL 1.1, ya estaba en el proyecto) sirven
+ * AUTOALOJADAS desde public/fonts/ — nunca desde fonts.googleapis.com, que
+ * es justo lo que dejó de cargarse para estas dos familias (ver
+ * components/layout.blade.php: el <link> de Google Fonts que queda solo
+ * sirve Caveat, la script de Nosotros, fuera de este lote).
+ * Cada archivo es la variante "variable" (un solo .woff2 cubre todo el
+ * rango de peso declarado), subset "latin" (cubre acentos y ñ del español:
+ * U+0000-00FF), descargada una sola vez desde Google Fonts y servida en
+ * disco — no hay build step que la regenere.
+ */
+@font-face {
+    font-family: 'Inter Tight';
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url('/fonts/inter-tight/InterTight-Variable.woff2') format('woff2-variations'),
+         url('/fonts/inter-tight/InterTight-Variable.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Fraunces';
+    font-style: normal;
+    font-weight: 300 700;
+    font-display: swap;
+    src: url('/fonts/fraunces/Fraunces-Variable.woff2') format('woff2-variations'),
+         url('/fonts/fraunces/Fraunces-Variable.woff2') format('woff2');
+}
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
@@ -33,8 +62,12 @@
 @source '../**/*.js';
 
 @theme {
-    /* Tipografía de marca (A2). Instrument Sans del esqueleto queda fuera. */
-    --font-sans: 'Figtree', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    /* Tipografía de marca — port Roavio (2026-09-20): Figtree sale, Inter
+     * Tight entra como sans/cuerpo (self-hosted, ver @font-face arriba).
+     * Fraunces sigue de display, ahora también self-hosted. body/h1..h6 se
+     * resuelven desde ACÁ (--font-sans / --font-display), nunca desde SCSS
+     * suelto en una vista — es la regla del proyecto. */
+    --font-sans: 'Inter Tight', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
     --font-display: 'Fraunces', ui-serif, Georgia, 'Times New Roman', serif;
     --font-script: 'Caveat', cursive;
@@ -112,6 +145,8 @@
      * la escala nativa de Tailwind, que otras vistas ya usan). */
     --radius-card: var(--r-lg);
     --radius-panel: var(--r-xl);
+    /* Port Roavio: radio uniforme de 10px (91% de sus elementos) -> rounded-tile. */
+    --radius-tile: var(--r-tile);
 
     /* Elevación -> shadow-e1, shadow-e2, shadow-e3 */
     --shadow-e1: var(--elev-1);
@@ -163,6 +198,47 @@
     /* Caja estrecha para texto corrido (fichas): 65-70 caracteres. */
     .shell-prose { max-width: 46rem; }
 
+    /* --- Contenedores Roavio (2026-09-20) ------------------------------
+     * .shell-boxed: el hero — 1392px boxed con radio. padding-inline en
+     * clamp() para que a 1440px de viewport el ancho DE CAJA (border-box,
+     * preflight ya pone box-sizing:border-box) dé exactamente 1392: a esa
+     * anchura 4vw = 57.6px, el clamp lo topa en el máximo (1.5rem = 24px),
+     * y 1440 - 2*24 = 1392. Por debajo de 1440 el padding baja hasta 1rem
+     * (16px) a partir de ~400px de viewport, igual que .shell.
+     * .shell-bleed: la banda siguiente al hero — 1432px, casi a sangre
+     * completa. Mismo cálculo con un padding mucho menor: a 1440px de
+     * viewport el clamp también topa en su máximo (0.25rem = 4px), y
+     * 1440 - 2*4 = 1432. */
+    .shell-boxed {
+        width: 100%;
+        max-width: var(--container-boxed);
+        margin-inline: auto;
+        padding-inline: clamp(1rem, 4vw, 1.5rem);
+    }
+    /* .shell-narrow: 1290px, el tercer ancho Roavio (lote 0 lo dejó
+     * declarado sin consumidor — ver tokens.css). Mismo padding que .shell,
+     * solo cambia el tope. Lo estrena el lote 1 (testimonios). */
+    .shell-narrow {
+        width: 100%;
+        max-width: var(--container-narrow);
+        margin-inline: auto;
+        padding-inline: 1rem;
+    }
+    @media (min-width: 640px) { .shell-narrow { padding-inline: 1.5rem; } }
+    @media (min-width: 1024px) { .shell-narrow { padding-inline: 2rem; } }
+    .shell-bleed {
+        width: 100%;
+        max-width: var(--container-bleed);
+        margin-inline: auto;
+        /* Decrece con el viewport (al revés que .shell-boxed): en vez de
+           min(...) con vw creciente, se resta vw a una base fija y se topa
+           por abajo en 4px. A 1440 de viewport, 1vw=14.4px, 1rem-0.9rem=
+           1.6px < 4px -> gana el piso del clamp() y da 4px exactos
+           (1440 - 2*4 = 1432). Por debajo de ~1024 el resultado ya no lo
+           fija el piso y crece hasta un tope cómodo de 1rem en móvil. */
+        padding-inline: clamp(0.25rem, calc(1rem - 1vw), 1rem);
+    }
+
     /* Ritmo vertical. .section = bloque normal · .section-tight = bloque
      * secundario (CTA de cierre, tira de filtros). */
     .section { padding-block: var(--section-y); }
@@ -202,6 +278,16 @@
      * respirar la foto a la derecha sin perder contraste en el texto. */
     @media (min-width: 1024px) {
         .scrim-hero-h::before { background: var(--scrim-hero-h); }
+    }
+
+    /* object-position responsive de verdad (lote 1, hero Roavio): consume
+     * las custom properties --pos-sm/--pos-lg que pone x-ui.picture cuando
+     * recibe positionSm. Regla FIJA (no utilidad Tailwind) a propósito: el
+     * valor real es un string interpolado en runtime (PHP), el escáner
+     * estático de Tailwind nunca podría verlo en el .blade.php fuente. */
+    .obj-pos-responsive { object-position: var(--pos-sm); }
+    @media (min-width: 640px) {
+        .obj-pos-responsive { object-position: var(--pos-lg); }
     }
 
     /* Zoom suave al pasar el ratón por una tarjeta con foto. Se anula con
@@ -410,6 +496,36 @@
             repeating-linear-gradient(135deg,
                 hsl(var(--brand-h) 40% 70% / .06) 0 1px,
                 transparent 1px 14px);
+    }
+
+    /* ============================================================================
+     * PORT ROAVIO — lote 1 (2026-09-21): marquee de aliados/sellos.
+     * Bucle CSS puro, cero JS/Swiper: el track duplica su contenido una vez
+     * (ver home.blade.php, el @foreach corre dos veces sobre el mismo array)
+     * y se traslada -50% de su propio ancho — el segundo tramo entra justo
+     * cuando el primero sale, sin salto ni reinicio visible. Pausado con
+     * prefers-reduced-motion, y también al pasar el mouse o al enfocar un
+     * tile con teclado, para no perder el punto de partida a media lectura.
+     * ========================================================================= */
+    .marquee-viewport {
+        -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
+        mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
+    }
+    .marquee-track {
+        display: flex;
+        width: max-content;
+        animation: pv-marquee 36s linear infinite;
+    }
+    .marquee-viewport:hover .marquee-track,
+    .marquee-viewport:focus-within .marquee-track {
+        animation-play-state: paused;
+    }
+    @keyframes pv-marquee {
+        from { transform: translateX(0); }
+        to   { transform: translateX(-50%); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .marquee-track { animation: none; }
     }
 }
 
