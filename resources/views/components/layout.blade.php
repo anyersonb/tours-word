@@ -199,6 +199,38 @@
     --}}
     <link rel="preload" href="{{ asset('fonts/inter-tight/InterTight-Variable.woff2') }}" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{{ asset('fonts/fraunces/Fraunces-Variable.woff2') }}" as="font" type="font/woff2" crossorigin>
+    {{--
+        Fix subdirectorio (2026-09-21, docs/rediseno-2026/11-fix-fuentes-subdirectorio.md):
+        estos @font-face vivían en resources/css/app.css con `url('/fonts/...')`
+        absoluto. Vite no reescribe esa URL (no es relativa al archivo fuente ni
+        pasa por su pipeline de assets) y queda literal en el CSS compilado: en
+        local resuelve porque el sitio sirve en la raíz, pero en staging
+        (limaviewtours.com/tour-word/) esa barra pelada apunta a la raíz de OTRO
+        sitio -> 404 -> fallback a fuente de sistema. Inline aquí, construido con
+        asset(), que sí conoce el prefijo real de despliegue -- mismo mecanismo
+        que ya usan los <link rel="preload"> de arriba. Se eligió inline en vez de
+        un public/fonts/fonts.css aparte para no sumar un request más a 112 KB de
+        fuente que ya compiten con el CSS de Vite. Conserva font-family, los
+        rangos de peso, font-style, font-display y los format() tal cual estaban.
+    --}}
+    <style>
+        @font-face {
+            font-family: 'Inter Tight';
+            font-style: normal;
+            font-weight: 100 900;
+            font-display: swap;
+            src: url('{{ asset('fonts/inter-tight/InterTight-Variable.woff2') }}') format('woff2-variations'),
+                 url('{{ asset('fonts/inter-tight/InterTight-Variable.woff2') }}') format('woff2');
+        }
+        @font-face {
+            font-family: 'Fraunces';
+            font-style: normal;
+            font-weight: 300 700;
+            font-display: swap;
+            src: url('{{ asset('fonts/fraunces/Fraunces-Variable.woff2') }}') format('woff2-variations'),
+                 url('{{ asset('fonts/fraunces/Fraunces-Variable.woff2') }}') format('woff2');
+        }
+    </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&display=swap" rel="stylesheet">

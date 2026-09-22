@@ -28,23 +28,21 @@
  * rango de peso declarado), subset "latin" (cubre acentos y ñ del español:
  * U+0000-00FF), descargada una sola vez desde Google Fonts y servida en
  * disco — no hay build step que la regenere.
+ *
+ * Fix subdirectorio (2026-09-21, docs/rediseno-2026/11-fix-fuentes-subdirectorio.md):
+ * los @font-face vivían AQUÍ con `src: url('/fonts/...')` absoluto. Vite no
+ * reescribe esa URL (avisa "didn't resolve at build time, it will remain
+ * unchanged") porque no es relativa al archivo fuente ni pasa por su
+ * pipeline de assets — queda literal en el CSS compilado. En local resuelve
+ * porque el proyecto sirve en la raíz; en staging
+ * (limaviewtours.com/tour-word/) esa barra pelada apunta a la raíz de OTRO
+ * sitio → 404 en las dos fuentes → fallback a fuente de sistema (el
+ * síntoma "plano, muy wordpress" que el cliente ya rechazó). Los
+ * @font-face se movieron a un <style> en components/layout.blade.php,
+ * construidos con asset() — el único punto que conoce el prefijo real de
+ * despliegue. El @theme de abajo sigue mapeando 'Inter Tight' / 'Fraunces'
+ * por font-family, así que no cambia nada más.
  */
-@font-face {
-    font-family: 'Inter Tight';
-    font-style: normal;
-    font-weight: 100 900;
-    font-display: swap;
-    src: url('/fonts/inter-tight/InterTight-Variable.woff2') format('woff2-variations'),
-         url('/fonts/inter-tight/InterTight-Variable.woff2') format('woff2');
-}
-@font-face {
-    font-family: 'Fraunces';
-    font-style: normal;
-    font-weight: 300 700;
-    font-display: swap;
-    src: url('/fonts/fraunces/Fraunces-Variable.woff2') format('woff2-variations'),
-         url('/fonts/fraunces/Fraunces-Variable.woff2') format('woff2');
-}
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
