@@ -51,7 +51,22 @@ return [
             // desajuste www/no-www. "/storage" nunca es absoluta, así que el
             // navegador siempre la resuelve contra el host real que sirvió
             // la página.
-            'url' => '/storage',
+            //
+            // PUBLIC_STORAGE_URL (docs/rediseno-2026/15-urls-imagenes-subdirectorio.md):
+            // único punto de ajuste para el despliegue de demo en el subdirectorio
+            // ajeno (limaviewtours.com/tour-word/), donde el .htaccess de la app
+            // BLOQUEA el acceso directo a "storage/" en la raíz (regla anti-fuga de
+            // App/Config/etc.) y solo "tour-word/public/storage/..." llega al archivo
+            // real -- medido: "/tour-word/storage/foo.webp" -> 403, "/tour-word/public/
+            // storage/foo.webp" -> 200. `env('PUBLIC_STORAGE_URL') ?: '/storage'`
+            // (nunca el segundo argumento de env()) a propósito: si el .env del
+            // servidor declara la clave vacía ("PUBLIC_STORAGE_URL=") en vez de
+            // omitirla, `?:` la trata igual que ausente y cae al default -- con
+            // env('KEY', 'default') una clave presente-pero-vacía se habría quedado
+            // en '' (URL rota) en vez de caer al default. Vacío/ausente = el
+            // comportamiento de siempre, local y producción real futura en la raíz
+            // del dominio, sin tocar nada.
+            'url' => env('PUBLIC_STORAGE_URL') ?: '/storage',
             'visibility' => 'public',
             'throw' => false,
             'report' => false,
