@@ -46,6 +46,16 @@ return [
         'tour_card' => [
             'cta' => 'Ver tour',
             'price_prefix' => 'Desde',
+            // Mockups móvil (lote 16): badge "Destacado" (dato real
+            // is_featured, nunca "Más reservado" — esa insignia del mockup
+            // no tiene dato que la respalde) y los 4 atributos DEMO de la
+            // grilla 2x2 (ver comentario "DEMO: pendiente campos en Tour" en
+            // x-ui.tour-card).
+            'badge_featured' => 'Destacado',
+            'attr_pickup' => 'Recojo incluido',
+            'attr_languages' => 'Español / Inglés',
+            'attr_cancellation' => 'Cancelación flexible',
+            'attr_daily' => 'Salida diaria',
         ],
 
         // Objetivo 2 (lote i18n, 2026-09-14): fallback honesto del contenido
@@ -133,13 +143,28 @@ return [
             'prev' => 'Foto anterior',
             'next' => 'Foto siguiente',
             'scroll_cue' => 'Desplázate para ver más',
+            // Mockups móvil (lote 16): copy y orden alineados a la maqueta
+            // del cliente (5 pastillas: operador/reserva/guías/atención/
+            // cancelación). Antes eran 5 claims distintos (safe/prices/
+            // sustainable) — se reemplazan por los 5 que el cliente aprobó
+            // en la maqueta, mismo criterio de "sin cifras inventadas": son
+            // afirmaciones de marketing genéricas, no datos.
             'trust' => [
-                'safe' => 'Viajes 100% seguros',
-                'guides' => 'Guías locales expertos',
+                'operator' => 'Operador local',
+                'reservation' => 'Reserva segura',
+                'guides' => 'Guías expertos',
                 'personalized' => 'Atención personalizada',
-                'prices' => 'Mejores precios garantizados',
-                'sustainable' => 'Turismo sostenible',
+                'cancellation' => 'Cancelación flexible',
             ],
+            // Buscador (mockup móvil 1): sin endpoint de búsqueda por texto
+            // libre (TourController@index solo filtra por slug de destino/
+            // experiencia — ver informe), así que es un ENLACE real con
+            // aspecto de buscador hacia el catálogo de tours, no un <input>
+            // que finge buscar.
+            'search_placeholder' => '¿A dónde te gustaría viajar?',
+            'search_aria' => 'Ir al catálogo de tours',
+            'pills_aria' => 'Destinos destacados',
+            'trust_title' => 'Por qué viajar con nosotros',
         ],
 
         // Port Roavio (2026-09-20): mosaico full-bleed de 6 fotos bajo el
@@ -159,6 +184,10 @@ return [
             'eyebrow' => 'Tu próximo mapa',
             'title' => 'Destinos imperdibles',
             'cta' => 'Ver todos',
+            // Mockup móvil (lote 16): pastilla sobre la tarjeta central del
+            // carrusel. "Destacado" sale del PRIMER destino publicado por
+            // `order` (decisión cerrada: no hay flag propio y no se crea).
+            'featured_badge' => 'Destino destacado',
         ],
 
         'why_us' => [

@@ -1,5 +1,11 @@
 @props([
     'label' => 'Carrusel',
+    // Aditiva (mockups móvil, lote 16): clases extra para el <ul> del track.
+    // Los 3 carruseles nuevos ("Destinos", "Actividades", "Tours destacados")
+    // la usan para meter padding lateral (el hueco que deja asomar la tarjeta
+    // vecina) y snap-center en vez de snap-start. Vacía por defecto: los
+    // consumidores existentes (testimonios) no cambian ni un píxel.
+    'trackClass' => '',
 ])
 {{--
     Carcasa de carrusel real (no solo decorativa): scroll-snap horizontal +
@@ -64,7 +70,7 @@
     role="region"
     aria-label="{{ $label }}"
 >
-    <ul x-ref="track" class="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+    <ul x-ref="track" class="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden {{ $trackClass }}">
         {{ $slot }}
     </ul>
 

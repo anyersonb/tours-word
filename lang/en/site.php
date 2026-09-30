@@ -46,6 +46,11 @@ return [
         'tour_card' => [
             'cta' => 'View tour',
             'price_prefix' => 'From',
+            'badge_featured' => 'Featured',
+            'attr_pickup' => 'Pickup included',
+            'attr_languages' => 'Spanish / English',
+            'attr_cancellation' => 'Flexible cancellation',
+            'attr_daily' => 'Daily departure',
         ],
 
         // Objetivo 2 (lote i18n, 2026-09-14): honest fallback notice when a
@@ -131,12 +136,16 @@ return [
             'next' => 'Next photo',
             'scroll_cue' => 'Scroll to see more',
             'trust' => [
-                'safe' => '100% safe travel',
-                'guides' => 'Expert local guides',
+                'operator' => 'Local operator',
+                'reservation' => 'Secure booking',
+                'guides' => 'Expert guides',
                 'personalized' => 'Personalized attention',
-                'prices' => 'Best price guarantee',
-                'sustainable' => 'Sustainable tourism',
+                'cancellation' => 'Flexible cancellation',
             ],
+            'search_placeholder' => 'Where would you like to travel?',
+            'search_aria' => 'Go to the tours catalog',
+            'pills_aria' => 'Featured destinations',
+            'trust_title' => 'Why travel with us',
         ],
 
         // Roavio port (2026-09-20): full-bleed 6-photo mosaic under the
@@ -156,6 +165,7 @@ return [
             'eyebrow' => 'Your next map',
             'title' => 'Must-see destinations',
             'cta' => 'View all',
+            'featured_badge' => 'Featured destination',
         ],
 
         'why_us' => [
