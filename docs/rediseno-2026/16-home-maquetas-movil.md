@@ -128,6 +128,6 @@ También noté un `ERR_CONNECTION_RESET` en consola al cargar `PublicSans-Variab
 ## 11. Pending diffs / lo que no se hizo
 
 - **Franja de 4 íconos al pie de "Por qué elegirnos"** (visible en la maqueta 4): decisión tomada de NO duplicarla — ver §7. Si el cliente insiste en tenerla en los dos lugares, es un cambio de una tarde.
-- **Suite oficial (MySQL)**: no verificada esta sesión por el entorno roto (ver §8). Recomiendo repetirla en cuanto `mysqld` esté disponible, antes deign considerar el lote cerrado para producción.
+- **Suite oficial (MySQL)**: no verificada esta sesión por el entorno roto (ver §8). Recomiendo repetirla en cuanto `mysqld` esté disponible, antes de considerar el lote cerrado para producción.
 - **Carrusel de Destinos con más de 3 destinos reales**: usé `lg:justify-center` en el track para centrar exactamente 3 tarjetas en escritorio (el catálogo real de hoy tiene 3 destinos, verificado con `DemoTourSeeder`). Si el catálogo creciera a 4+, ese `justify-center` en un contenedor con scroll podría dejar la primera tarjeta parcialmente inalcanzable en algunos motores — no es un bug hoy (probado y funciona con 3), solo una nota para cuando el catálogo crezca.
 - **EN (inglés)**: traduje todas las claves nuevas (`lang/en/site.php`) pero solo verifiqué visualmente ES en el navegador esta sesión — no tomé capturas EN por presupuesto de turnos. El test `HomeCatalogLinksTest`/`LocaleSwitcherLinksTest` cubren EN a nivel de enlaces (cuando la suite pueda correr).
