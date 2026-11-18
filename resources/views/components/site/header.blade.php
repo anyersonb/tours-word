@@ -106,7 +106,7 @@
 >
     <div class="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-6 xl:px-8">
         <a href="{{ route('home') }}" class="flex shrink-0 items-center" aria-label="{{ config('app.name') }}">
-            <x-brand.mark variant="horizontal" class="h-8 w-auto" />
+            <x-brand.mark variant="horizontal" class="h-10 w-auto xl:h-11" />
         </a>
 
         {{--
@@ -121,7 +121,7 @@
             @foreach($navItems as $item)
                 <a
                     href="{{ $item['route'] }}"
-                    class="relative py-1 text-sm font-medium whitespace-nowrap transition-colors hover:text-action after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:rounded-full after:bg-action after:transition-transform after:duration-300 after:content-[''] {{ $item['active'] ? 'text-action after:scale-x-100' : 'text-text-2 after:scale-x-0 hover:after:scale-x-100' }}"
+                    class="relative py-1 text-sm font-medium whitespace-nowrap transition-colors hover:text-action after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:rounded-full after:bg-gold after:transition-transform after:duration-300 after:content-[''] {{ $item['active'] ? 'text-action after:scale-x-100' : 'text-text-2 after:scale-x-0 hover:after:scale-x-100' }}"
                     @if($item['active']) aria-current="page" @endif
                 >{{ $item['label'] }}</a>
             @endforeach

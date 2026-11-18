@@ -52,7 +52,10 @@
     <div class="shell py-14 lg:py-16">
         <div class="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
             <div class="sm:col-span-2 lg:col-span-1">
-                <x-brand.mark variant="mono" class="h-7 w-auto text-white" />
+                {{-- El arte oficial lleva texto espresso: sobre el fondo oscuro del pie va en una placa blanca. --}}
+                <a href="{{ route('home') }}" class="inline-block rounded-panel bg-surface p-4 shadow-e2" aria-label="{{ config('app.name') }}">
+                    <x-brand.mark variant="full" class="h-auto w-56" sizes="224px" :eager="false" />
+                </a>
                 @if(filled($companyName))
                     <p class="mt-4 text-sm text-on-dark-2">{{ $companyName }}</p>
                 @endif
@@ -64,16 +67,16 @@
                 @if($hasFooterSocial)
                     <div class="mt-5 flex gap-2">
                         @if(filled($socialInstagram))
-                            <a href="{{ $socialInstagram }}" target="_blank" rel="noopener noreferrer" aria-label="{{ __('site.contacto.info.social_instagram') }}" class="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-action">{!! $iconInstagram !!}</a>
+                            <a href="{{ $socialInstagram }}" target="_blank" rel="noopener noreferrer" aria-label="{{ __('site.contacto.info.social_instagram') }}" class="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-gold hover:text-ink">{!! $iconInstagram !!}</a>
                         @endif
                         @if(filled($socialFacebook))
-                            <a href="{{ $socialFacebook }}" target="_blank" rel="noopener noreferrer" aria-label="{{ __('site.contacto.info.social_facebook') }}" class="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-action">{!! $iconFacebook !!}</a>
+                            <a href="{{ $socialFacebook }}" target="_blank" rel="noopener noreferrer" aria-label="{{ __('site.contacto.info.social_facebook') }}" class="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-gold hover:text-ink">{!! $iconFacebook !!}</a>
                         @endif
                         @if(filled($socialYoutube))
-                            <a href="{{ $socialYoutube }}" target="_blank" rel="noopener noreferrer" aria-label="{{ __('site.contacto.info.social_youtube') }}" class="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-action">{!! $iconYoutube !!}</a>
+                            <a href="{{ $socialYoutube }}" target="_blank" rel="noopener noreferrer" aria-label="{{ __('site.contacto.info.social_youtube') }}" class="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-gold hover:text-ink">{!! $iconYoutube !!}</a>
                         @endif
                         @if(filled($footerWhatsapp))
-                            <a href="{{ $footerWhatsapp }}" target="_blank" rel="noopener noreferrer" aria-label="{{ __('site.contacto.info.social_whatsapp') }}" class="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-action">{!! $iconChatSmall !!}</a>
+                            <a href="{{ $footerWhatsapp }}" target="_blank" rel="noopener noreferrer" aria-label="{{ __('site.contacto.info.social_whatsapp') }}" class="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-gold hover:text-ink">{!! $iconChatSmall !!}</a>
                         @endif
                     </div>
                 @endif
@@ -143,20 +146,5 @@
         <div class="mt-6 border-t border-on-dark-line pt-6 text-sm text-on-dark-3">
             &copy; {{ now()->year }} {{ $companyName ?: config('app.name') }}. {{ __('site.footer.rights') }}
         </div>
-    </div>
-
-    {{--
-        Port Roavio: wordmark gigante que cierra el pie. Mismo SVG de marca
-        (inline, reacciona a --brand-h — ver docblock de x-brand.mark), solo
-        que a un tamaño que nadie más usa en el sitio. Ancho relativo (no
-        alto fijo) para que escale proporcional al viewport vía su propio
-        viewBox, sin desbordar ni recortarse a los lados en pantallas
-        angostas — acotado al mismo max-width que el resto del pie (80rem)
-        para que su borde quede alineado con las columnas de arriba.
-        aria-hidden: es decorativo, el nombre ya está en el <h1>/logo del
-        header y en el primer bloque de esta misma columna.
-    --}}
-    <div class="mt-10 overflow-hidden border-t border-on-dark-line py-8 sm:py-10" aria-hidden="true">
-        <x-brand.mark variant="mono" class="mx-auto block w-[88%] max-w-5xl text-white/90" />
     </div>
 </footer>

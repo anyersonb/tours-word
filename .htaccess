@@ -1,0 +1,224 @@
+# /public_html/tour-word/.htaccess
+# Raiz de la app Laravel dentro del arbol web: todo lo que NO sea public/
+# se deniega ANTES de cualquier reescritura.
+#
+# v2 (18/09/2026). Cambios respecto a la v1, ambos medidos en el servidor vivo:
+#   (A) Pasarela de assets ANTES de la lista de denegacion, para que
+#       /tour-word/storage/... resuelva al symlink public/storage y no al
+#       storage real de la app (que sigue denegado).
+#   (B) El reenvio final ya no va a public/index.php sino a index.php de ESTA
+#       carpeta. Con public/index.php, SCRIPT_NAME y REQUEST_URI no compartian
+#       prefijo, Symfony calculaba base vacia y TODAS las rutas daban 404
+#       (medido: /tour-word/es -> 404, /tour-word/public/es -> 200), ademas de
+#       generar las fotos colgando de la raiz del dominio (/storage/tours/...,
+#       404 en el navegador aunque curl no lo viera).
+
+Options -Indexes -MultiViews
+
+# (1) Deny por nombre de archivo (basename). Apache 2.4 / LiteSpeed.
+<FilesMatch "(?i)^(\.env.*|\.htaccess|\.htpasswd|composer\.(json|lock)|package(-lock)?\.json|artisan|phpunit\.xml.*|vite\.config\.js|\.gitignore|\.gitattributes|\.editorconfig|README\.md|.*\.sqlite.*|.*\.db|.*\.sql|.*\.log|.*\.bak|.*\.ini|.*~)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+RewriteEngine On
+
+# (1b) PASARELA DE ASSETS -- va ANTES de la denegacion por directorio.
+#      Solo redirige los prefijos que existen de verdad dentro de public/.
+#      Verificado en el servidor: public/storage es un symlink a
+#      storage/app/public y el servidor SI lo sigue
+#      (tour-camino-inca-400.webp -> 200, 15.232 bytes, image/webp).
+#
+#      CORREGIDO respecto al primer intento de la v2, que dejaba las fotos en
+#      403 (medido). Llevaba una compuerta
+#          RewriteCond %{DOCUMENT_ROOT}/tour-word/public/$1 -f
+#      que NO puede funcionar: las RewriteCond se evaluan ANTES de la
+#      RewriteRule que las sigue, asi que ahi $1 todavia no existe y la
+#      condicion se probaba contra una ruta truncada. Nunca daba verdadera, la
+#      peticion seguia de largo y la atrapaba la denegacion por directorio
+#      de (2).
+#
+#      Se quita la compuerta en vez de reescribirla con %1: no hace falta.
+#      Lo unico que este mapeo alcanza es el contenido de public/, que es
+#      material publicable por definicion -- public/storage apunta al disco
+#      "public" de Laravel, no al storage interno. Lo que no exista ahi da 404
+#      normal, y los nombres peligrosos (.log, .env, .sqlite...) siguen
+#      denegados por el <FilesMatch> de (1), que se aplica igual despues de
+#      reescribir. Comprobado tras el cambio: storage/logs/laravel.log -> 403.
+#
+#      SEGUNDA CORRECCION, tambien medida: con la lista de (2) tal como estaba,
+#      las fotos seguian en 403 mientras el CSS pasaba a 200. La diferencia no
+#      era la regla -- las dos rutas entran por la misma alternancia -- sino que
+#      public/build es una carpeta real y public/storage es un SYMLINK a
+#      .../tour-word/storage/app/public. Al reescribir, la ruta fisica vuelve a
+#      quedar dentro de "storage" y la denegacion por directorio de (2) la
+#      atrapaba en la segunda vuelta. Por eso el acceso directo a
+#      /tour-word/public/storage/... si daba 200 (ese lo resuelve el .htaccess
+#      de public/, donde esta regla no existe) y el alias daba 403.
+#      El 403 lo emitia LiteSpeed, no Laravel.
+#
+#      Se resuelve sin aflojar nada: (1a) deniega explicitamente los tres
+#      subdirectorios internos del storage real, y (2) deja de bloquear
+#      "storage" a secas. Lo unico que queda alcanzable por /tour-word/storage/
+#      es el disco publico de Laravel (tours, destinations, experiences), que
+#      es material publicable por definicion.
+
+#
+#      TERCERA CORRECCION, y la que funciona. Quitar "storage" de la lista de
+#      (2) NO arreglo nada: seguia en 403 (medido). Luego la denegacion por
+#      directorio no era la causa -- el 403 lo emite LiteSpeed al ATRAVESAR el
+#      symlink dentro de una reescritura interna, y eso no lo levanta ninguna
+#      regla de este archivo. Tocar Options +FollowSymLinks era la otra salida,
+#      pero si el hosting no permite ese override devuelve 500 en TODO el
+#      subdirectorio, y no vale la pena arriesgarlo por esto.
+#      La salida limpia es no pasar por el symlink: se apunta directo a la
+#      ruta fisica storage/app/public, que es exactamente a donde apunta
+#      public/storage. Mismo contenido, sin symlink de por medio.
+
+# (1a) El storage INTERNO de la app, denegado por nombre explicito ANTES del
+#      alias. framework/ (cache, sesiones, vistas compiladas) y logs/ nunca se
+#      sirven; de app/ solo se sirve app/public, que es el disco publico de
+#      Laravel -- app/private y el resto quedan fuera por el lookahead.
+RewriteRule ^storage/(framework|logs)(/|$) - [F,L]
+RewriteRule ^storage/app/(?!public/) - [F,L]
+
+# (1b) Alias del disco publico: /tour-word/storage/X -> storage/app/public/X.
+#      El (?!app/) evita que la regla se muerda la cola: despues de reescribir,
+#      la ruta ya empieza por storage/app/ y no vuelve a coincidir.
+RewriteRule ^storage/(?!app/)(.+)$ storage/app/public/$1 [L]
+
+# (1c) El resto de assets, que si viven en public/ como carpetas reales.
+RewriteRule ^((?:build|images|css|js|fonts)/.+|favicon\.ico|favicon\.svg|robots\.txt)$ public/$1 [L]
+
+# (2) Deny por DIRECTORIO. Imprescindible: (1) solo mira el nombre del
+#     archivo, no la carpeta que lo contiene.
+#     "storage" ya NO esta en esta lista: lo cubre (1a), que deniega sus tres
+#     subdirectorios internos por nombre. Dejarlo aqui volvia a atrapar al
+#     symlink public/storage en la segunda vuelta y tumbaba todas las fotos
+#     (403 medido). Ver la nota larga de (1b).
+RewriteRule ^(app|bootstrap|config|database|docs|lang|node_modules|resources|routes|scripts|tests|vendor|\.git|\.claude|\.github)(/|$) - [F,L]
+
+# --- Replica de los bloqueos del dominio anfitrion, para no depender de su orden ---
+
+# (a) Anti-WordPress y anti-Joomla: este proyecto es Laravel, ninguna de estas
+#     rutas existe. Ampliado con las rutas reales del .htaccess vivo del
+#     anfitrion (xmlrpc.php, wp-json, administrator/, media/system/,
+#     language/en-GB/, elementor, wp-content/plugins/ -- ver nota de SS5.1
+#     sobre el origen de esta lista).
+RewriteRule (^|/)(wp-login\.php|wp-config\.php|xmlrpc\.php|wp-cron\.php)$ - [F,L,NC]
+RewriteRule (^|/)(wp-admin|wp-includes|wp-content|wp-json|wordpress|wp)(/|$) - [F,L,NC]
+RewriteRule (^|/)administrator(/|$) - [F,L,NC]
+RewriteRule (^|/)media/system/ - [F,L,NC]
+RewriteRule (^|/)language/en-GB/ - [F,L,NC]
+RewriteRule elementor - [F,L,NC]
+RewriteRule (^|/)wp-content/plugins/ - [F,L,NC]
+
+# (b) Rutas de CMS y de instaladores que nadie tiene por que pedir aca.
+RewriteRule (^|/)(phpmyadmin|adminer\.php|\.well-known/acme-challenge/\.\.|setup\.php|install\.php|shell\.php|alfa.*\.php)(/|$) - [F,L,NC]
+
+# (c) Filtro de escaneres por user-agent. Lista corta y explicita, ampliada con
+#     los user-agents reales del .htaccess vivo del anfitrion (ver nota abajo).
+#     NO bloquear por "vacio" ni por "curl", que romperia el humo post-deploy.
+RewriteCond %{HTTP_USER_AGENT} (sqlmap|nikto|nmap|masscan|nuclei|acunetix|nessus|zgrab|wpscan|dirbuster|gobuster|feroxbuster) [NC,OR]
+RewriteCond %{HTTP_USER_AGENT} (ALittle\ Client|visionheight|nhs-data|fraud-research|Xpanse|Cortex-Xpanse) [NC]
+RewriteRule ^ - [F,L]
+
+# (d) Metodos HTTP que esta app no usa nunca.
+RewriteCond %{REQUEST_METHOD} ^(TRACE|TRACK|DEBUG)$
+RewriteRule ^ - [F,L]
+
+# Panel de administracion: HTTP Basic delante del login de Filament.
+# CORREGIDO tras la re-verificacion de security-engineer (04-seguridad.md SS8.3):
+# el bloque original usaba RewriteRule [E=PROTEGIDO] + Deny from env=, y NO
+# funcionaba -- E= de un .htaccess se fija en la fase fixup, DESPUES del
+# control de acceso, asi que "Deny from env=PROTEGIDO" nunca veia la variable.
+# Medido: /tour-word/admin devolvia 200 SIN credenciales.
+# Ademas "Satisfy any" + "Allow from all" (directivas de Apache 2.2, sin
+# <IfModule>) anulaban el "Require all denied" del <FilesMatch> de arriba --
+# medido: /tour-word/.env y /composer.lock daban 200 en vez de 403 -- y si el
+# host no carga mod_access_compat, esas directivas dan 500 en TODO el
+# subdirectorio (medido en Apache sin ese modulo).
+#
+# NOTA v2, medida en ESTE servidor (LiteSpeed, no Apache): el
+# Require expr "%{ENV:...}" NO acota como en Apache -- aqui la autenticacion
+# cubre TODO el subdirectorio, no solo /admin (medido: /tour-word/ sin
+# credenciales -> 401). Falla cerrado, que para una demo privada es el lado
+# correcto del error, pero conviene saberlo: quien vea la demo necesita la
+# clave. Es exactamente el aviso que dejo security-engineer al cerrar su
+# segunda pasada ("LiteSpeed no es Apache y lo que medi lo medi en Apache").
+<IfModule mod_setenvif.c>
+    SetEnvIf Request_URI "^/tour-word/(admin|livewire)(/|$)" PACHAVIVA_PROTEGIDO=1
+</IfModule>
+<IfModule mod_auth_basic.c>
+    AuthType Basic
+    AuthName "Pacha Viva - demo privada"
+    AuthUserFile /home/limaview/tour-word-data/.htpasswd
+    <IfModule mod_authz_core.c>
+        <RequireAny>
+            Require expr "%{ENV:PACHAVIVA_PROTEGIDO} != '1'"
+            Require valid-user
+        </RequireAny>
+    </IfModule>
+</IfModule>
+
+# Bloqueo por IP replicado del anfitrion (A-3, hueco senalado por
+# security-engineer en 04-seguridad.md SS8.4 punto 2): el anfitrion SI tiene un
+# bloqueo por IP en su .htaccess vivo (SS5.2 lo nombra) y, por el mismo
+# mecanismo medido abajo (el .htaccess hijo declara su propio RewriteEngine y
+# SUSTITUYE, no hereda, las reglas del padre), ese bloqueo NO cubre
+# /tour-word/ salvo que se replique aqui tambien.
+# --- Replica del bloqueo por IP del anfitrion (foto del .htaccess vivo, 18/09/2026).
+#     NO se sincroniza sola: si Leo agrega IPs a su archivo manana, esta lista
+#     se queda atras -- es una foto de un momento, no un espejo en vivo.
+RewriteCond %{REMOTE_ADDR} ^20\.100\.191\.218$ [OR]
+RewriteCond %{REMOTE_ADDR} ^141\.98\.11\.224$ [OR]
+RewriteCond %{REMOTE_ADDR} ^64\.89\.161\.160$ [OR]
+RewriteCond %{REMOTE_ADDR} ^188\.39\.109\.162$ [OR]
+RewriteCond %{REMOTE_ADDR} ^3\.18\.186\.238$
+RewriteRule ^ - [F,L]
+
+# Cabeceras de seguridad (M-3). CSP corregida tras la re-verificacion de
+# security-engineer (04-seguridad.md SS8.7): la version anterior rompia el
+# sitio sin que ningun curl lo detectara (se rompe en el navegador, no en el
+# codigo de respuesta).
+# (1) script-src sin 'unsafe-eval' mataba Alpine: el bundle que se sube
+#     (public/build/assets/app-*.js) usa AsyncFunction para evaluar x-data/
+#     x-on, y CSP sin unsafe-eval lo bloquea -- se cae el slider del hero, la
+#     galeria, el menu movil y el selector de moneda. "Compilado por Vite" no
+#     es lo mismo que "CSP-safe": la build estandar de Alpine sigue evaluando.
+# (2) style-src/font-src apuntaban a fonts.bunny.net, que este proyecto NO
+#     usa -- el layout carga Google Fonts (fonts.googleapis.com,
+#     fonts.gstatic.com, ver layout.blade.php:197-199). Con el origen viejo,
+#     la hoja de fuentes queda bloqueada y el sitio cae a tipografia de
+#     sistema.
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data:; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'"
+
+    # Espejo de demostracion en dominio ajeno: fuera del indice, siempre.
+    # No depende de .env, ni de config:cache, ni de que la app arranque.
+    # Cubre tambien PDF, imagenes y sitemap.xml, que una meta no alcanza.
+    Header always set X-Robots-Tag "noindex, nofollow, noarchive"
+</IfModule>
+
+# (2b) La raiz pelada no tiene ruta propia: la app vive bajo /es y /en.
+#      Sin esto, /tour-word/ devuelve el 404 de Laravel (medido) y es
+#      justamente la URL que uno teclea. Se manda al idioma por defecto.
+RewriteRule ^$ /tour-word/es [R=302,L]
+
+# (3) Reenvio final al front controller de ESTA carpeta.
+#     No a public/index.php: ver la nota (B) de la cabecera. Las dos
+#     condiciones dejan pasar intactos los archivos y carpetas que existen de
+#     verdad -- incluidos los que acaba de reescribir la pasarela (1b), que en
+#     la segunda vuelta ya apuntan a public/... y si existen.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [L]

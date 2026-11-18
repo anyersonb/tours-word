@@ -1,5 +1,5 @@
 /**
- * Pacha Viva — tokens de color (única fuente de verdad).
+ * INKA PALACE Travel — tokens de color (única fuente de verdad).
  *
  * REGLA DURA: ningún componente escribe nunca un hexadecimal ni un
  * --brand-N directo. Solo se consumen los tokens SEMÁNTICOS de abajo
@@ -7,65 +7,80 @@
  * un color que no existe todavía como token semántico, el token falta:
  * se crea aquí, no se hardcodea en el componente.
  *
- * Identidad provisional (lote 0) — la clienta aún no aprobó nada.
+ * Paleta de la hoja de marca (2026-10-12): Espresso Brown #3E2F24, Sage
+ * Green #556B52, Champagne Gold #C9A96A, Ivory #FAF7EE. Reemplaza al sistema
+ * anterior, que colgaba de un solo número (--brand-h: 155, verde bosque).
+ * Contrastes calculados con la fórmula WCAG 2.1 (luminancia relativa).
+ *
+ * El dorado #C9A96A mide 2.09:1 sobre ivory: NUNCA como texto ni como fondo
+ * de botón sobre claro. Solo filetes, íconos decorativos, relleno y, sobre
+ * espresso, también texto (5.72:1). Para texto dorado sobre claro: --gold-deep.
  */
 
 :root {
-  /* Cambiar estos dos números reviste el sitio completo */
-  --brand-h: 155; /* 12 = terracota · 205 = azul · 32 = ocre */
-  --brand-s: 1;   /* multiplicador de saturación global */
+  /* Colores de la hoja de marca, tal cual */
+  --espresso: #3e2f24;
+  --sage:     #556b52;
+  --gold:     #c9a96a;
+  --ivory:    #faf7ee;
 
-  /* Rampa 50 → 900. Saturación/luminosidad fijas del mockup, no tocar. */
-  --brand-50:  hsl(var(--brand-h) calc(28% * var(--brand-s)) 95%);
-  --brand-100: hsl(var(--brand-h) calc(32% * var(--brand-s)) 88%);
-  --brand-200: hsl(var(--brand-h) calc(30% * var(--brand-s)) 76%);
-  --brand-300: hsl(var(--brand-h) calc(28% * var(--brand-s)) 62%);
-  --brand-400: hsl(var(--brand-h) calc(34% * var(--brand-s)) 47%);
-  --brand-500: hsl(var(--brand-h) calc(47% * var(--brand-s)) 34%);
-  --brand-600: hsl(var(--brand-h) calc(59% * var(--brand-s)) 26%);
-  --brand-700: hsl(var(--brand-h) calc(62% * var(--brand-s)) 20%);
-  --brand-800: hsl(var(--brand-h) calc(64% * var(--brand-s)) 15%);
-  --brand-900: hsl(var(--brand-h) calc(62% * var(--brand-s)) 10%);
+  /* Variantes derivadas */
+  --espresso-deep: #2b2019; /* hover del botón primario: ivory sobre él 14.81:1 */
+  --sage-hover:    #475b45; /* hover de sage: blanco 7.37:1 */
+  --sage-text:     #3f5340; /* sage como TEXTO: 7.77:1 sobre ivory, 8.32:1 sobre blanco, 7.07:1 sobre arena */
+  --gold-deep:     #7a5a1f; /* dorado como TEXTO sobre claro: 5.92:1 sobre ivory, 6.34:1 blanco, 5.39:1 arena, 4.80:1 arena-deep */
 
-  /* Neutrales */
-  --ground:    #f4f6f3;
+  /* Rampa 50 -> 900 del verde salvia. 600 = Sage Green de marca. Solo
+   * rellenos suaves (chips 50/100, selección) y texto 700+; 600 sostiene
+   * texto blanco encima (5.82:1). */
+  --brand-50:  #eef2ec;
+  --brand-100: #dde5da;
+  --brand-200: #c0cebc;
+  --brand-300: #9fb39b;
+  --brand-400: #7c9478;
+  --brand-500: #667f62;
+  --brand-600: var(--sage);
+  --brand-700: var(--sage-text);
+  --brand-800: #2f3f30;
+  --brand-900: #202b21;
+
+  /* Neutrales cálidos */
+  --ground:    var(--ivory);
   --surface:   #fff;
-  --surface-2: #eef1ee;
-  --line:      #dbe2dc;
-  --line-soft: #e7ebe7;
-  --ink:       #14201a;
-  --ink-2:     #3d4a42;
-  --ink-3:     #647069; /* corregido lote 1/B10: era #6c7972 (4.19:1 sobre --ground, FALLA AA). Ahora 4.76:1 sobre --ground y 5.17:1 sobre --surface — medido con la fórmula WCAG. */
+  --surface-2: #f5f0e3;
+  --line:      #e3dac8;
+  --line-soft: #ede6d6;
+  --ink:       var(--espresso);
+  --ink-2:     #5c4b3d; /* 7.75:1 sobre ivory, 7.06:1 sobre arena */
+  --ink-3:     #6f5d4e; /* 5.85:1 sobre ivory, 6.27:1 sobre blanco, 5.32:1 sobre arena */
 
   /* Semánticos de estado */
-  --amber:      #c9821f; /* SOLO ícono/relleno decorativo: 3.14:1 sobre --surface, NO sirve como color de texto (falla AA) */
-  --amber-text: #93590c; /* variante oscura para cuando el ámbar es TEXTO: 5.71:1 sobre --surface, 5.26:1 sobre --ground */
-  --danger:     #ab3a30; /* 6.21:1 sobre --surface */
-  --info:       #2c6fa8; /* 5.32:1 con texto blanco encima */
+  --amber:      var(--gold);      /* SOLO ícono/relleno decorativo (estrellas): 2.24:1 sobre blanco, NO sirve como texto */
+  --amber-text: var(--gold-deep); /* ámbar como TEXTO: 6.34:1 sobre blanco, 5.92:1 sobre ivory */
+  --danger:     #ab3a30; /* 6.21:1 sobre blanco */
 
   /*
-   * Acentos de catálogo (lote 1, A8): fuera del hue 155 de marca a propósito
-   * (badges "MÁS VENDIDO"/"RECOMENDADO" de los mockups; el naranja y el azul
-   * NO deben derivarse de --brand-h). El sistema admite exactamente 4 —
-   * no agregar un quinto sin volver a medir contraste:
-   *   1. --accent-green  (= --action)     -> badge "NATURALEZA"
-   *   2. --accent-amber  (= --amber-text) -> badge "CERTIFICADOS POR MINCETUR"
-   *   3. --accent-orange (nuevo, abajo)   -> badge "MÁS VENDIDO"
-   *   4. --accent-blue   (= --info)       -> badge "RECOMENDADO"
-   * Medido con texto blanco encima (uso: pastilla sólida sobre foto):
-   * --accent-orange = 5.18:1, --accent-blue = 5.32:1. Ambos pasan AA normal.
+   * Acentos de catálogo (lote 1, A8): el sistema admite estos 4 -
+   * no agregar un quinto sin volver a medir contraste. Medido con texto
+   * blanco encima (pastilla sólida sobre foto):
+   *   1. --accent-green  (= sage)         5.82:1 -> badge "NATURALEZA"
+   *   2. --accent-amber  (= --gold-deep)  6.34:1 -> badge "CERTIFICADOS POR MINCETUR"
+   *   3. gold: fondo --gold + texto --espresso 5.72:1 -> badge "MÁS VENDIDO" (inverso de "Recomendado"; sin token --accent-*)
+   *   4. recommended: espresso + texto --gold 5.72:1 -> badge "RECOMENDADO" (no usa token --accent-*; sage ya lo usan "Naturaleza"/destacado)
    */
-  --accent-orange: #c2410c;
-  --accent-green:  var(--action);
-  --accent-amber:  var(--amber-text);
-  --accent-blue:   var(--info);
-  --on-accent:     #fff; /* texto sobre cualquier pastilla --accent-* sólida */
+  --accent-green:  var(--sage);
+  --accent-amber:  var(--gold-deep);
+  --on-accent:     #fff;
 
-  /* Semánticos de marca: es lo ÚNICO que consumen los componentes */
-  --action:       var(--brand-600);
-  --action-hover: var(--brand-700);
-  --on-action:    #fff; /* 6.64:1 sobre --action, 9.04:1 sobre --action-hover */
-  --brand-text:   var(--brand-700); /* 8.32:1 sobre --ground, 9.04:1 sobre --surface — medido */
+  /* Semánticos de marca: es lo ÚNICO que consumen los componentes.
+   * Botón primario = espresso con texto ivory; secundario = sage con blanco. */
+  --action:        var(--espresso);
+  --action-hover:  var(--espresso-deep);
+  --on-action:     var(--ivory);  /* 11.98:1 sobre --action, 14.81:1 sobre --action-hover */
+  --secondary:       var(--sage);
+  --secondary-hover: var(--sage-hover);
+  --on-secondary:    #fff;        /* 5.82:1 sobre --secondary, 7.37:1 sobre hover */
+  --brand-text:    var(--sage-text); /* 7.77:1 sobre ivory, 8.32:1 blanco */
 
   /* Semánticos de superficie y borde, sobre los neutrales */
   --bg:          var(--ground);
@@ -73,11 +88,8 @@
   --card-2:      var(--surface-2);
   --border:      var(--line);
   --border-soft: var(--line-soft);
-  --text:        var(--ink);
+  --text:        var(--ink);    /* 11.98:1 sobre ivory */
   --text-2:      var(--ink-2);
-  /* --text-muted: corregido en el lote 1 (B10). Ahora PASA AA de texto
-   * normal en las dos superficies: 4.76:1 sobre --ground, 5.17:1 sobre
-   * --surface. Ya no hace falta reservarlo a texto grande/iconografía. */
   --text-muted:  var(--ink-3);
 }
 
@@ -86,7 +98,7 @@
  *
  * Misma regla dura que arriba: los componentes consumen SOLO tokens
  * semánticos. Lo que sigue NO reinventa la paleta: el eje sigue siendo
- * --brand-h: 155. Se agrega alrededor.
+ * la paleta de marca (ver arriba). Se agrega alrededor.
  *
  *  1. Un neutro CÁLIDO (arena) para alternar fondos de sección. El sitio
  *     entero sobre --ground (verde grisáceo) + --surface (blanco) se leía
@@ -104,28 +116,27 @@
 :root {
   /* --- 1. Neutro cálido (arena) -------------------------------------- */
   /* Tercer fondo de sección. Contrastes medidos sobre --sand:
-   *   --ink 15.17:1 · --text-2 8.41:1 · --text-muted 4.67:1 · --brand-700
-   *   8.18:1 · --action 6.00:1. Los cinco pasan AA de texto normal.
-   * OJO: sobre --sand-deep, --text-muted cae a 4.21:1 (solo texto grande).
-   * Sobre --sand-deep usar --text-2 (7.58:1) o --text (13.68:1). */
-  --sand:      #f7f3ec;
-  --sand-deep: #efe7da; /* variante para bordes/relleno sutil sobre --sand */
-  --sand-line: #e3d9c8; /* borde hairline sobre --sand */
+   *   --ink 10.90:1 · --text-2 7.06:1 · --text-muted 5.32:1 · --brand-700
+   *   7.07:1 · --gold-deep 5.39:1. Todos pasan AA de texto normal.
+   * Sobre --sand-deep: --ink 9.71:1 · --text-2 6.29:1 · --text-muted 4.74:1
+   * · --gold-deep 4.80:1 (los cuatro pasan). */
+  --sand:      #f3ecdc;
+  --sand-deep: #eadfc9; /* variante para bordes/relleno sutil sobre --sand */
+  --sand-line: #ddd0b6; /* borde hairline sobre --sand */
 
   /* --- 2. Superficie oscura de marca --------------------------------- */
-  /* hsl(155 62% 10%) = --brand-900. Se le da nombre propio de superficie
-   * porque su rol no es "el tono 900 de la rampa" sino "el fondo oscuro
-   * del sitio", y tiene su propia familia de texto encima.
-   * Medidos sobre --ink-surface (#0a291c):
-   *   #fff 15.59:1 · --on-dark-2 (#c6d6cd) 10.32:1 · --on-dark-3 (#8fa79b) 6.07:1
-   * Y sobre --ink-surface-2: 12.48:1 / 8.26:1 / 4.85:1.
-   * Los tres pasan AA de texto normal. */
-  --ink-surface:   hsl(var(--brand-h) calc(62% * var(--brand-s)) 10%);
-  --ink-surface-2: hsl(var(--brand-h) calc(55% * var(--brand-s)) 15%);
-  --on-dark:       #fff;
-  --on-dark-2:     #c6d6cd;
-  --on-dark-3:     #8fa79b;
-  --on-dark-line:  hsl(var(--brand-h) calc(30% * var(--brand-s)) 24%);
+  /* Espresso #3E2F24: el fondo oscuro del sitio (pie, topbar, bandas de
+   * cierre), con su propia familia de texto encima. Medidos sobre
+   * --ink-surface: ivory 11.98:1 · --on-dark-2 (#e4dac7) 9.26:1 ·
+   * --on-dark-3 (#bbad97) 5.83:1 · --gold 5.72:1.
+   * Y sobre --ink-surface-2 (#4f3d30): 9.60:1 / 7.42:1 / 4.67:1 / 4.59:1.
+   * Todos pasan AA de texto normal. */
+  --ink-surface:   var(--espresso);
+  --ink-surface-2: #4f3d30;
+  --on-dark:       var(--ivory);
+  --on-dark-2:     #e4dac7;
+  --on-dark-3:     #bbad97;
+  --on-dark-line:  #66533f;
 
   /* --- 3. Tratamiento de imagen -------------------------------------- */
   /* Scrim de hero: sobre la zona de texto deja una luminancia <= 0.055,
@@ -140,56 +151,48 @@
    * nuevo con el peor píxel del compuesto en las TRES fotos (no solo la
    * que falló): 4.5-6.8:1 a 375, todas por encima del mínimo. */
   --scrim-hero:  linear-gradient(180deg,
-                   hsl(158 45% 6% / .60) 0%,
-                   hsl(158 45% 6% / .80) 55%,
-                   hsl(158 45% 6% / .90) 100%);
+                   hsl(24 32% 7% / .60) 0%,
+                   hsl(24 32% 7% / .80) 55%,
+                   hsl(24 32% 7% / .90) 100%);
   --scrim-hero-h: linear-gradient(90deg,
-                   hsl(158 45% 6% / .88) 0%,
-                   hsl(158 45% 6% / .76) 46%,
-                   hsl(158 45% 6% / .30) 80%,
-                   hsl(158 45% 6% / .12) 100%);
+                   hsl(24 32% 7% / .88) 0%,
+                   hsl(24 32% 7% / .76) 46%,
+                   hsl(24 32% 7% / .30) 80%,
+                   hsl(24 32% 7% / .12) 100%);
   /* Banda de cierre a pantalla completa (newsletter/CTA): la foto es
    * fondo, no protagonista, y TODO el texto va encima. Medido a 360 con
    * el scrim de hero, --on-dark-2 sobre la panorámica caía a 4.07:1; con
    * este, sube por encima de AA. */
   --scrim-band:  linear-gradient(180deg,
-                   hsl(158 45% 6% / .80) 0%,
-                   hsl(158 45% 6% / .88) 100%);
+                   hsl(24 32% 7% / .80) 0%,
+                   hsl(24 32% 7% / .88) 100%);
 
   /* Scrim de tarjeta con rótulo abajo (destinos). Más corto que el de hero
    * porque el texto ocupa solo el último tercio. */
   --scrim-card:  linear-gradient(180deg,
-                   hsl(158 45% 6% / 0) 30%,
-                   hsl(158 45% 6% / .42) 58%,
-                   hsl(158 45% 6% / .86) 100%);
+                   hsl(24 32% 7% / 0) 30%,
+                   hsl(24 32% 7% / .42) 58%,
+                   hsl(24 32% 7% / .86) 100%);
   /* Velo tenue permanente sobre TODA foto de catálogo: unifica fotos de
    * banco de temperaturas distintas y evita que una foto muy saturada
    * pelee con la marca. Muy sutil a propósito. */
-  --photo-tint:  hsl(var(--brand-h) 40% 12% / .04);
+  --photo-tint:  hsl(24 30% 12% / .04);
 
   /* --- 4. Escala tipográfica fluida ---------------------------------- */
   /* clamp(min, preferido, max): el mínimo es el valor a 360px y el máximo
    * el de 1440px. Evita tener que declarar 3 breakpoints por título. */
-  --fs-hero:    clamp(2.125rem, 1.30rem + 3.66vw, 4rem);      /* 34 -> 64 */
+  --fs-hero:    clamp(2rem, 1.25rem + 3.2vw, 3.5rem);        /* 32 -> 56 (Cinzel es ancha) */
   --fs-h1:      clamp(1.875rem, 1.35rem + 2.33vw, 3rem);      /* 30 -> 48 */
   --fs-h2:      clamp(1.5rem,  1.17rem + 1.48vw, 2.25rem);    /* 24 -> 36 */
   --fs-h3:      clamp(1.125rem, 1.02rem + 0.46vw, 1.375rem);  /* 18 -> 22 */
   --fs-lead:    clamp(1.0625rem, 0.99rem + 0.32vw, 1.25rem);  /* 17 -> 20 */
-  /* Opción tipográfica v2, elegida (2026-09-22, docs/rediseno-2026/14-tipografia-v2.md):
-   * Bodoni Moda es un Didone de contraste extremo -- sus trazos finos se
-   * cierran si se aprietan con tracking negativo (el -0.02em de Fraunces
-   * dejaba los remates de las serifas casi tocándose a tamaño hero). Se
-   * sube a 0 (sin tracking) y el line-height del display sube de 1.08 a
-   * 1.14: los ascendentes/descendentes de un Didone son más largos que los
-   * de Fraunces y a 1.08 el diacrítico de una mayúscula acentuada rozaba la
-   * línea de arriba en el h1 de dos líneas del hero.
-   * Otras dos parejas probadas en el mismo árbol y descartadas (documentadas
-   * en el informe para reconstruirlas): Lora sola -- lh-display 1.16,
-   * ls-display -0.008em; Archivo sola -- lh-display 1.02, ls-display
-   * -0.032em (y font-black en vez de font-semibold en el h1 del hero). */
-  --lh-display: 1.14;
+  /* Cinzel (display) es una capital romana: sus minúsculas son versalitas,
+   * más anchas que una serif de texto. Por eso el display lleva un tracking
+   * leve positivo (0.015em) y el line-height sube a 1.18 para que el
+   * diacrítico de una mayúscula acentuada no roce la línea de arriba. */
+  --lh-display: 1.18;
   --lh-title:   1.18;
-  --ls-display: 0em;
+  --ls-display: 0.015em;
   --ls-eyebrow: 0.14em;
 
   /* --- 5. Ritmo vertical y radios ------------------------------------ */
@@ -203,12 +206,12 @@
   /* --- 6. Sombras -----------------------------------------------------
    * Teñidas con el hue de marca en vez de negro puro: sobre --ground y
    * --sand, una sombra gris neutra se ve sucia. */
-  --elev-1:       0 1px 2px hsl(var(--brand-h) 25% 12% / .06);
-  --elev-2:       0 4px 14px -3px hsl(var(--brand-h) 25% 12% / .12),
-                  0 2px 4px -2px hsl(var(--brand-h) 25% 12% / .07);
-  --elev-3:       0 20px 44px -14px hsl(var(--brand-h) 30% 10% / .24),
-                  0 4px 10px -4px hsl(var(--brand-h) 25% 12% / .10);
-  --elev-ring:    inset 0 0 0 1px hsl(var(--brand-h) 20% 30% / .08);
+  --elev-1:       0 1px 2px hsl(24 25% 12% / .06);
+  --elev-2:       0 4px 14px -3px hsl(24 25% 12% / .12),
+                  0 2px 4px -2px hsl(24 25% 12% / .07);
+  --elev-3:       0 20px 44px -14px hsl(24 30% 10% / .24),
+                  0 4px 10px -4px hsl(24 25% 12% / .10);
+  --elev-ring:    inset 0 0 0 1px hsl(24 20% 30% / .08);
 }
 
 /* ============================================================================

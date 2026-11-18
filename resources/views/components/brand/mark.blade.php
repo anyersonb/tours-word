@@ -1,36 +1,42 @@
 @props([
-    'variant' => 'horizontal', // horizontal | vertical | mono | symbol
-    'class' => 'h-8 w-auto',
+    'variant' => 'horizontal', // horizontal (cabecera) | full (logo completo, apilado)
+    'class' => 'h-11 w-auto',
+    'sizes' => '(min-width: 1024px) 22rem, 80vw', // solo para "full"
+    'eager' => true,
 ])
 @php
     /**
-     * Único componente que conoce el nombre y el logo de la marca. Si el
-     * nombre cambia (está EN REVISIÓN, ver docs/lote-0/01-nombres.md), este
-     * es el único archivo que se toca — nada de "Pacha Viva" repartido en
-     * las vistas.
+     * Único componente que conoce el logotipo de la marca (INKA PALACE
+     * Travel). Si el nombre o el diseño cambian, es el único archivo que se
+     * toca.
      *
-     * El SVG se INYECTA inline (no <img src>) a propósito: logo.svg y
-     * logo-mono.svg usan var(--action, #hex) / currentColor, y un <img src>
-     * carga el SVG en un documento aislado que no puede leer las custom
-     * properties de esta página — se vería siempre con el hex de emergencia
-     * aunque cambiemos --brand-h. Inline sí reacciona en vivo (verificado:
-     * ver docs/lote-1/00-sistema-diseno.md, prueba A1).
+     * El logotipo es el arte oficial, tal cual, como imagen (nunca redibujado):
+     * fondo transparente por keying del marfil del JPEG original. El texto es
+     * espresso sobre marfil/blanco, así que SOLO se lee sobre fondos claros;
+     * sobre superficies oscuras (pie) va dentro de una placa marfil.
+     *
+     * horizontal: ilustración a la izquierda y "INKA PALACE / TRAVEL" a la
+     *   derecha. Son recortes de los mismos píxeles del archivo oficial,
+     *   recolocados (sin redibujar): en un alto de 44px el logo apilado
+     *   dejaría el texto en ~7px de mayúscula, ilegible.
+     * full: el logo apilado completo (páginas de error, pie).
+     *
+     * Archivos: public/images/brand/inka-palace-logo*.
      */
-    $files = [
-        'horizontal' => 'logo.svg',
-        'vertical' => 'logo-vertical.svg',
-        'mono' => 'logo-mono.svg',
-        'symbol' => 'simbolo.svg',
-    ];
-
-    $file = $files[$variant] ?? $files['horizontal'];
-    $path = public_path('images/brand/'.$file);
-    $svg = is_file($path) ? file_get_contents($path) : '';
-
-    // Le pasamos la clase de Tailwind al <svg> raíz para que el tamaño se
-    // controle igual que cualquier otro elemento del sistema.
-    if ($svg !== '') {
-        $svg = preg_replace('/<svg /', '<svg class="'.e($class).'" ', $svg, 1);
-    }
+    $name = config('app.name');
+    $base = asset('images/brand/inka-palace-logo');
 @endphp
-{!! $svg !!}
+@if($variant === 'full')
+<picture>
+    <source type="image/webp" srcset="{{ $base }}-640.webp 640w, {{ $base }}.webp 1054w" sizes="{{ $sizes }}">
+    <img src="{{ $base }}.png" srcset="{{ $base }}-640.png 640w, {{ $base }}.png 1054w" sizes="{{ $sizes }}"
+         width="1054" height="732" alt="{{ $name }}" class="{{ $class }}"
+         @unless($eager) loading="lazy" @endunless decoding="async">
+</picture>
+@else
+<picture>
+    <source type="image/webp" srcset="{{ $base }}-horizontal-1x.webp 1x, {{ $base }}-horizontal.webp 2x">
+    <img src="{{ $base }}-horizontal-1x.png" srcset="{{ $base }}-horizontal-1x.png 1x, {{ $base }}-horizontal.png 2x"
+         width="575" height="100" alt="{{ $name }}" class="{{ $class }}" decoding="async">
+</picture>
+@endif

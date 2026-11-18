@@ -12,9 +12,9 @@
     //
     // Fix 2 (cierre lote SEO, 2026-09-14): "titleLiteral" es true solo
     // cuando la clienta SI escribio meta_title -- ese texto ya trae su
-    // propia marca ("... | Pacha Viva") y x-layout no debe componerlo con
-    // "· Pacha Viva" encima (duplicado real, medido en produccion:
-    // "[MUESTRA] Camino Inca 4 días | Pacha Viva · Pacha Viva"). Cuando cae
+    // propia marca ("... | INKA PALACE Travel") y x-layout no debe componerlo con
+    // "· INKA PALACE Travel" encima (duplicado real, medido en produccion:
+    // "[MUESTRA] Camino Inca 4 días | INKA PALACE Travel · INKA PALACE Travel"). Cuando cae
     // al respaldo (titulo del tour), x-layout SI compone, igual que antes.
     $metaTitle = filled($tour['meta_title'] ?? null) ? $tour['meta_title'] : $tour['title'];
     $titleLiteral = filled($tour['meta_title'] ?? null);
@@ -22,7 +22,7 @@
 
     $galleryImages = collect($tour['images'])->map(fn ($image) => ['src' => $image['src'], 'alt' => $image['alt']])->all();
     if (empty($galleryImages)) {
-        $galleryImages = [['src' => PlaceholderImage::svg(1200, 800, $tour['title'], '2c6fa8'), 'alt' => $tour['title']]];
+        $galleryImages = [['src' => PlaceholderImage::svg(1200, 800, $tour['title'], '556b52'), 'alt' => $tour['title']]];
     }
 
     $breadcrumbItems = [

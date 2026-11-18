@@ -28,8 +28,8 @@
     // Fix 2 (cierre lote SEO, 2026-09-14): cuando la clienta escribe su
     // propio meta_title (Tour/Destination/Experience), ese texto YA trae su
     // propia marca -- componerlo con "· " . config('app.name') encima
-    // duplicaba "Pacha Viva" en el <title> ("... | Pacha Viva · Pacha
-    // Viva"). "titleLiteral" (default false, sin cambio de comportamiento
+    // duplicaba la marca en el <title> ("... | INKA PALACE Travel · INCA
+    // PALACE Travel"). "titleLiteral" (default false, sin cambio de comportamiento
     // para home/nosotros/contacto/catalogo, que siempre pasan un titulo de
     // pagina, no de contenido) le dice al layout que NO componga: el
     // llamador ya decidio el <title> completo. Solo se compone cuando
@@ -188,57 +188,57 @@
     <meta name="twitter:image" content="{{ $ogImageUrl }}">
 
     {{--
-        Tipografías de marca — v2 (2026-09-22, docs/rediseno-2026/14-tipografia-v2.md):
-        Public Sans (sans/cuerpo) y Bodoni Moda (display) reemplazan a Inter
-        Tight/Fraunces del port Roavio -- esa pareja leía "plantilla de IA"
-        (encargo de Anyerson, tercer rechazo visual del proyecto). Las dos
-        son SIL OFL 1.1 y se sirven AUTOALOJADAS desde public/fonts/ (ver
-        @font-face más abajo) — nunca desde fonts.googleapis.com. El preload
-        es solo de esas dos: son las que carga TODA página del sitio (body +
-        h1..h6). Caveat (script, uso puntual en Nosotros) es la única que
-        queda en Google Fonts: no forma parte de este lote y una sola
-        familia de más no justifica bajarla y mantenerla también en disco.
+        Tipografías de marca — INKA PALACE Travel (2026-10-12): Cinzel (display,
+        logotipo, headings) + Inter (cuerpo). Las dos son SIL OFL 1.1 y se sirven
+        AUTOALOJADAS desde public/fonts/ (subsets latin y latin-ext, variable
+        400..700) — nunca desde fonts.googleapis.com. El preload es solo del
+        subset latin de cada una: es lo que carga TODA página (body + h1..h6 +
+        logotipo). La script Caveat de Nosotros se retiró: la marca usa solo estas dos familias. El subset latin-ext solo se descarga si aparece un glifo suyo.
+        Los @font-face viven aquí y no en app.css porque Vite no reescribe
+        url('/fonts/...') absoluto (docs/rediseno-2026/11-fix-fuentes-subdirectorio.md):
+        asset() sí conoce el prefijo real de despliegue.
     --}}
-    <link rel="preload" href="{{ asset('fonts/public-sans/PublicSans-Variable.woff2') }}" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="{{ asset('fonts/bodoni-moda/BodoniModa-Variable.woff2') }}" as="font" type="font/woff2" crossorigin>
-    {{--
-        Fix subdirectorio (2026-09-21, docs/rediseno-2026/11-fix-fuentes-subdirectorio.md):
-        estos @font-face vivían en resources/css/app.css con `url('/fonts/...')`
-        absoluto. Vite no reescribe esa URL (no es relativa al archivo fuente ni
-        pasa por su pipeline de assets) y queda literal en el CSS compilado: en
-        local resuelve porque el sitio sirve en la raíz, pero en staging
-        (limaviewtours.com/tour-word/) esa barra pelada apunta a la raíz de OTRO
-        sitio -> 404 -> fallback a fuente de sistema. Inline aquí, construido con
-        asset(), que sí conoce el prefijo real de despliegue -- mismo mecanismo
-        que ya usan los <link rel="preload"> de arriba. Se eligió inline en vez de
-        un public/fonts/fonts.css aparte para no sumar un request más a la fuente
-        que ya compite con el CSS de Vite. Conserva font-family, los rangos de
-        peso, font-style, font-display y los format() tal cual estaban -- solo
-        cambian las dos familias (v2, 2026-09-22).
-    --}}
+    <link rel="preload" href="{{ asset('fonts/cinzel/Cinzel-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ asset('fonts/inter/Inter-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
     <style>
         @font-face {
-            font-family: 'Public Sans';
+            font-family: 'Cinzel';
             font-style: normal;
-            font-weight: 100 900;
+            font-weight: 400 700;
             font-display: swap;
-            src: url('{{ asset('fonts/public-sans/PublicSans-Variable.woff2') }}') format('woff2-variations'),
-                 url('{{ asset('fonts/public-sans/PublicSans-Variable.woff2') }}') format('woff2');
+            src: url('{{ asset('fonts/cinzel/Cinzel-latin-ext.woff2') }}') format('woff2');
+            unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
         }
         @font-face {
-            font-family: 'Bodoni Moda';
+            font-family: 'Cinzel';
             font-style: normal;
-            font-weight: 400 900;
+            font-weight: 400 700;
             font-display: swap;
-            src: url('{{ asset('fonts/bodoni-moda/BodoniModa-Variable.woff2') }}') format('woff2-variations'),
-                 url('{{ asset('fonts/bodoni-moda/BodoniModa-Variable.woff2') }}') format('woff2');
+            src: url('{{ asset('fonts/cinzel/Cinzel-latin.woff2') }}') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 400 700;
+            font-display: swap;
+            src: url('{{ asset('fonts/inter/Inter-latin-ext.woff2') }}') format('woff2');
+            unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+        }
+        @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 400 700;
+            font-display: swap;
+            src: url('{{ asset('fonts/inter/Inter-latin.woff2') }}') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
         }
     </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&display=swap" rel="stylesheet">
 
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
+    <meta name="theme-color" content="#3e2f24">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>

@@ -76,7 +76,7 @@
     // Destination/Experience ya tienen columna cover_image_path desde el
     // esquema del lote 1, pero la base de hoy no tiene ninguna cargada, y
     // tour_images sigue vacía).
-    $photoPalette = ['1b6949', '2c6fa8', '93590c', 'c2410c', '135338'];
+    $photoPalette = ['3f5340', '556b52', '7a5a1f', '3e2f24', '2f3f30'];
 
     $experienceIcons = [
         'trekking' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><path d="m3 20 6-10 4 6 2-3 6 7H3Z"/></svg>',
@@ -339,7 +339,7 @@
                     </p>
 
                     <div class="mt-8 flex flex-wrap items-center gap-3">
-                        <x-ui.button href="{{ Route::has('tours.index') ? route('tours.index') : '#' }}" class="px-6 py-3 text-base shadow-e2">
+                        <x-ui.button variant="light" href="{{ Route::has('tours.index') ? route('tours.index') : '#' }}" class="px-6 py-3 text-base shadow-e2">
                             {{ __('site.home.hero.cta_primary') }}
                         </x-ui.button>
                         {{-- Sobre foto, la variante "ghost" (texto verde sin
@@ -503,8 +503,8 @@
 
         "Destino destacado" (decisión cerrada): el PRIMERO por `order` — no
         existe un flag propio en Destination y no se crea uno solo para esto.
-        La pastilla "Destino destacado" y el scale-110 de escritorio van en
-        el <li>, NUNCA en x-ui.destination-card (componente compartido, sigue
+        La pastilla "Destino destacado" y la reducción (scale-[0.92]) de las demás en escritorio van en
+        el <li> (el realce NO usa scale-110: el track es overflow-x-auto y recortaba la tarjeta), NUNCA en x-ui.destination-card (componente compartido, sigue
         con el mismo contrato) — y el scale nunca cambia el ANCHO del slide,
         para que el cálculo de `active`/`maxScroll` del carrusel (que asume
         slides del mismo ancho) siga siendo correcto.
@@ -537,7 +537,7 @@
                     @foreach($destinations as $i => $destination)
                         @php $isDestacado = $i === 0; @endphp
                         <li
-                            class="relative shrink-0 snap-center w-[74%] transition-transform duration-300 sm:w-[46%] lg:w-[30%] {{ $isDestacado ? 'z-[1] lg:scale-110' : 'lg:scale-95 lg:opacity-90' }}"
+                            class="relative shrink-0 snap-center w-[74%] transition-transform duration-300 sm:w-[46%] lg:w-[30%] {{ $isDestacado ? 'z-[1]' : 'lg:scale-[0.92] lg:opacity-90' }}"
                             data-reveal
                             style="--reveal-delay:{{ min($i, 5) * 80 }}ms"
                         >
@@ -740,7 +740,7 @@
                         <span class="text-brand-text">{{ __('site.home.why_us.title_highlight') }}</span>{{ __('site.home.why_us.title_after') }}
                     </x-ui.section-title>
 
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div class="grid grid-cols-2 gap-3 sm:gap-4">
                         @foreach(__('site.home.why_us.features') as $i => $feature)
                             <x-ui.feature-card
                                 :icon="$whyUsIcons[$i] ?? $whyUsIcons[0]"
@@ -753,11 +753,22 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Franja de 4 íconos al pie (maqueta 4, lote 18; revierte la
+                 decisión de no repetirla del lote 16). Mismos SVG que
+                 $heroTrustIcons; texto en site.home.why_us.strip. --}}
+            <ul class="mt-10 flex border-t border-line pt-6 sm:mt-12" data-reveal>
+                @foreach(['operator', 'reservation', 'personalized', 'cancellation'] as $key)
+                    <li class="min-w-0 flex-1 border-l border-line first:border-l-0">
+                        <x-ui.trust-badge :icon="$heroTrustIcons[$key]" layout="stacked" tone="light">{{ __('site.home.why_us.strip.'.$key) }}</x-ui.trust-badge>
+                    </li>
+                @endforeach
+            </ul>
         </div>
     </section>
 
     {{--
-        ============ 6. MOSAICO (port Roavio, 2026-09-20 — reubicado lote 16) ============
+============ 6. MOSAICO (port Roavio, 2026-09-20 — reubicado lote 16) ============
         Reordenado al final del recorrido de catálogo (decisión cerrada del
         lote 16: "...después Mosaico, Aliados y Newsletter en su orden
         actual" — Mosaico ya no va pegado al hero, va después de "Por qué
@@ -977,6 +988,7 @@
                         class="w-full rounded-full border border-white/30 bg-white/10 px-5 py-3 text-sm text-white placeholder:text-on-dark-3 disabled:cursor-not-allowed disabled:opacity-70"
                     >
                     <x-ui.button
+                        variant="light"
                         disabled
                         title="{{ __('site.home.newsletter.unavailable') }}"
                         aria-label="{{ __('site.home.newsletter.unavailable') }}"

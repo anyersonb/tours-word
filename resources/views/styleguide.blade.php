@@ -3,7 +3,7 @@
         // Placeholder local (data URI, sin red): las fotos reales del catálogo
         // llegan en el lote de contenido; esto solo evita depender de un
         // servicio externo para ver el layout de las tarjetas.
-        function pv_placeholder(int $w, int $h, string $label, string $hex = '2c6fa8'): string
+        function pv_placeholder(int $w, int $h, string $label, string $hex = '556b52'): string
         {
             $hex = ltrim($hex, '#');
             $svg = <<<SVG
@@ -22,7 +22,7 @@
 
         <header>
             <p class="text-sm font-semibold uppercase tracking-wide text-action">Lote 1 · Etapa A</p>
-            <h1 class="font-display text-3xl font-bold text-ink sm:text-4xl">Guía de estilos — Pacha Viva</h1>
+            <h1 class="font-display text-3xl font-bold text-ink sm:text-4xl">Guía de estilos — INKA PALACE Travel</h1>
             <p class="mt-2 max-w-2xl text-text-2">
                 Inventario vivo de los componentes del sistema de diseño (A7). Página con
                 <code class="rounded bg-surface-2 px-1.5 py-0.5 text-sm">noindex</code>, no forma parte del sitio público.
@@ -48,9 +48,8 @@
                 @endforeach
             </div>
             <div class="mt-4 flex flex-wrap items-end gap-6">
-                <p class="font-display text-3xl font-semibold text-ink">Bodoni Moda — font-display</p>
-                <p class="font-sans text-lg text-ink">Public Sans — font-sans (texto de interfaz)</p>
-                <p class="font-script text-2xl text-brand-text">Caveat — font-script</p>
+                <p class="font-display text-3xl font-semibold text-ink">Cinzel — font-display</p>
+                <p class="font-sans text-lg text-ink">Inter — font-sans (texto de interfaz)</p>
             </div>
         </section>
 
@@ -73,10 +72,10 @@
         {{-- ================= BADGES / EYEBROWS ================= --}}
         <section aria-labelledby="badges-h">
             <x-ui.section-title id="badges-h" as="h2">Badges y eyebrows</x-ui.section-title>
-            <p class="mb-3 max-w-2xl text-sm text-text-2">4 acentos admitidos (ver tokens.css): verde de marca, ámbar, naranja y azul. Naranja y azul están fuera del hue 155 a propósito.</p>
+            <p class="mb-3 max-w-2xl text-sm text-text-2">Acentos admitidos (ver tokens.css): salvia, ámbar (dorado profundo), dorado con texto espresso ("Más vendido") y espresso con texto dorado ("Recomendado", su inverso).</p>
             <div class="flex flex-wrap gap-3">
-                <x-ui.badge variant="orange">Más vendido</x-ui.badge>
-                <x-ui.badge variant="blue">Recomendado</x-ui.badge>
+                <x-ui.badge variant="gold">Más vendido</x-ui.badge>
+                <x-ui.badge variant="recommended">Recomendado</x-ui.badge>
                 <x-ui.badge variant="green">Naturaleza</x-ui.badge>
                 <x-ui.badge variant="amber">Certificado</x-ui.badge>
             </div>
@@ -95,16 +94,16 @@
                 <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-text-muted">Tour</h3>
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     <x-ui.tour-card
-                        :image="pv_placeholder(480,360,'Camino Inca','1b6949')"
-                        badge="Más vendido" badge-variant="orange"
+                        :image="pv_placeholder(480,360,'Camino Inca','3f5340')"
+                        badge="Más vendido" badge-variant="gold"
                         title="[MUESTRA] Camino Inca 4 días"
                         summary="Tour de muestra: trekking clásico hasta Machu Picchu."
                         duration="4 días / 3 noches" category="Trekking"
                         :pen-cents="350000" :usd-cents="9500"
                     />
                     <x-ui.tour-card
-                        :image="pv_placeholder(480,360,'Gastronomía AQP','2c6fa8')"
-                        badge="Recomendado" badge-variant="blue"
+                        :image="pv_placeholder(480,360,'Gastronomía AQP','556b52')"
+                        badge="Recomendado" badge-variant="recommended"
                         title="[MUESTRA] Tour gastronómico en Arequipa"
                         summary="Tour de muestra: ruta de picanterías tradicionales."
                         duration="4 horas" category="Gastronomía"
@@ -123,7 +122,7 @@
             <div>
                 <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-text-muted">Destino</h3>
                 <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                    <x-ui.destination-card :image="pv_placeholder(320,400,'Cusco','135338')" name="Cusco" tagline="La capital histórica del imperio inca" />
+                    <x-ui.destination-card :image="pv_placeholder(320,400,'Cusco','2f3f30')" name="Cusco" tagline="La capital histórica del imperio inca" />
                     <x-ui.destination-card :image="pv_placeholder(320,400,'Arequipa','0e3f2a')" name="Arequipa" tagline="Conocida como la Ciudad Blanca" />
                 </div>
             </div>
@@ -131,8 +130,8 @@
             <div>
                 <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-text-muted">Experiencia</h3>
                 <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                    <x-ui.experience-card :image="pv_placeholder(320,240,'Trekking','1b6949')" title="Caminatas y Trekking" description="Rutas en los Andes." />
-                    <x-ui.experience-card :image="pv_placeholder(320,240,'Cultura','93590c')" title="Cultura y Tradición" description="Historia y costumbres locales." />
+                    <x-ui.experience-card :image="pv_placeholder(320,240,'Trekking','3f5340')" title="Caminatas y Trekking" description="Rutas en los Andes." />
+                    <x-ui.experience-card :image="pv_placeholder(320,240,'Cultura','7a5a1f')" title="Cultura y Tradición" description="Historia y costumbres locales." />
                 </div>
             </div>
 
@@ -156,7 +155,7 @@
                 <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-text-muted">Ficha de equipo</h3>
                 <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
                     <x-ui.team-member-card
-                        :photo="pv_placeholder(320,240,'Guía','2c6fa8')"
+                        :photo="pv_placeholder(320,240,'Guía','556b52')"
                         name="Nombre de muestra" role="Guía de montaña (muestra)"
                         bio="Contenido de muestra, pendiente de la clienta."
                         :social="[['label' => 'Instagram', 'href' => '#', 'icon' => '']]"
@@ -214,7 +213,7 @@
         <section aria-labelledby="carousel-h">
             <x-ui.section-title id="carousel-h" as="h2">Carcasa de carrusel</x-ui.section-title>
             <x-ui.carousel-shell label="Ejemplo de carrusel">
-                @foreach(['1b6949','2c6fa8','c2410c','93590c'] as $hex)
+                @foreach(['3f5340','556b52','3e2f24','7a5a1f'] as $hex)
                     <li class="w-64 shrink-0 snap-start">
                         <img src="{{ pv_placeholder(256,180,'Slide','#'.$hex) }}" alt="" class="h-full w-full rounded-xl object-cover">
                     </li>

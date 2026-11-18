@@ -7,7 +7,7 @@
     // consistente que ya usa el resto del sitio.
     $galleryImages = collect($experience['gallery'])->map(fn ($image) => ['src' => $image['src'], 'alt' => $image['alt']])->all();
     if (empty($galleryImages)) {
-        $galleryImages = [['src' => PlaceholderImage::svg(1200, 800, $experience['name'], '2c6fa8'), 'alt' => $experience['name']]];
+        $galleryImages = [['src' => PlaceholderImage::svg(1200, 800, $experience['name'], '556b52'), 'alt' => $experience['name']]];
     }
 
     $breadcrumbItems = [
@@ -24,7 +24,7 @@
     //
     // Fix 2 (cierre lote SEO): "titleLiteral" es true solo cuando la clienta
     // SI escribio meta_title -- ese texto ya trae su propia marca ("... |
-    // Pacha Viva") y x-layout no debe componerlo con "· Pacha Viva" encima
+    // INKA PALACE Travel") y x-layout no debe componerlo con "· INKA PALACE Travel" encima
     // (duplicado real, medido en produccion). Cuando cae al respaldo
     // (nombre de la experiencia), x-layout SI compone, igual que antes.
     $metaTitle = filled($experience['meta_title'] ?? null) ? $experience['meta_title'] : $experience['name'];
@@ -104,7 +104,7 @@
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach($relatedTours as $tour)
                         <x-ui.tour-card
-                            :image="$tour['images'][0]['src'] ?? PlaceholderImage::svg(480, 360, $tour['title'], '2c6fa8')"
+                            :image="$tour['images'][0]['src'] ?? PlaceholderImage::svg(480, 360, $tour['title'], '556b52')"
                             :image-alt="$tour['images'][0]['alt'] ?? $tour['title']"
                             :title="$tour['title']"
                             :summary="$tour['summary']"

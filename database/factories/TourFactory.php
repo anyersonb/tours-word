@@ -17,7 +17,7 @@ class TourFactory extends Factory
      * Define the model's default state.
      *
      * Prices here are plain test fixtures (this factory only ever runs
-     * against pachaviva_test, never seeds anything a visitor could see) — the
+     * against the test database, never seeds anything a visitor could see) — the
      * "no cifras inventadas que parezcan reales" rule applies to the public
      * demo seeder (DemoTourSeeder), which uses round, obviously-placeholder
      * amounts instead.

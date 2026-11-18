@@ -1,5 +1,5 @@
 @props([
-    'variant' => 'primary', // primary | secondary | ghost | link
+    'variant' => 'primary', // primary | secondary | light | ghost | link
     'size' => 'md', // sm | md
     'href' => null,
     'icon' => null, // slot HTML opcional a la izquierda
@@ -17,6 +17,7 @@
     $variants = [
         'primary' => 'bg-action text-on-action hover:bg-action-hover',
         'secondary' => 'border border-line text-text-2 hover:border-action hover:text-action bg-surface',
+        'light' => 'bg-ivory text-ink hover:bg-white', // sobre foto/espresso: espresso sobre ivory 11.98:1
         'ghost' => 'text-action hover:bg-brand-50',
         'link' => 'text-action underline-offset-4 hover:underline p-0 rounded-none',
     ];

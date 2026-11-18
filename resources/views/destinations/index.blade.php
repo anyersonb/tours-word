@@ -40,7 +40,9 @@
 >
 
     {{-- ============ CABECERA ============
-         Puerto Roavio (lote 2): foto real de galería + .shell-bleed (1432,
+         Puerto Roavio (lote 2): foto real de galería. El texto va en .shell (como
+         el logo): con .shell-bleed (4px de padding) el título quedaba pegado al borde.
+         Ancho anterior: (1432,
          a sangre) — a propósito el MÁS ancho de los tres, para que esta
          cabecera se sienta la más "panorámica" del catálogo (contraste
          fuerte contra la de tours/index, que es .shell/1280). No cinematic
@@ -55,7 +57,6 @@
         :lead="__('site.destinations.index.hero.subtitle')"
         :image="$headerImage"
         :image-alt="$headerImageAlt"
-        container-class="shell-bleed"
         {{-- object-position mirado en el navegador (no "center" a ciegas):
              a la relación de aspecto de esta banda (~5.5:1) el default del
              componente (45%) dejaba la mitad superior de la foto -- cielo
@@ -86,7 +87,7 @@
                     @foreach($destinations as $i => $destination)
                         <x-ui.destination-card
                             variant="flat"
-                            :image="$destination['gallery'][0]['src'] ?? PlaceholderImage::svg(480, 600, $destination['name'], '2c6fa8')"
+                            :image="$destination['gallery'][0]['src'] ?? PlaceholderImage::svg(480, 600, $destination['name'], '556b52')"
                             :image-alt="$destination['cover_image_alt'] ?? $destination['name']"
                             :name="$destination['name']"
                             :tagline="$destination['description']"

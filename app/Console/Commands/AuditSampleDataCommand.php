@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 
 /**
  * Repeatable pre-deploy audit (S4, docs/lote-1/01-esquema-lote1.md), born
- * from two lote-2 QA artifacts found live in `pachaviva`:
+ * from two lote-2 QA artifacts found live in the staging database:
  *   - tours.id=3 ("Camino Inca Corto a Machu Picchu"): is_featured=1,
  *     order=0, no "[MUESTRA]" prefix — renders first in the Home carousel,
  *     indistinguishable from real client content.

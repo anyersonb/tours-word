@@ -11,7 +11,7 @@
     componente nuevo en vez de reusar feature-card con estilos distintos.
 --}}
 <div {{ $attributes->class(['flex flex-col gap-3']) }}>
-    <span class="flex h-11 w-11 items-center justify-center rounded-full bg-brand-50 text-action" aria-hidden="true">
+    <span class="flex h-11 w-11 items-center justify-center rounded-full text-gold-deep ring-1 ring-gold" aria-hidden="true">
         {!! $icon !!}
     </span>
     <div>

@@ -27,6 +27,13 @@
     de siempre queda como un <span> interior sin tocar su tamaño gráfico —
     el área de toque crece, el dibujo no.
 
+    Lote 22 (carrusel a 768, preexistente): `go()` iba a `offsetLeft` y `sync()` dividía
+    scrollLeft entre el ancho del slide, sin contar gap ni padding lateral. Con
+    `snap-center` el destino real es el CENTRO del slide (acotado a 0..maxScroll):
+    ahora `target()` lo calcula leyendo `scroll-snap-align` del slide (start o
+    center) y `sync()` elige el slide cuyo destino queda más cerca. Los
+    consumidores con snap-start dan el mismo resultado que antes.
+
     R2 (ronda 2, arreglo 3, 02/09): con pocas tarjetas que ya caben en el
     viewport (maxScroll = scrollWidth - clientWidth = 0), flechas y puntos no
     movían nada — un control roto para el visitante. Ahora `maxScroll` se
@@ -52,15 +59,27 @@
             const track = this.$refs.track;
             this.maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
         },
-        sync() {
-            const track = this.$refs.track;
-            const slideWidth = track.children[0]?.offsetWidth || 1;
-            this.active = Math.round(track.scrollLeft / slideWidth);
-        },
-        go(i) {
+        target(i) {
             const track = this.$refs.track;
             const slide = track.children[i];
-            if (slide) track.scrollTo({ left: slide.offsetLeft, behavior: 'smooth' });
+            if (!slide) return 0;
+            const left = slide.getBoundingClientRect().left - track.getBoundingClientRect().left + track.scrollLeft;
+            const centered = getComputedStyle(slide).scrollSnapAlign.includes('center');
+            const raw = centered ? left + slide.offsetWidth / 2 - track.clientWidth / 2 : left;
+            return Math.min(Math.max(raw, 0), Math.max(0, track.scrollWidth - track.clientWidth));
+        },
+        sync() {
+            const track = this.$refs.track;
+            const atEnd = track.scrollLeft >= track.scrollWidth - track.clientWidth - 1;
+            let best = 0, bestDist = Infinity;
+            for (let i = 0; i < track.children.length; i++) {
+                const d = Math.abs(this.target(i) - track.scrollLeft);
+                if (d < bestDist || (atEnd && d === bestDist)) { best = i; bestDist = d; }
+            }
+            this.active = best;
+        },
+        go(i) {
+            this.$refs.track.scrollTo({ left: this.target(i), behavior: 'smooth' });
         },
         prev() { this.go(Math.max(this.active - 1, 0)); },
         next() { this.go(Math.min(this.active + 1, this.count - 1)); },

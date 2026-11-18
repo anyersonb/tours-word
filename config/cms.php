@@ -85,7 +85,7 @@ return [
     | el catálogo pase a real, el staging quedaría indexable sin control.
     |
     | Solo se enciende con IS_STAGING_MIRROR=true en el .env DEL DESPLIEGUE
-    | de /tour-word/, nunca en el .env del dominio real de Pacha Viva.
+    | de /tour-word/, nunca en el .env del dominio real de INKA PALACE Travel.
     |
     | FALLA CERRADA a propósito (hallazgo M-1, corregido tras
     | docs/rediseno-2026/04-seguridad.md ##5). Hasta este fix la clave era
@@ -105,7 +105,7 @@ return [
     | (noindex). Ante la duda, no indexable.
     |
     | Costo que hay que aceptar a cambio: el .env de producción REAL de
-    | Pacha Viva (su propio dominio, NO el espejo) tiene que declarar
+    | INKA PALACE Travel (su propio dominio, NO el espejo) tiene que declarar
     | IS_STAGING_MIRROR=false EXPLÍCITO -- ya no basta con omitir la
     | variable. Ese fallo es ruidoso y barato (se nota en la primera
     | revisión de SEO, se arregla con una línea); el anterior era

@@ -7,7 +7,7 @@ return [
     // contact.blade.php, fuera de mi alcance en este lote). Sin cifras ni
     // afirmaciones regulatorias: ver docs/lote-1/00-sistema-diseno.md.
     'seo' => [
-        'default_description' => 'Pacha Viva es una agencia de turismo en Cusco, Perú. Diseñamos tours y experiencias auténticas por los destinos del país con expertos locales.',
+        'default_description' => 'INKA PALACE Travel es una agencia de turismo en Cusco, Perú. Diseñamos tours y experiencias auténticas por los destinos del país con expertos locales.',
     ],
 
     // UI compartida (lote 1, arreglo A1 sobre `carousel-shell.blade.php`).
@@ -56,6 +56,13 @@ return [
             'attr_languages' => 'Español / Inglés',
             'attr_cancellation' => 'Cancelación flexible',
             'attr_daily' => 'Salida diaria',
+            // Lote 19: textos de los bloques condicionales (solo si llega el dato).
+            'low_availability' => 'Últimos cupos',
+            'discount' => ':percent% Descuento',
+            'before' => 'ANTES',
+            'now' => 'AHORA',
+            'reviews' => ':count reseña|:count reseñas',
+            'rating_label' => 'Calificación :rating de 5.',
         ],
 
         // Objetivo 2 (lote i18n, 2026-09-14): fallback honesto del contenido
@@ -175,7 +182,7 @@ return [
         ],
 
         'featured_tours' => [
-            'eyebrow' => 'Selección Pacha Viva',
+            'eyebrow' => 'Selección INKA PALACE Travel',
             'title' => 'Tours destacados',
             'cta' => 'Ver todos los tours',
         ],
@@ -196,6 +203,12 @@ return [
             'title_highlight' => 'nosotros',
             'title_after' => '?',
             'photo_alt' => 'Pareja de viajeros revisando un mapa',
+            'strip' => [
+                'operator' => 'Operador local',
+                'reservation' => 'Reserva segura',
+                'personalized' => 'Atención directa',
+                'cancellation' => 'Cancelación flexible',
+            ],
             'features' => [
                 ['title' => 'Expertos locales', 'description' => 'Conocemos cada rincón del Perú.'],
                 ['title' => 'Atención personalizada', 'description' => 'Te ayudamos a planificar tu viaje ideal.'],
@@ -429,7 +442,7 @@ return [
     // de TeamMember/Setting, nunca de este archivo (D1/D2).
     'nosotros' => [
         'meta' => [
-            'description' => 'Pacha Viva es una agencia de turismo en Cusco, Perú, que conecta viajeros con lo auténtico del país de la mano de expertos locales.',
+            'description' => 'INKA PALACE Travel es una agencia de turismo en Cusco, Perú, que conecta viajeros con lo auténtico del país de la mano de expertos locales.',
         ],
 
         'breadcrumb' => [
@@ -454,8 +467,9 @@ return [
             // PENDIENTE clienta: afirma "impacto positivo en las comunidades
             // y en el medio ambiente" — verificable, no relleno.
             'paragraph_2' => 'Creemos en un turismo responsable que genera un impacto positivo en las comunidades y en el medio ambiente.',
-            'signature' => 'Equipo Pacha Viva',
+            'signature' => 'Equipo INKA PALACE Travel',
             'photo_alt' => 'Vista aérea de los andenes circulares de Moray al atardecer',
+            'emblem_alt' => 'Emblema de INKA PALACE Travel: un viajero inca con mochila frente a Machu Picchu y un avión en el cielo',
         ],
 
         'values' => [
