@@ -160,7 +160,7 @@
                         <p class="text-xs font-medium uppercase tracking-wide text-text-2">{{ __('site.contacto.form.booking_tour_label') }}</p>
                         <p class="mt-1 text-lg font-semibold text-ink">{{ $requestedTour->title }}</p>
                         @if($requestedTourUrl)
-                            <a href="{{ $requestedTourUrl }}" class="mt-1 inline-block text-sm font-medium text-brand-text underline underline-offset-2 hover:text-action-hover">
+                            <a href="{{ $requestedTourUrl }}" class="mt-1 inline-block text-sm font-medium text-brand-text underline underline-offset-2 hover:text-ink">
                                 {{ __('site.contacto.form.booking_tour_link') }}
                             </a>
                         @endif
@@ -288,7 +288,7 @@
                                 href="{{ $privacyPolicyUrl }}"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                class="font-medium text-brand-text underline underline-offset-2 hover:text-action-hover"
+                                class="font-medium text-brand-text underline underline-offset-2 hover:text-ink"
                             >{{ __('site.contacto.form.privacy_link') }}</a>
                             {{ __('site.contacto.form.privacy_post') }}
                         @else

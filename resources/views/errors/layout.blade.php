@@ -29,12 +29,13 @@
     <meta name="robots" content="noindex, nofollow">
     <title>{{ $title }} · {{ config('app.name') }}</title>
     <link rel="preload" href="{{ asset('fonts/cinzel/Cinzel-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="{{ asset('fonts/inter/Inter-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ asset('fonts/poppins/poppins-latin-400-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
     <style>
         @font-face { font-family: 'Cinzel'; font-style: normal; font-weight: 400 700; font-display: swap; src: url('{{ asset('fonts/cinzel/Cinzel-latin.woff2') }}') format('woff2'); }
-        @font-face { font-family: 'Inter'; font-style: normal; font-weight: 400 700; font-display: swap; src: url('{{ asset('fonts/inter/Inter-latin.woff2') }}') format('woff2'); }
+        @font-face { font-family: 'Poppins'; font-style: normal; font-weight: 400; font-display: swap; src: url('{{ asset('fonts/poppins/poppins-latin-400-normal.woff2') }}') format('woff2'); }
+        @font-face { font-family: 'Poppins'; font-style: normal; font-weight: 600; font-display: swap; src: url('{{ asset('fonts/poppins/poppins-latin-600-normal.woff2') }}') format('woff2'); }
         :root { --espresso: #3e2f24; --ivory: #faf7ee; --gold: #c9a96a; }
-        body { margin: 0; background: var(--ivory); color: var(--espresso); font-family: 'Inter', system-ui, sans-serif; }
+        body { margin: 0; background: var(--ivory); color: var(--espresso); font-family: 'Poppins', system-ui, sans-serif; }
     </style>
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <meta name="theme-color" content="#3e2f24">

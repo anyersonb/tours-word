@@ -8,7 +8,7 @@
 return [
 
     'meta' => [
-        'title' => 'Inka Palace Travel | Tours en Perú con operador local',
+        'title' => 'INKA PALACE Travel | Tours en Perú con operador local',
         'description' => 'Agencia de turismo con expertos locales. Tours en Lima, Ica, Cusco, Machu Picchu y más, con reserva segura.',
     ],
 
@@ -120,7 +120,7 @@ return [
     ],
 
     'featured' => [
-        'eyebrow' => 'Selección Inka Palace Travel',
+        'eyebrow' => 'Selección INKA PALACE Travel',
         'title' => 'Tours destacados',
         'text' => 'Los favoritos de nuestros viajeros, con recojo en tu hotel y guía en español o inglés.',
         'see_all' => 'Ver todos los tours',

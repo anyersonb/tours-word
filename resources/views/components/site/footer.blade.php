@@ -3,7 +3,7 @@
     use App\Models\Setting;
 
     /**
-     * Footer de Inka Palace Travel (PDF s10): cinta andina + bloque café con
+     * Footer de INKA PALACE Travel (PDF s10): cinta andina + bloque café con
      * logo, destinos, enlaces, contacto y redes + franja de copyright y medios
      * de pago. Conserva lo que ya hacía el de main:
      *  - A6 (bloqueantes de producción peruanos): RUC, razón social, RNAVT,
@@ -53,7 +53,7 @@
     <div class="container footer__grid">
         <div class="footer__brand">
             <a class="footer__logo" href="{{ route('home') }}" aria-label="{{ config('brand.name') }}">
-                <x-brand.mark width="108" height="84" loading="lazy" />
+                <x-brand.mark variant="full" sizes="108px" :eager="false" />
             </a>
             <p class="footer__about">{{ __('home.footer.about') }}</p>
             <a class="btn btn--wa" href="{{ $waUrl }}" target="_blank" rel="noopener"><x-glyph name="whatsapp" :size="18" />{{ __('home.footer.whatsapp_cta') }}</a>

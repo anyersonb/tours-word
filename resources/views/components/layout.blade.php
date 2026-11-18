@@ -188,13 +188,13 @@
     <meta name="twitter:image" content="{{ $ogImageUrl }}">
 
     {{--
-        Tipografías de marca — Inka Palace Travel (rebrand 2026-11): Cinzel
-        (titulares) y Poppins (cuerpo/UI), SIL OFL 1.1, AUTOALOJADAS desde
-        public/fonts/ (nunca desde fonts.googleapis.com). Reemplazan a
-        Bodoni Moda + Public Sans. Preload solo de las tres que pinta TODA
-        página above-the-fold (cuerpo 400, botones/menú 600, titular 700);
-        las demás pesas cargan bajo demanda. Caveat (script, uso puntual en
-        Nosotros) también va autoalojada, sin preload (no es crítica).
+        Tipografías de marca — INKA PALACE Travel: Cinzel (titulares; variable
+        400..700, subsets latin + latin-ext) y Poppins (cuerpo/UI; el PDF de
+        diseño usa Poppins, no Inter: docs/lote-1/inka-palace/07-integracion-staging-oficial.md),
+        SIL OFL 1.1, AUTOALOJADAS desde public/fonts/ (nunca desde
+        fonts.googleapis.com). Preload solo de las tres que pinta TODA página
+        above-the-fold (cuerpo 400, botones/menú 600, titular Cinzel); el
+        subset latin-ext solo se descarga si aparece un glifo suyo.
 
         Subdirectorio (docs/rediseno-2026/11-fix-fuentes-subdirectorio.md):
         los @font-face van INLINE y con asset(), nunca en el CSS de Vite, que
@@ -203,16 +203,14 @@
     --}}
     <link rel="preload" href="{{ asset('fonts/poppins/poppins-latin-400-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{{ asset('fonts/poppins/poppins-latin-600-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="{{ asset('fonts/cinzel/cinzel-latin-700-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ asset('fonts/cinzel/Cinzel-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
     <style>
-        @font-face { font-family: 'Cinzel'; font-style: normal; font-weight: 700; font-display: swap; src: url('{{ asset('fonts/cinzel/cinzel-latin-700-normal.woff2') }}') format('woff2'); }
-        @font-face { font-family: 'Cinzel'; font-style: normal; font-weight: 600; font-display: swap; src: url('{{ asset('fonts/cinzel/cinzel-latin-600-normal.woff2') }}') format('woff2'); }
+        @font-face { font-family: 'Cinzel'; font-style: normal; font-weight: 400 700; font-display: swap; src: url('{{ asset('fonts/cinzel/Cinzel-latin-ext.woff2') }}') format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+        @font-face { font-family: 'Cinzel'; font-style: normal; font-weight: 400 700; font-display: swap; src: url('{{ asset('fonts/cinzel/Cinzel-latin.woff2') }}') format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
         @font-face { font-family: 'Poppins'; font-style: normal; font-weight: 300; font-display: swap; src: url('{{ asset('fonts/poppins/poppins-latin-300-normal.woff2') }}') format('woff2'); }
         @font-face { font-family: 'Poppins'; font-style: normal; font-weight: 400; font-display: swap; src: url('{{ asset('fonts/poppins/poppins-latin-400-normal.woff2') }}') format('woff2'); }
         @font-face { font-family: 'Poppins'; font-style: normal; font-weight: 500; font-display: swap; src: url('{{ asset('fonts/poppins/poppins-latin-500-normal.woff2') }}') format('woff2'); }
         @font-face { font-family: 'Poppins'; font-style: normal; font-weight: 600; font-display: swap; src: url('{{ asset('fonts/poppins/poppins-latin-600-normal.woff2') }}') format('woff2'); }
-        @font-face { font-family: 'Caveat'; font-style: normal; font-weight: 500; font-display: swap; src: url('{{ asset('fonts/caveat/caveat-latin-500-normal.woff2') }}') format('woff2'); }
-        @font-face { font-family: 'Caveat'; font-style: normal; font-weight: 600; font-display: swap; src: url('{{ asset('fonts/caveat/caveat-latin-600-normal.woff2') }}') format('woff2'); }
         @font-face { font-family: 'Poppins'; font-style: normal; font-weight: 700; font-display: swap; src: url('{{ asset('fonts/poppins/poppins-latin-700-normal.woff2') }}') format('woff2'); }
     </style>
 

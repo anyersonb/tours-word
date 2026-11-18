@@ -21,7 +21,7 @@
     <div class="mx-auto max-w-7xl space-y-16 px-4 py-12 sm:px-6 lg:px-8">
 
         <header>
-            <p class="text-sm font-semibold uppercase tracking-wide text-action">Lote 1 · Etapa A</p>
+            <p class="text-sm font-semibold uppercase tracking-wide text-brand-text">Lote 1 · Etapa A</p>
             <h1 class="font-display text-3xl font-bold text-ink sm:text-4xl">Guía de estilos — INKA PALACE Travel</h1>
             <p class="mt-2 max-w-2xl text-text-2">
                 Inventario vivo de los componentes del sistema de diseño (A7). Página con

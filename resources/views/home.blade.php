@@ -2,7 +2,7 @@
     use Illuminate\Support\Str;
 
     /*
-     * Home de Inka Palace Travel — port del PDF de diseño (docs/lote-1/inka-palace/
+     * Home de INKA PALACE Travel — port del PDF de diseño (docs/lote-1/inka-palace/
      * referencia/s00..s10.jpg, 1440 px) a main. Contrato de datos:
      * docs/lote-1/inka-palace/02-contrato-home.md (HomeController).
      *

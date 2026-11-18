@@ -55,7 +55,6 @@
     --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
     --font-display: 'Cinzel', 'Times New Roman', serif;
-    --font-script: 'Caveat', cursive;
 
     /* Rampa de marca -> utilidades bg-brand-*, text-brand-*, border-brand-* */
     --color-brand-50: var(--brand-50);
@@ -449,8 +448,8 @@
     .prose-pv > * + * { margin-top: 1em; }
     .prose-pv p { line-height: 1.7; }
     .prose-pv strong { font-weight: 600; color: var(--text); }
-    .prose-pv a { color: var(--action); text-decoration: underline; text-underline-offset: 3px; }
-    .prose-pv a:hover { color: var(--action-hover); }
+    .prose-pv a { color: var(--brand-text); text-decoration: underline; text-underline-offset: 3px; }
+    .prose-pv a:hover { color: var(--ink); }
     .prose-pv :is(ul, ol) { padding-left: 1.25rem; display: flex; flex-direction: column; gap: .4rem; }
     .prose-pv ul { list-style: disc; }
     .prose-pv ol { list-style: decimal; }

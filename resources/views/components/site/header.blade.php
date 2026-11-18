@@ -2,7 +2,7 @@
     use App\Models\Setting;
 
     /*
-     * Header de Inka Palace Travel (PDF s00): topbar + cinta andina + header
+     * Header de INKA PALACE Travel (PDF s00): topbar + cinta andina + header
      * sticky. Vive en x-site.header para que TODAS las páginas lo hereden;
      * conserva lo que ya hacía el de main: rutas con route() (prefijo de
      * idioma por URL::defaults), item activo con routeIs(), selector de
@@ -58,7 +58,7 @@
 >
     <div class="container header__inner">
         <a class="header__logo" href="{{ route('home') }}" aria-label="{{ config('brand.name') }}">
-            <x-brand.mark width="85" height="66" />
+            <x-brand.mark variant="full" sizes="(min-width: 1100px) 96px, 76px" />
         </a>
 
         <nav class="nav" id="menu-principal" :class="{ 'is-open': open }" aria-label="Principal">

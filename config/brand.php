@@ -2,7 +2,7 @@
 
 /*
 |--------------------------------------------------------------------------
-| Marca: Inka Palace Travel
+| Marca: INKA PALACE Travel
 |--------------------------------------------------------------------------
 |
 | Datos de marca y contacto leídos del diseño del Home (lote 1). Un valor
@@ -13,11 +13,11 @@
 
 return [
 
-    'name' => 'Inka Palace Travel',
+    'name' => 'INKA PALACE Travel',
 
     'tagline' => 'Agencia de turismo con expertos locales',
 
-    'logo' => 'img/brand/inka-palace-logo.png',
+    'logo' => 'images/brand/inka-palace-logo.png',
 
     'contact' => [
         'phone' => '+51 959 173 246',

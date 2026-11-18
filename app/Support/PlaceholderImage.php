@@ -12,9 +12,9 @@ namespace App\Support;
  */
 final class PlaceholderImage
 {
-    public static function svg(int $width, int $height, string $label, string $hex = 'e0a63a'): string
+    public static function svg(int $width, int $height, string $label, string $hex = 'c9a96a'): string
     {
-        $accent = '#'.(preg_match('/^#?[0-9a-fA-F]{6}$/', $hex) ? ltrim($hex, '#') : 'e0a63a');
+        $accent = '#'.(preg_match('/^#?[0-9a-fA-F]{6}$/', $hex) ? ltrim($hex, '#') : 'c9a96a');
         $safeLabel = htmlspecialchars($label, ENT_QUOTES, 'UTF-8');
         $size = max(40, (int) round(min($width, $height) * 0.45));
         $cx = $width / 2;
@@ -24,8 +24,8 @@ final class PlaceholderImage
         $svg = <<<SVG
         <svg xmlns="http://www.w3.org/2000/svg" width="{$width}" height="{$height}" viewBox="0 0 {$width} {$height}" role="img">
             <title>{$safeLabel}</title>
-            <rect width="100%" height="100%" fill="#f7f4ef" />
-            <g transform="translate({$cx} {$cy}) scale({$u})" fill="#291b12" fill-opacity="0.10">
+            <rect width="100%" height="100%" fill="#f5f0e3" />
+            <g transform="translate({$cx} {$cy}) scale({$u})" fill="#3e2f24" fill-opacity="0.10">
                 <path d="M-1.5 -5 H1.5 V-3.5 H3 V-1.5 H5 V1.5 H3 V3.5 H1.5 V5 H-1.5 V3.5 H-3 V1.5 H-5 V-1.5 H-3 V-3.5 H-1.5 Z" />
             </g>
             <circle cx="{$cx}" cy="{$cy}" r="{$u}" fill="{$accent}" fill-opacity="0.85" />

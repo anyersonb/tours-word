@@ -1,100 +1,113 @@
 /**
- * Inka Palace Travel — tokens (única fuente de verdad).
+ * INKA PALACE Travel — tokens (única fuente de verdad).
  *
- * Rebrand (2026-11, docs/lote-1/inka-palace/): reemplaza la identidad verde
- * "Pacha Viva" por la paleta muestreada del PDF de diseño del Home (imagen
- * única 2880x18142, sin capas). Se CONSERVAN los NOMBRES de token del sistema
- * anterior (--action, --brand-*, --ground, --ink-surface...) para que
- * ui/* y las páginas internas sigan funcionando sin reescribir sus
- * utilidades de Tailwind: cambia el VALOR, no el contrato.
+ * HOJA DE MARCA OFICIAL (2026-10-12): Espresso #3E2F24, Sage #556B52,
+ * Champagne Gold #C9A96A, Ivory #FAF7EE. Esta hoja MANDA sobre los colores
+ * inferidos del JPEG del PDF (docs/lote-1/inka-palace/07-integracion-staging-oficial.md).
+ * El PDF manda solo en estructura/composición del Home.
  *
- * REGLA DURA (igual que antes): ningún componente escribe un hexadecimal.
- * Solo se consumen tokens semánticos. Si falta uno, se crea aquí.
+ * Se CONSERVAN los nombres de token de la capa anterior (--action,
+ * --brand-*, --ink-surface, --accent-*, --forest...) para que ui/* y el
+ * Home no se reescriban: cambia el VALOR, no el contrato. Mapeo:
+ *   café oscuro del PDF  -> Espresso     verde bosque del PDF -> Sage
+ *   dorado del PDF       -> Champagne Gold (relleno) / --gold-deep (texto)
+ *   crema del PDF        -> Ivory / arena
  *
- * Mapeo de roles (importante al leer los componentes viejos):
- *   --action / bg-action        = DORADO (CTA del diseño). Es un RELLENO.
- *                                 Sobre él va --on-action (café oscuro, 8:1).
- *   --brand-text / text-brand-text = dorado oscuro para TEXTO sobre claro
- *                                 (el dorado vivo sobre blanco mide 2.1:1 y
- *                                 NO sirve como texto). Las vistas que usaban
- *                                 text-action como color de texto migraron a
- *                                 text-brand-text.
- *   --ink-surface               = café oscuro (topbar, footer, bandas).
- *   --accent-green              = verde bosque (antes era el verde de marca).
+ * REGLAS DE CONTRASTE (WCAG 2.1, medidas):
+ *  - El dorado #C9A96A mide 2.09:1 sobre ivory: NUNCA como texto ni como
+ *    fondo de botón con texto claro sobre claro. Solo relleno, filetes e
+ *    íconos decorativos; sobre espresso sí sirve como texto (5.72:1).
+ *  - Texto dorado sobre claro: --gold-deep #7A5A1F (5.92:1 ivory, 5.58:1 arena).
+ *  - Texto sobre relleno dorado: espresso (5.72:1; 4.65:1 sobre el hover).
+ *  - Texto sobre sage: blanco 5.82:1. Sage como texto: --sage-text 7.77:1.
+ *  - WhatsApp conserva su verde propio (blanco sobre #158045 = 5.0:1).
  *
- * Valores crudos muestreados con GD del PDF; donde se desvían por contraste
- * AA, el comentario lo dice. Contrastes calculados con la fórmula WCAG 2.1.
+ * REGLA DURA: ningún componente escribe un hexadecimal. Solo tokens
+ * semánticos; si falta uno, se crea aquí.
  */
 
 :root {
-  /* ---- Paleta cruda (solo se referencia desde esta hoja) ---- */
-  --c-coffee-900: #291b12;   /* topbar, footer, botón oscuro (muestreado) */
-  --c-coffee-800: #3d2a1c;   /* tarjetas sobre café (muestreado) */
-  --c-gold-100:   #fbefd5;   /* fondo de icono dorado (muestreado) */
-  --c-gold-500:   #e0a63a;   /* CTA y acentos (muestreado) */
-  --c-gold-600:   #cb912a;   /* hover del CTA */
-  --c-gold-700:   #86600f;   /* texto dorado sobre claro: 5.7:1 sobre blanco, 5.2:1 sobre crema (muestreo ~#b8862b, oscurecido para AA) */
-  --c-forest-700: #24483a;   /* bloque Camino Inca, tarjeta de contacto (muestreado) */
-  --c-forest-100: #e7eee6;   /* fondo de icono verde (muestreado) */
-  --c-teal-700:   #1b6d83;   /* turquesa: insignias, icono Cultura (muestreado) */
-  --c-teal-100:   #ddeff3;
-  --c-clay-100:   #f3e9dd;
-  --c-terracotta: #9e2b19;   /* rojo de etiquetas y cinta (muestreado) */
-  --c-ochre:      #875c29;   /* cinta andina (muestreado) */
-  --c-sage:       #607f60;   /* cinta andina (muestreado) */
-  --c-cream-100:  #f7f4ef;   /* fondos alternos (muestreado) */
+  /* ---- Hoja de marca, tal cual ---- */
+  --espresso: #3e2f24;
+  --sage:     #556b52;
+  --gold:     #c9a96a;
+  --ivory:    #faf7ee;
+
+  /* Derivadas (contrastes medidos en el encabezado) */
+  --espresso-deep: #2b2019; /* hover sobre espresso: ivory 14.81:1 */
+  --sage-hover:    #475b45; /* blanco 7.37:1 */
+  --sage-text:     #3f5340; /* sage como texto: 7.77:1 sobre ivory */
+  --gold-deep:     #7a5a1f; /* dorado como TEXTO sobre claro */
+
+  /* ---- Paleta cruda (alias internos; solo se referencian desde esta hoja) ---- */
+  --c-coffee-900: var(--espresso);
+  --c-coffee-800: #4f3d30;   /* tarjetas sobre espresso */
+  --c-gold-100:   #f5eddb;   /* fondo de icono dorado (tinte del gold sobre ivory) */
+  --c-gold-500:   var(--gold);
+  --c-gold-600:   #b8975a;   /* hover del CTA: espresso encima 4.65:1 */
+  --c-gold-700:   var(--gold-deep);
+  --c-forest-700: var(--sage);       /* bloque Camino Inca, tarjeta de contacto */
+  --c-forest-100: #eef2ec;
+  --c-teal-700:   var(--sage-text);  /* la hoja de marca no tiene turquesa: se mapea a salvia profundo */
+  --c-teal-100:   #dde5da;
+  --c-clay-100:   #f1ead9;
+  --c-terracotta: #ab3a30;           /* alerta (--danger de la hoja): blanco 6.21:1 */
+  --c-ochre:      var(--gold-deep);
+  --c-sage:       var(--sage);
+  --c-cream-100:  #f5f0e3;           /* fondos alternos */
   --c-white:      #fff;
-  --c-line:       #e6dfd9;   /* divisores (muestreado) */
-  --c-wa-icon:    #1faf5a;   /* WhatsApp (muestreado) */
-  --c-wa-action:  #158045;   /* WhatsApp con texto blanco: oscurecido para AA 5:1 */
+  --c-line:       #e3dac8;
+  --c-wa-icon:    #1faf5a;   /* WhatsApp (verde propio por contraste) */
+  --c-wa-action:  #158045;   /* WhatsApp con texto blanco: 5:1 */
 
   /* --brand-h/--brand-s ya no generan una rampa HSL: se conservan solo
    * porque otras reglas (p. ej. .weave) los leen para sus motivos. */
-  --brand-h: 30;
+  --brand-h: 24;
   --brand-s: 1;
 
   /* Rampa 50 -> 900, dorado (50-600) a café (700-900). bg-brand-50 =
    * fondo suave dorado de chips/estados; text-brand-text = dorado oscuro. */
   --brand-50:  var(--c-gold-100);
-  --brand-100: #f6e0b0;
-  --brand-200: #efca83;
-  --brand-300: #e8b95c;
+  --brand-100: #ede3cc;
+  --brand-200: #dfd0ad;
+  --brand-300: #d5be8a;
   --brand-400: var(--c-gold-500);
   --brand-500: var(--c-gold-600);
-  --brand-600: #a87718;
+  --brand-600: #a98a4d;
   --brand-700: var(--c-gold-700);
   --brand-800: var(--c-coffee-800);
   --brand-900: var(--c-coffee-900);
 
   /* Neutrales */
-  --ground:    var(--c-white);
+  --ground:    var(--ivory);
   --surface:   var(--c-white);
   --surface-2: var(--c-cream-100);
   --line:      var(--c-line);
-  --line-soft: #eee8e2;
+  --line-soft: #ede6d6;
   --ink:       var(--c-coffee-900);
-  --ink-2:     #4a3b31;
-  --ink-3:     #6b5d54; /* 6.2:1 sobre blanco, 5.6:1 sobre crema */
+  --ink-2:     #5c4b3d; /* 7.75:1 sobre ivory */
+  --ink-3:     #6f5d4e; /* 5.85:1 sobre ivory, 6.27:1 sobre blanco */
 
   /* Semánticos de estado */
-  --amber:      #c9821f; /* SOLO decorativo, no como texto */
-  --amber-text: #93590c; /* 5.7:1 sobre blanco */
-  --danger:     #ab3a30;
+  --amber:      var(--gold); /* SOLO decorativo (estrellas), no como texto */
+  --amber-text: var(--gold-deep); /* 6.34:1 sobre blanco */
+  --danger:     #ab3a30; /* 6.21:1 sobre blanco */
   --info:       #2c6fa8;
 
   /* Acentos de catálogo (ui/badge, tour-card): pastilla sólida con texto
    * blanco encima, todas >= 4.5:1. */
-  --accent-orange: #c2410c;
-  --accent-green:  var(--c-forest-700); /* 10:1 con blanco */
+    --accent-green:  var(--sage); /* 5.82:1 con blanco */
   --accent-amber:  var(--amber-text);
-  --accent-blue:   var(--info);
-  --on-accent:     #fff;
+    --on-accent:     #fff;
 
   /* Semánticos de marca: lo único que consumen los componentes */
   --action:       var(--c-gold-500);
   --action-hover: var(--c-gold-600);
   --on-action:    var(--c-coffee-900); /* 8.2:1 sobre --action, 6.5:1 sobre --action-hover */
-  --brand-text:   var(--c-gold-700);
+  --brand-text:   var(--gold-deep); /* dorado como texto sobre claro: 5.92:1 sobre ivory */
+  --secondary:       var(--sage);
+  --secondary-hover: var(--sage-hover);
+  --on-secondary:    #fff; /* 5.82:1 sobre sage, 7.37:1 sobre hover */
 
   /* Semánticos de superficie y borde */
   --bg:          var(--ground);
@@ -107,7 +120,7 @@
   --text-muted:  var(--ink-3);
 
   /* Foco visible: dorado oscuro sobre claro, dorado vivo sobre oscuro */
-  --focus:         #7a5200;
+  --focus:         var(--gold-deep);
   --focus-on-dark: var(--c-gold-500);
 }
 
@@ -118,25 +131,25 @@
  * ========================================================================= */
 :root {
   /* --- Neutro cálido (crema) -------------------------------------------- */
-  --sand:      var(--c-cream-100);
-  --sand-deep: #efe7da;
-  --sand-line: #e3d9c8;
+  --sand:      #f3ecdc;
+  --sand-deep: #eadfc9;
+  --sand-line: #ddd0b6;
 
-  /* --- Superficie oscura (café). Medidos sobre #291b12:
+  /* --- Superficie oscura (café). Medidos sobre espresso #3e2f24:
    *   blanco 16:1 · --on-dark-2 12:1 · --on-dark-3 7.7:1 -------------------- */
   --ink-surface:   var(--c-coffee-900);
-  --ink-surface-2: var(--c-coffee-800);
-  --on-dark:       #fff;
-  --on-dark-2:     #e6dcd3;
-  --on-dark-3:     #b9aca2;
-  --on-dark-line:  rgb(255 255 255 / .2);
+  --ink-surface-2: #4f3d30;
+  --on-dark:       var(--ivory);
+  --on-dark-2:     #e4dac7; /* 9.26:1 sobre espresso */
+  --on-dark-3:     #bbad97; /* 5.83:1 sobre espresso */
+  --on-dark-line:  #66533f;
 
   /* --- Tratamiento de imagen (derivados del café) ----------------------- */
-  --scrim-hero:  linear-gradient(180deg, rgb(41 27 18 / .60) 0%, rgb(41 27 18 / .80) 55%, rgb(41 27 18 / .90) 100%);
-  --scrim-hero-h: linear-gradient(90deg, rgb(41 27 18 / .88) 0%, rgb(41 27 18 / .76) 46%, rgb(41 27 18 / .30) 80%, rgb(41 27 18 / .12) 100%);
-  --scrim-band:  linear-gradient(180deg, rgb(41 27 18 / .80) 0%, rgb(41 27 18 / .88) 100%);
-  --scrim-card:  linear-gradient(180deg, rgb(41 27 18 / 0) 30%, rgb(41 27 18 / .42) 58%, rgb(41 27 18 / .86) 100%);
-  --photo-tint:  rgb(41 27 18 / .04);
+  --scrim-hero:  linear-gradient(180deg, rgb(24 15 12 / .60) 0%, rgb(24 15 12 / .80) 55%, rgb(24 15 12 / .90) 100%);
+  --scrim-hero-h: linear-gradient(90deg, rgb(24 15 12 / .88) 0%, rgb(24 15 12 / .76) 46%, rgb(24 15 12 / .30) 80%, rgb(24 15 12 / .12) 100%);
+  --scrim-band:  linear-gradient(180deg, rgb(24 15 12 / .80) 0%, rgb(24 15 12 / .88) 100%);
+  --scrim-card:  linear-gradient(180deg, rgb(24 15 12 / 0) 30%, rgb(24 15 12 / .42) 58%, rgb(24 15 12 / .86) 100%);
+  --photo-tint:  rgb(62 47 36 / .04);
 
   /* --- Escala tipográfica fluida ------------------------------------------
    * Cinzel (display) es más ancha que la Didone anterior; el techo de cada
@@ -161,10 +174,10 @@
   --r-xl: 1.75rem;
 
   /* --- Sombras (teñidas con el café) ------------------------------------ */
-  --elev-1:       0 1px 2px rgb(41 27 18 / .06);
-  --elev-2:       0 4px 14px -3px rgb(41 27 18 / .12), 0 2px 4px -2px rgb(41 27 18 / .07);
-  --elev-3:       0 20px 44px -14px rgb(41 27 18 / .26), 0 4px 10px -4px rgb(41 27 18 / .10);
-  --elev-ring:    inset 0 0 0 1px rgb(41 27 18 / .08);
+  --elev-1:       0 1px 2px rgb(62 47 36 / .06);
+  --elev-2:       0 4px 14px -3px rgb(62 47 36 / .12), 0 2px 4px -2px rgb(62 47 36 / .07);
+  --elev-3:       0 20px 44px -14px rgb(62 47 36 / .26), 0 4px 10px -4px rgb(62 47 36 / .10);
+  --elev-ring:    inset 0 0 0 1px rgb(62 47 36 / .08);
 }
 
 /* ============================================================================
@@ -214,19 +227,19 @@
   --ribbon-7: var(--c-sage);
 
   /* Sombras / overlays del Home */
-  --shadow-card: 0 18px 40px -18px rgb(41 27 18 / .28), 0 2px 8px rgb(41 27 18 / .06);
-  --shadow-float: 0 22px 50px -20px rgb(41 27 18 / .35);
-  --shadow-search: 0 24px 60px -24px rgb(41 27 18 / .35), 0 2px 10px rgb(41 27 18 / .08);
-  --shadow-btn: 0 10px 22px -10px rgb(224 166 58 / .75);
+  --shadow-card: 0 18px 40px -18px rgb(62 47 36 / .28), 0 2px 8px rgb(62 47 36 / .06);
+  --shadow-float: 0 22px 50px -20px rgb(62 47 36 / .35);
+  --shadow-search: 0 24px 60px -24px rgb(62 47 36 / .35), 0 2px 10px rgb(62 47 36 / .08);
+  --shadow-btn: 0 10px 22px -10px rgb(201 169 106 / .75);
   --glow-wa: 0 0 0 6px rgb(31 175 90 / .22), 0 14px 30px -8px rgb(31 175 90 / .55);
   /* Hero: el degradado se limita al lado del texto (izquierda); la derecha
    * queda viva como en el PDF. */
-  --shade-hero: linear-gradient(90deg, rgb(41 27 18 / .7) 0%, rgb(41 27 18 / .58) 28%, rgb(41 27 18 / .46) 44%, rgb(41 27 18 / .24) 52%, rgb(41 27 18 / .08) 58%, rgb(41 27 18 / 0) 62%), linear-gradient(180deg, rgb(41 27 18 / .12) 0%, rgb(41 27 18 / 0) 30%, rgb(41 27 18 / .18) 100%);
-  --shade-hero-mobile: linear-gradient(180deg, rgb(41 27 18 / .55) 0%, rgb(41 27 18 / .7) 100%);
-  --shade-band: linear-gradient(90deg, rgb(41 27 18 / .9) 0%, rgb(41 27 18 / .72) 45%, rgb(41 27 18 / .42) 100%);
-  --shade-card: linear-gradient(180deg, rgb(41 27 18 / 0) 38%, rgb(41 27 18 / .55) 62%, rgb(41 27 18 / .92) 100%);
-  --shade-card-soft: linear-gradient(180deg, rgb(41 27 18 / 0) 55%, rgb(41 27 18 / .75) 100%);
-  --glass:        rgb(41 27 18 / .52);
+  --shade-hero: linear-gradient(90deg, rgb(24 15 12 / .7) 0%, rgb(24 15 12 / .58) 28%, rgb(24 15 12 / .46) 44%, rgb(24 15 12 / .24) 52%, rgb(24 15 12 / .08) 58%, rgb(24 15 12 / 0) 62%), linear-gradient(180deg, rgb(24 15 12 / .12) 0%, rgb(24 15 12 / 0) 30%, rgb(24 15 12 / .18) 100%);
+  --shade-hero-mobile: linear-gradient(180deg, rgb(24 15 12 / .55) 0%, rgb(24 15 12 / .7) 100%);
+  --shade-band: linear-gradient(90deg, rgb(24 15 12 / .9) 0%, rgb(24 15 12 / .72) 45%, rgb(24 15 12 / .42) 100%);
+  --shade-card: linear-gradient(180deg, rgb(24 15 12 / 0) 38%, rgb(24 15 12 / .55) 62%, rgb(24 15 12 / .92) 100%);
+  --shade-card-soft: linear-gradient(180deg, rgb(24 15 12 / 0) 55%, rgb(24 15 12 / .75) 100%);
+  --glass:        rgb(62 47 36 / .52);
   --glass-light:  rgb(255 255 255 / .14);
-  --glass-chip:   rgb(41 27 18 / .62);
+  --glass-chip:   rgb(62 47 36 / .62);
 }

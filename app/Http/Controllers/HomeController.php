@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 /**
- * Home público (rebrand Inka Palace Travel, lote 1). Lee SOLO contenido
+ * Home público (rebrand INKA PALACE Travel, lote 1). Lee SOLO contenido
  * publicado del CMS y no rellena huecos con datos inventados: sin datos
  * entrega colecciones vacías y la vista decide el estado vacío.
  *

@@ -48,7 +48,7 @@ class TourCatalogTest extends TestCase
                 'meeting_point' => ['es' => 'Plaza de Armas'],
                 'inclusions' => ['es' => ['Transporte', 'Guía']],
                 'exclusions' => ['es' => ['Almuerzo']],
-                'meta_title' => ['es' => 'Valle Sagrado | Inka Palace Travel'],
+                'meta_title' => ['es' => 'Valle Sagrado | INKA PALACE Travel'],
                 'meta_description' => ['es' => 'Meta descripción de prueba.'],
                 'price_pen_cents' => '150.00',
                 'price_usd_cents' => '40.00',

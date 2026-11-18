@@ -18,9 +18,9 @@ class HomeTest extends TestCase
     {
         $this->get(route('home', ['locale' => 'es']))
             ->assertOk()
-            ->assertSee('Inka Palace Travel');
+            ->assertSee('INKA PALACE Travel');
 
-        $this->assertSame('Inka Palace Travel', config('brand.name'));
+        $this->assertSame('INKA PALACE Travel', config('brand.name'));
     }
 
     public function test_home_with_empty_cms_delivers_empty_collections_not_invented_data(): void
