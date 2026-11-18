@@ -7,7 +7,7 @@ return [
     // out of scope for this lote). No figures or regulatory claims: see
     // docs/lote-1/00-sistema-diseno.md.
     'seo' => [
-        'default_description' => 'Inka Palace Travel is a tour operator in Peru. We design authentic tours and experiences across the country with local experts.',
+        'default_description' => 'INKA PALACE Travel is a tour operator based in Cusco, Peru. We design authentic tours and experiences across the country with local experts.',
     ],
 
     // Shared UI (lote 1, arreglo A1 on `carousel-shell.blade.php`).
@@ -51,6 +51,13 @@ return [
             'attr_languages' => 'Spanish / English',
             'attr_cancellation' => 'Flexible cancellation',
             'attr_daily' => 'Daily departure',
+            // Lote 19: textos de los bloques condicionales (solo si llega el dato).
+            'low_availability' => 'Last spots',
+            'discount' => ':percent% Off',
+            'before' => 'WAS',
+            'now' => 'NOW',
+            'reviews' => ':count review|:count reviews',
+            'rating_label' => 'Rated :rating out of 5.',
         ],
 
         // Objetivo 2 (lote i18n, 2026-09-14): honest fallback notice when a
@@ -156,7 +163,7 @@ return [
         ],
 
         'featured_tours' => [
-            'eyebrow' => 'Inka Palace Travel selection',
+            'eyebrow' => 'INKA PALACE Travel selection',
             'title' => 'Featured tours',
             'cta' => 'View all tours',
         ],
@@ -174,6 +181,12 @@ return [
             'title_highlight' => 'us',
             'title_after' => '?',
             'photo_alt' => 'Couple of travelers looking at a map',
+            'strip' => [
+                'operator' => 'Local operator',
+                'reservation' => 'Secure booking',
+                'personalized' => 'Direct support',
+                'cancellation' => 'Flexible cancellation',
+            ],
             'features' => [
                 ['title' => 'Local experts', 'description' => 'We know every corner of Peru.'],
                 ['title' => 'Personalized attention', 'description' => 'We help you plan your ideal trip.'],
@@ -361,7 +374,7 @@ return [
     // TeamMember/Setting, never from this file (D1/D2).
     'nosotros' => [
         'meta' => [
-            'description' => 'Inka Palace Travel is a tour operator in Peru, connecting travelers with the authentic side of the country through local experts.',
+            'description' => 'INKA PALACE Travel is a tour operator based in Cusco, Peru, connecting travelers with the authentic side of the country through local experts.',
         ],
 
         'breadcrumb' => [
@@ -385,8 +398,9 @@ return [
             // PENDING client: claims "positive impact on communities and the
             // environment" — verifiable, not filler.
             'paragraph_2' => 'We believe in responsible tourism that creates a positive impact on communities and the environment.',
-            'signature' => 'Inka Palace Travel Team',
+            'signature' => 'INKA PALACE Travel Team',
             'photo_alt' => 'Aerial view of the circular terraces of Moray at sunset',
+            'emblem_alt' => 'INKA PALACE Travel emblem: an Inca traveler with a backpack in front of Machu Picchu and a plane in the sky',
         ],
 
         'values' => [

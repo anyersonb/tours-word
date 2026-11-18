@@ -102,7 +102,7 @@
   --card-2:      var(--surface-2);
   --border:      var(--line);
   --border-soft: var(--line-soft);
-  --text:        var(--ink);
+  --text:        var(--ink);    /* 11.98:1 sobre ivory */
   --text-2:      var(--ink-2);
   --text-muted:  var(--ink-3);
 

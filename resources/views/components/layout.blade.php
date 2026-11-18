@@ -28,8 +28,8 @@
     // Fix 2 (cierre lote SEO, 2026-09-14): cuando la clienta escribe su
     // propio meta_title (Tour/Destination/Experience), ese texto YA trae su
     // propia marca -- componerlo con "· " . config('app.name') encima
-    // duplicaba "Pacha Viva" en el <title> ("... | Pacha Viva · Pacha
-    // Viva"). "titleLiteral" (default false, sin cambio de comportamiento
+    // duplicaba la marca en el <title> ("... | INKA PALACE Travel · INCA
+    // PALACE Travel"). "titleLiteral" (default false, sin cambio de comportamiento
     // para home/nosotros/contacto/catalogo, que siempre pasan un titulo de
     // pagina, no de contenido) le dice al layout que NO componga: el
     // llamador ya decidio el <title> completo. Solo se compone cuando
@@ -217,6 +217,9 @@
     </style>
 
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
+    <meta name="theme-color" content="#3e2f24">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>

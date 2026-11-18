@@ -1,5 +1,5 @@
 @props([
-    'variant' => 'primary', // primary | secondary | ghost | link
+    'variant' => 'primary', // primary | secondary | light | ghost | link
     'size' => 'md', // sm | md
     'href' => null,
     'icon' => null, // slot HTML opcional a la izquierda

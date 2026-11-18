@@ -13,7 +13,7 @@
          * pastilla de la foto, no aporta contraste, así que el texto va en
          * blanco puro y no en un gris claro.
          */
-        'on-dark' => ['dot' => 'bg-brand-200', 'text' => 'text-white', 'bg' => 'bg-white/15 backdrop-blur-sm ring-1 ring-white/25'],
+        'on-dark' => ['dot' => 'bg-gold', 'text' => 'text-white', 'bg' => 'bg-white/15 backdrop-blur-sm ring-1 ring-white/25'],
     ];
     $v = $variants[$variant] ?? $variants['brand'];
 @endphp

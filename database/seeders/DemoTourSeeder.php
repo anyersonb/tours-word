@@ -56,8 +56,8 @@ class DemoTourSeeder extends Seeder
                 'en' => 'The old Inca capital, and the gateway to Machu Picchu. Cusco rewards a slow pace: Inca walls still holding up colonial balconies, steep neighbourhoods like San Blas, markets where the haggling happens in Quechua, and a main square that feels like two different places at noon and after dark. It is the natural base for any journey through the southern Andes.',
             ],
             'meta_title' => [
-                'es' => 'Viajes y tours en Cusco | Inka Palace Travel',
-                'en' => 'Cusco Travel and Tours | Inka Palace Travel',
+                'es' => 'Viajes y tours en Cusco | INKA PALACE Travel',
+                'en' => 'Cusco Travel and Tours | INKA PALACE Travel',
             ],
             'meta_description' => [
                 'es' => 'Qué ver y qué hacer en Cusco: centro histórico, San Blas, mercados y las rutas que salen de la ciudad hacia el Valle Sagrado y Machu Picchu.',
@@ -75,8 +75,8 @@ class DemoTourSeeder extends Seeder
                 'en' => 'The valley the Urubamba river carved between Cusco and Machu Picchu. It sits lower and warmer than the city, which makes it the best place to acclimatise before taking on anything at altitude. This is where you find the terraces of Pisac, the salt pans of Maras, the circles of Moray, and Ollantaytambo, the only town in the valley still lived in on its original Inca street plan.',
             ],
             'meta_title' => [
-                'es' => 'Valle Sagrado de los Incas: tours y rutas | Inka Palace Travel',
-                'en' => 'The Sacred Valley of the Incas: Tours and Routes | Inka Palace Travel',
+                'es' => 'Valle Sagrado de los Incas: tours y rutas | INKA PALACE Travel',
+                'en' => 'The Sacred Valley of the Incas: Tours and Routes | INKA PALACE Travel',
             ],
             'meta_description' => [
                 'es' => 'Pisac, Maras, Moray y Ollantaytambo en el valle del Urubamba, la salida que mejor funciona para aclimatarse antes de una ruta de altura.',
@@ -94,8 +94,8 @@ class DemoTourSeeder extends Seeder
                 'en' => 'The white city, built out of volcanic sillar stone at the foot of El Misti. Arequipa has its own accent, its own kitchen, and a historic centre you can cover entirely on foot: the Santa Catalina monastery, the arcades around the main square, the Yanahuara viewpoint, and the farmland that begins exactly where the pavement ends.',
             ],
             'meta_title' => [
-                'es' => 'Arequipa: qué ver y dónde comer | Inka Palace Travel',
-                'en' => 'Arequipa: What to See and Where to Eat | Inka Palace Travel',
+                'es' => 'Arequipa: qué ver y dónde comer | INKA PALACE Travel',
+                'en' => 'Arequipa: What to See and Where to Eat | INKA PALACE Travel',
             ],
             'meta_description' => [
                 'es' => 'Santa Catalina, el sillar, el mirador de Yanahuara y las picanterías de siempre: cómo aprovechar Arequipa en pocos días.',
@@ -113,8 +113,8 @@ class DemoTourSeeder extends Seeder
                 'en' => 'High-altitude routes, from a single day to several, sleeping under canvas or in a village guesthouse. Mule tracks, mountain passes, glacial lakes, and stretches of stone path that have been in use since long before the Spanish arrived. Every departure states its physical demand on its own page, and none of them is sold as easier than it is.',
             ],
             'meta_title' => [
-                'es' => 'Trekking en los Andes del Perú | Inka Palace Travel',
-                'en' => 'Trekking in the Peruvian Andes | Inka Palace Travel',
+                'es' => 'Trekking en los Andes del Perú | INKA PALACE Travel',
+                'en' => 'Trekking in the Peruvian Andes | INKA PALACE Travel',
             ],
             'meta_description' => [
                 'es' => 'Caminatas de uno o varios días por los Andes del sur, con guía oficial y exigencia física declarada en cada ruta.',
@@ -132,8 +132,8 @@ class DemoTourSeeder extends Seeder
                 'en' => 'Markets, picanterías, and home kitchens. Eating is the fastest way to understand a Peruvian region — what it grows, what it preserves, what it celebrates and when. These routes are built for tasting slowly, asking plenty of questions, and going back on your own afterwards.',
             ],
             'meta_title' => [
-                'es' => 'Rutas gastronómicas en el Perú | Inka Palace Travel',
-                'en' => 'Peruvian Food Routes | Inka Palace Travel',
+                'es' => 'Rutas gastronómicas en el Perú | INKA PALACE Travel',
+                'en' => 'Peruvian Food Routes | INKA PALACE Travel',
             ],
             'meta_description' => [
                 'es' => 'Mercados, picanterías y cocina regional peruana explicada en la mesa, no en una carta traducida.',
@@ -151,8 +151,8 @@ class DemoTourSeeder extends Seeder
                 'en' => 'Archaeological sites, weaving workshops, and communities where people still spin, dye and weave the way they learned at home. Visits are guided and agreed in advance with the host community — never a surprise arrival.',
             ],
             'meta_title' => [
-                'es' => 'Cultura viva y sitios arqueológicos | Inka Palace Travel',
-                'en' => 'Living Culture and Archaeological Sites | Inka Palace Travel',
+                'es' => 'Cultura viva y sitios arqueológicos | INKA PALACE Travel',
+                'en' => 'Living Culture and Archaeological Sites | INKA PALACE Travel',
             ],
             'meta_description' => [
                 'es' => 'Arqueología inca, textiles andinos y visitas coordinadas con las comunidades que los producen.',
@@ -273,8 +273,8 @@ class DemoTourSeeder extends Seeder
             'is_published' => true,
             'order' => 1,
             'meta_title' => [
-                'es' => 'Camino Inca a Machu Picchu, 4 días | Inka Palace Travel',
-                'en' => 'Inca Trail to Machu Picchu, 4 Days | Inka Palace Travel',
+                'es' => 'Camino Inca a Machu Picchu, 4 días | INKA PALACE Travel',
+                'en' => 'Inca Trail to Machu Picchu, 4 Days | INKA PALACE Travel',
             ],
             'meta_description' => [
                 'es' => 'Trekking de cuatro días por el Camino Inca original hasta Machu Picchu, con guía oficial, porteadores y campamento. Sale desde Cusco.',
@@ -371,8 +371,8 @@ class DemoTourSeeder extends Seeder
             'is_published' => true,
             'order' => 2,
             'meta_title' => [
-                'es' => 'Ruta de picanterías en Arequipa | Inka Palace Travel',
-                'en' => 'Arequipa Picantería Food Trail | Inka Palace Travel',
+                'es' => 'Ruta de picanterías en Arequipa | INKA PALACE Travel',
+                'en' => 'Arequipa Picantería Food Trail | INKA PALACE Travel',
             ],
             'meta_description' => [
                 'es' => 'Mercado San Camilo, picantería tradicional y sobremesa con vista a la campiña: la cocina arequipeña explicada en la mesa.',
@@ -475,8 +475,8 @@ class DemoTourSeeder extends Seeder
             'is_published' => true,
             'order' => 3,
             'meta_title' => [
-                'es' => 'Valle Sagrado: Pisac, Maras y Moray | Inka Palace Travel',
-                'en' => 'Sacred Valley: Pisac, Maras and Moray | Inka Palace Travel',
+                'es' => 'Valle Sagrado: Pisac, Maras y Moray | INKA PALACE Travel',
+                'en' => 'Sacred Valley: Pisac, Maras and Moray | INKA PALACE Travel',
             ],
             'meta_description' => [
                 'es' => 'Día completo por el Valle Sagrado desde Cusco: Pisac, las salineras de Maras, los andenes circulares de Moray y Ollantaytambo.',

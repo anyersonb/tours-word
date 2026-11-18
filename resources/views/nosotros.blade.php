@@ -107,9 +107,21 @@
                         {{ __('site.nosotros.purpose.paragraph_2') }}
                     </p>
 
-                    <p class="mt-7 font-script text-3xl text-brand-text sm:text-4xl">
+                    <p class="mt-7 font-display text-xl font-semibold text-brand-text sm:text-2xl">
                         {{ __('site.nosotros.purpose.signature') }} &#9825;
                     </p>
+
+                    {{-- Emblema de marca (recorte de la ilustración final, fondo transparente):
+                         solo se lee bien sobre fondo claro, por eso va aquí y no en el pie oscuro. --}}
+                    <img
+                        src="{{ asset('images/brand/inka-palace-emblema.webp') }}"
+                        srcset="{{ asset('images/brand/inka-palace-emblema-640.webp') }} 640w, {{ asset('images/brand/inka-palace-emblema.webp') }} 1012w"
+                        sizes="(min-width: 1024px) 22rem, 80vw"
+                        width="1012" height="512"
+                        alt="{{ __('site.nosotros.purpose.emblem_alt') }}"
+                        loading="lazy" decoding="async"
+                        class="mt-8 h-auto w-full max-w-sm"
+                    >
                 </div>
 
                 <div class="photo aspect-[4/3] w-full rounded-panel shadow-e3">

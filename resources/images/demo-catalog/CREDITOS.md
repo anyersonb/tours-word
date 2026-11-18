@@ -6,7 +6,7 @@ Generado: 2026-09-14
 > **AVISO — FOTOS TEMPORALES.** Este banco (Unsplash, licencia libre) es un
 > relleno provisional para que el sitio deje de verse como una plantilla
 > vacía mientras la clienta entrega su propio material fotográfico. En
-> cuanto lleguen las fotos reales de Pacha Viva, estas se reemplazan y este
+> cuanto lleguen las fotos reales de INKA PALACE Travel, estas se reemplazan y este
 > archivo (junto con `database/seeders/DemoCatalogImageSeeder.php`, que es
 > quien las conecta al catálogo) deja de tener efecto. No borrar este
 > archivo hasta ese reemplazo: es la prueba de licencia de uso comercial

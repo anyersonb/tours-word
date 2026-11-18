@@ -4,7 +4,8 @@
  * Cadena de assets — qué manda sobre qué (detalle en docs/lote-1/00-sistema-diseno.md):
  *
  * 1. resources/css/tokens.css es la ÚNICA fuente de color: rampa HSL derivada
- *    de --brand-h y los semánticos (--action, --brand-text, --ground...).
+ *    de la paleta de marca (Espresso/Sage/Gold/Ivory) y los semánticos
+ *    (--action, --brand-text, --ground...).
  * 2. Este archivo (app.css) es la ÚNICA fuente de la cadena Tailwind: el
  *    @theme de abajo MAPEA esos tokens a --color-* / --font-* de Tailwind 4
  *    para que existan utilidades como bg-brand-600, text-action, font-display.
@@ -68,6 +69,16 @@
     --color-brand-800: var(--brand-800);
     --color-brand-900: var(--brand-900);
 
+    /* Paleta de la hoja de marca -> bg-espresso, text-gold-deep, bg-gold, border-gold... */
+    --color-espresso: var(--espresso);
+    --color-sage: var(--sage);
+    --color-gold: var(--gold);
+    --color-gold-deep: var(--gold-deep);
+    --color-ivory: var(--ivory);
+    --color-secondary: var(--secondary);
+    --color-secondary-hover: var(--secondary-hover);
+    --color-on-secondary: var(--on-secondary);
+
     /* Semánticos de marca y superficie -> bg-action, text-brand-text, bg-ground... */
     --color-focus: var(--focus);
     --color-action: var(--action);
@@ -86,15 +97,12 @@
     --color-text-2: var(--text-2);
     --color-text-muted: var(--text-muted);
 
-    /* Estado y acentos de catálogo (A8) -> bg-amber-text, bg-accent-orange... */
+    /* Estado y acentos de catálogo (A8) -> bg-amber-text, bg-accent-green... */
     --color-amber: var(--amber);
     --color-amber-text: var(--amber-text);
     --color-danger: var(--danger);
-    --color-info: var(--info);
     --color-accent-green: var(--accent-green);
     --color-accent-amber: var(--accent-amber);
-    --color-accent-orange: var(--accent-orange);
-    --color-accent-blue: var(--accent-blue);
     --color-on-accent: var(--on-accent);
 
     /* ---- Pase visual 2026-09-14 ---------------------------------------
@@ -324,7 +332,7 @@
      *
      * Así que el énfasis deja de ser de COLOR y pasa a ser de PESO: los glifos
      * van en blanco, como el resto del titular, y el fragmento sube de 600 a
-     * 700 (Bodoni Moda se carga variable 400..900, así que no añade descarga).
+     * 700 (Cinzel se carga variable 400..700, así que no añade descarga).
      * El peso no gasta contraste — al contrario, un trazo más grueso se lee
      * mejor sobre foto — y no necesita espacio vertical.
      *
@@ -404,21 +412,20 @@
     .weave {
         background-image:
             repeating-linear-gradient(135deg,
-                hsl(var(--brand-h) 30% 30% / .05) 0 1px,
+                hsl(24 30% 30% / .05) 0 1px,
                 transparent 1px 14px);
     }
     .weave-dark {
         background-image:
             repeating-linear-gradient(135deg,
-                hsl(var(--brand-h) 40% 70% / .06) 0 1px,
+                hsl(38 45% 70% / .07) 0 1px,
                 transparent 1px 14px);
     }
 }
 
 @layer base {
     /* Los display quedan con el tracking del sistema (--ls-display, ver
-     * tokens.css); a tamaño hero Bodoni Moda necesita ese valor en 0 -- sus
-     * trazos finos de Didone se cierran con tracking negativo. */
+     * tokens.css); Cinzel lleva tracking leve positivo (mayúsculas anchas). */
     h1, h2, h3 { letter-spacing: var(--ls-display); }
 
     /* Evita el salto de layout mientras carga cada foto: el contenedor
@@ -427,7 +434,7 @@
     img { max-width: 100%; height: auto; }
     .photo :is(img) { height: 100%; }
 
-    /* Selección con el verde de marca. */
+    /* Selección con el verde salvia de marca. */
     ::selection { background-color: var(--brand-100); color: var(--ink); }
 }
 
