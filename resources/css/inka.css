@@ -171,7 +171,7 @@ section[id], footer[id] { scroll-margin-top: 96px; }
 .hero__progress { flex: 1; display: flex; gap: 6px; min-width: 0; }
 .hero__seg { position: relative; flex: 1; height: 4px; border-radius: 2px; background: rgb(255 255 255 / .38); overflow: hidden; }
 .hero__fill { position: absolute; inset: 0; background: var(--gold); transform: scaleX(0); transform-origin: left; }
-.hero__seg.is-done .hero__fill { transform: scaleX(1); }
+/* Solo la barra del slide activo se llena; las demas quedan vacias. */
 .hero__seg.is-active .hero__fill { animation: hero-fill var(--hero-delay, 6s) linear forwards; }
 .hero.is-paused .hero__seg.is-active .hero__fill { animation-play-state: paused; }
 @keyframes hero-fill { to { transform: scaleX(1); } }
@@ -199,7 +199,7 @@ section[id], footer[id] { scroll-margin-top: 96px; }
   .hero__controls { margin-top: 18px; gap: 6px; }
   .hero__arrow { width: 42px; height: 42px; }
   .hero__progress { margin-inline: 6px; }
-  .hero__pause { width: 44px; margin-right: -6px; }
+  .hero__pause { width: 44px; }
 }
 @media (min-width: 1024px) and (max-width: 1279px) {
   .hero__copy { padding-right: 360px; }
@@ -697,7 +697,8 @@ picture { display: contents; }
 .hero.is-paused .hero__seg.is-active .hero__fill { animation-play-state: paused; }
 .hero__photo { position: absolute; inset: 0; }
 .hero__photo .hero__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.hero__seg.is-reduced .hero__fill { transform: scaleX(1); animation: none; }
+.hero__seg.is-reduced.is-active .hero__fill { transform: scaleX(1); animation: none; }
+.hero__seg.is-reduced:not(.is-active) .hero__fill { transform: scaleX(0); animation: none; }
 
 /* Carruseles móviles (mockups del cliente): tours destacados con la tarjeta
  * vecina asomando. Solo < 1024: en escritorio vuelve a la rejilla del PDF. */
@@ -743,3 +744,22 @@ picture { display: contents; }
   /* Cultura: la descripción ocupa 2 líneas; reservar 2 líneas en las tres para que icono y título compartan línea */
   .exp__body .dest__tag { min-height: 3.1em; }
 }
+
+/* ===== Fidelidad con la paleta oficial (2026-11) ===== */
+/* WhatsApp sobre la card Sage del FAQ: anillo ivory para separar los dos verdes */
+.contact-card .btn--wa { box-shadow: 0 0 0 2px var(--ivory); }
+.contact-card .btn--wa:focus-visible { outline-color: var(--ivory); }
+/* Encuadres de las fotos provisionales (sin tocar el resto) */
+.city img[src$="/provisional/ica.jpg"] { object-position: 12% 40%; }
+.exp img[src$="/provisional/trekking.jpg"] { object-position: 50% 58%; }
+.plan__media img[src$="/provisional/plan-nazca.jpg"] { object-position: 50% 92%; }
+/* Titulo de card de planes sin "dias" huerfano */
+.plan__title { text-wrap: balance; }
+/* Topbar y boton de Instagram: wrap limpio */
+.topbar__item span, .topbar__notice { text-wrap: balance; }
+@media (max-width: 479px) { .btn { text-wrap: balance; text-align: center; } }
+/* Carrito (deshabilitado): contraste suficiente sobre su fondo ivory */
+.cart { color: var(--text); }
+.cart:disabled { opacity: 1; color: var(--text-2); border-color: var(--text-muted); }
+/* Rol "teal" = espresso: sobre fondos oscuros (Cultura) el icono sólido se invierte a ivory */
+.icon-tile--solid-teal { background: var(--ivory); color: var(--espresso); }

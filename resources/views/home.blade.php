@@ -329,7 +329,7 @@
                                         @elseif (! empty($p['price']))
                                             {{ $p['price'] }}
                                         @else
-                                            {{ __('home.plans.price_placeholder') }}
+                                            {{ str_contains($ph = __('home.plans.price_placeholder'), 'S/') ? $ph : 'S/ '.$ph }}
                                         @endif
                                     </strong>
                                 </p>

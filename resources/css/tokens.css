@@ -48,8 +48,8 @@
   --c-gold-700:   var(--gold-deep);
   --c-forest-700: var(--sage);       /* bloque Camino Inca, tarjeta de contacto */
   --c-forest-100: #eef2ec;
-  --c-teal-700:   var(--sage-text);  /* la hoja de marca no tiene turquesa: se mapea a salvia profundo */
-  --c-teal-100:   #dde5da;
+  --c-teal-700:   var(--espresso);   /* 2.º rol de color: espresso (la hoja no tiene turquesa; un 2.º verde se confundía con Sage) */
+  --c-teal-100:   #f1ead9;   /* tinte cálido (clay) */
   --c-clay-100:   #f1ead9;
   --c-terracotta: #ab3a30;           /* alerta (--danger de la hoja): blanco 6.21:1 */
   --c-ochre:      var(--gold-deep);
@@ -214,7 +214,7 @@
   --alert:         var(--c-terracotta);
   --on-alert:      var(--c-white);
   --star:          var(--c-gold-500);
-  --whatsapp:        var(--c-wa-icon);
+  --whatsapp:        var(--c-wa-action); /* UN solo verde de WhatsApp */
   --whatsapp-action: var(--c-wa-action);
   --on-whatsapp:     var(--c-white);
 
@@ -223,7 +223,7 @@
   --ribbon-2: var(--c-gold-500);
   --ribbon-3: var(--c-forest-700);
   --ribbon-4: var(--c-coffee-900);
-  --ribbon-5: var(--c-teal-700);
+  --ribbon-5: var(--sage-text);
   --ribbon-6: var(--c-ochre);
   --ribbon-7: var(--c-sage);
 
@@ -232,7 +232,7 @@
   --shadow-float: 0 22px 50px -20px rgb(62 47 36 / .35);
   --shadow-search: 0 24px 60px -24px rgb(62 47 36 / .35), 0 2px 10px rgb(62 47 36 / .08);
   --shadow-btn: 0 10px 22px -10px rgb(201 169 106 / .75);
-  --glow-wa: 0 0 0 6px rgb(31 175 90 / .22), 0 14px 30px -8px rgb(31 175 90 / .55);
+  --glow-wa: 0 0 0 6px rgb(21 128 69 / .22), 0 14px 30px -8px rgb(21 128 69 / .55);
   /* Hero: el degradado se limita al lado del texto (izquierda); la derecha
    * queda viva como en el PDF. */
   --shade-hero: linear-gradient(90deg, rgb(24 15 12 / .7) 0%, rgb(24 15 12 / .58) 28%, rgb(24 15 12 / .46) 44%, rgb(24 15 12 / .24) 52%, rgb(24 15 12 / .08) 58%, rgb(24 15 12 / 0) 62%), linear-gradient(180deg, rgb(24 15 12 / .12) 0%, rgb(24 15 12 / 0) 30%, rgb(24 15 12 / .18) 100%);

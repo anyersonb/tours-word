@@ -48,7 +48,7 @@
          usa "Tours destacados" en la Home para las tarjetas variant="flat",
          así el catálogo completo se ve como una continuación de esa
          sección y no como una pantalla aparte. --}}
-    <section class="bg-surface">
+    <section class="bg-ground">
         <div class="shell-boxed section">
             {{-- La barra de filtros se apoya sobre el borde superior de la
                  seccion (margen negativo + z-index propio): se lee como un

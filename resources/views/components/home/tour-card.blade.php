@@ -8,7 +8,7 @@
     Money en la moneda por defecto, y sin precio, el marcador [PRECIO].
 --}}
 @php
-    $tones = ['Recomendado' => 'forest', 'Tendencia' => 'forest', 'Más vendido' => 'accent', 'Últimos cupos' => 'alert'];
+    $tones = ['Recomendado' => 'forest', 'Tendencia' => 'teal', 'Más vendido' => 'accent', 'Últimos cupos' => 'alert'];
     $tone = $tones[$tour['badge'] ?? ''] ?? 'forest';
     $src = $tour['image'] ?? null;
     $pen = $tour['price_pen_cents'] ?? null;
@@ -47,7 +47,7 @@
                     @elseif (!empty($tour['price']))
                         {{ $tour['price'] }}
                     @else
-                        {{ __('home.featured.price_placeholder') }}
+                        {{ str_contains($ph = __('home.featured.price_placeholder'), 'S/') ? $ph : 'S/ '.$ph }}
                     @endif
                 </strong>
                 <span class="price__per">{{ __('home.featured.per_person') }}</span></p>

@@ -142,7 +142,7 @@
     </div>
 
     <div class="flex flex-1 flex-col gap-3 p-5">
-        <h{{ $hl }} class="text-h3 font-semibold text-ink">
+        <h{{ $hl }} class="font-sans text-h3 font-semibold text-ink">
             <a href="{{ $href }}" class="before:absolute before:inset-0 before:content-['']">
                 {{ $title }}
             </a>

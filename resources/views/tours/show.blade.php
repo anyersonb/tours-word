@@ -167,12 +167,12 @@
                 :usd-cents="$tour['price_usd_cents']"
                 :prefix="__('site.tours.show.price_prefix')"
                 tone="dark"
-                class="mt-7 font-display text-h2 font-semibold text-white"
+                class="mt-7 font-sans text-h2 font-bold text-white"
             />
         </div>
     </section>
 
-    <section class="bg-surface">
+    <section class="bg-ground">
         <div class="shell section">
             {{--
                 Defecto C (validacion de la clienta, 2026-09-14): en movil el
@@ -355,7 +355,7 @@
 
     {{-- ============ INCLUYE / NO INCLUYE ============ --}}
     @if(!empty($tour['inclusions']) || !empty($tour['exclusions']))
-        <section class="bg-surface">
+        <section class="bg-ground">
             <div class="shell section">
               <div class="mx-auto grid max-w-4xl gap-6 sm:grid-cols-2">
                 @if(!empty($tour['inclusions']))
