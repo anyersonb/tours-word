@@ -67,3 +67,18 @@ Alcance: 12 URLs x 1440/768/375/320 (48 cargas). Evidencia: `qa/reg-<slug>--{144
 - OK: 0 overflow horizontal; 0 errores de consola; 0 respuestas >=400; 0 hosts externos (Caveat ya autoalojada); 0 `<img>` sin atributo alt ni rotas; h3 en Poppins; contraste texto sobre dorado = 7,69:1 (todos los `.btn--accent`, badges, filtro activo, newsletter); placeholder Inka dorado/crema (no azul); /es/contacto muestra teléfono, correo y dirección (sin aviso vacío); franja Camino Inca = tarjeta en PEN (S/ 3,500.00) y USD (US$ 95.00); "Pacha Viva" solo en title/og/twitter de la ficha de tour demo (3 ocurrencias, meta_title de BD).
 - P2: targets <44 px en móvil en internas: migas de pan (20 px), campos del formulario de contacto (42 px), checkbox (16 px), enlace de teléfono en tarjeta (20 px), enlace de título en cards (24 px, pero su ::before cubre la tarjeta). Home limpia.
 - P3: /admin/login (Filament) inputs/botón 36 px y botón "Entrar" con falso positivo de contraste; breadcrumb de ficha a 375 envuelve y deja "/" huérfana al inicio de la 2.ª línea; las cards `.reveal` salen en opacity 0 si no se hace scroll (captura fullPage las muestra vacías; con scroll real OK).
+
+## QA paleta oficial (2026-11-18, arbol congelado)
+Alcance: 9 URLs (`/es/`, `/es/?muestra=1`, `/en/`, `/es/tours`, ficha `muestra-camino-inca-4-dias`, `/es/contacto`, `/es/nosotros`, `/es/no-existe`, `/admin/login`) x 1440/375 = 18 cargas, un solo Chrome headless. Evidencia: `qa/pal-<slug>--{1440,375}.png`.
+
+OK: 0 overflow horizontal; 0 errores de consola (salvo el 404 intencional de `/es/no-existe`); 0 requests >=400; 0 hosts externos; 0 `<img>` sin alt ni rotas; H1 unico en las 18; Poppins (cuerpo) y Cinzel (H1/titulos) cargadas, sin fallback en paginas publicas; favicons (svg, 32 png, apple-touch) referenciados y 200; logo oficial webp 640 px servido a 76-108 px (>=2x, nitido) con alt; targets >=44 px en Home movil (0 elementos menores, incluye `?muestra=1`); "Pacha Viva" = 0 en HTML publico; contraste de texto medido (computed, alpha compuesto) sobre ivory, blanco, espresso, dorado (botones, badges, eyebrows, filtros activos, links, footer, topbar, newsletter): sin pares <4.5:1 salvo los listados abajo; dorado `#C9A96A` como texto sobre claro: 0 casos (solo `.testi__quote` en dorado, decorativo, ver P3).
+
+### Hallazgos
+- P2 `APP_NAME="Inka Palace Travel"` en `.env` local: produce "Inka Palace Travel" (no "INKA PALACE Travel") en alt del logo (header/footer), `og:site_name`, `<title>` de /es/tours y 404, `aria-label` del 404 y marca de /admin/login. No es codigo (el repo y lang usan la marca correcta); el doc 07 indica que el servidor ya tiene el valor correcto: verificar `.env` del servidor y corregir el local.
+- P2 Contraste 4.41:1 (<4.5): `.dest__count` ("[N] tours, desde S/ 3,500.00", 14 px) y `.contact-card__role` ("Gerente General", 13 px) en Home: blanco al 80 % sobre sage `#556B52`. Fix: subir a opacidad >=0.9 (o `--on-dark-2` equivalente) en ambos.
+- P3 `/admin/login` (Filament) sigue con su paleta ambar por defecto y fuente Inter Variable propia, fuera de la hoja de marca (texto/boton medidos correctos: ambar con marron oscuro, aprox. 7:1; el 1.09 del script es falso positivo por color oklch).
+- P3 `.testi__quote` usa dorado vivo como color de texto sobre blanco (comillas decorativas, no texto leido); confirmar que es glifo decorativo con `aria-hidden`.
+- Falsos positivos descartados: "Cusco" sobre imagen en cards (fondo foto), textos con ratio 1 por `opacity:0` de `.reveal` hasta hacer scroll (recomprobados con scroll: espresso/blanco >=12:1).
+
+### Veredicto
+APTO CON HUECOS: sin P0/P1. Pendientes P2 (APP_NAME local/servidor; 2 textos blancos al 80 % sobre sage) y P3 (admin Filament sin marca; quote dorado).
