@@ -83,7 +83,7 @@
                     @foreach($experiences as $i => $experience)
                         <x-ui.mosaic-tile
                             class="aspect-video"
-                            :image="$experience['gallery'][0]['src'] ?? PlaceholderImage::svg(480, 360, $experience['name'])"
+                            :image="$experience['gallery'][0]['src'] ?? PlaceholderImage::svg(480, 360, $experience['name'], '556b52')"
                             :image-alt="$experience['cover_image_alt'] ?? $experience['name']"
                             :title="$experience['name']"
                             :subtitle="\Illuminate\Support\Str::limit($experience['description'], 60)"
