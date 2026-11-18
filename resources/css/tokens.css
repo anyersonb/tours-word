@@ -197,6 +197,7 @@
   --border-on-dark: rgb(255 255 255 / .22);
   --text-on-dark: var(--c-white);
   --text-on-dark-muted: rgb(255 255 255 / .8);
+  --text-on-sage-muted: rgb(255 255 255 / .9); /* sobre sage #556b52: ~5.07:1 (.8 daba 4.41) */
 
   --accent:        var(--c-gold-500);
   --accent-hover:  var(--c-gold-600);
