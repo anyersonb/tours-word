@@ -61,7 +61,7 @@ class LangKeyParityTest extends TestCase
 
     public function test_every_spanish_interface_key_has_an_english_counterpart(): void
     {
-        $files = ['site.php', 'contact-form.php', 'validation.php'];
+        $files = ['site.php', 'contact-form.php', 'validation.php', 'home.php'];
         $base = lang_path();
 
         $missingInEnglish = [];

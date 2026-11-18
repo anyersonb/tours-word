@@ -16,7 +16,7 @@
                     {{ __('site.ui.pagination.previous') }}
                 </span>
             @else
-                <a href="{{ $paginator->previousPageUrl() }}" class="inline-flex items-center rounded-full border border-line px-4 py-2 text-sm text-text-2 hover:border-action hover:text-action focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action">
+                <a href="{{ $paginator->previousPageUrl() }}" class="inline-flex items-center rounded-full border border-line px-4 py-2 text-sm text-text-2 hover:border-action hover:text-brand-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus">
                     {{ __('site.ui.pagination.previous') }}
                 </a>
             @endif
@@ -28,7 +28,7 @@
 
         <div>
             @if($paginator->hasMorePages())
-                <a href="{{ $paginator->nextPageUrl() }}" class="inline-flex items-center rounded-full border border-line px-4 py-2 text-sm text-text-2 hover:border-action hover:text-action focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action">
+                <a href="{{ $paginator->nextPageUrl() }}" class="inline-flex items-center rounded-full border border-line px-4 py-2 text-sm text-text-2 hover:border-action hover:text-brand-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus">
                     {{ __('site.ui.pagination.next') }}
                 </a>
             @else

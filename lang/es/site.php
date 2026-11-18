@@ -7,7 +7,7 @@ return [
     // contact.blade.php, fuera de mi alcance en este lote). Sin cifras ni
     // afirmaciones regulatorias: ver docs/lote-1/00-sistema-diseno.md.
     'seo' => [
-        'default_description' => 'Pacha Viva es una agencia de turismo en Cusco, Perú. Diseñamos tours y experiencias auténticas por los destinos del país con expertos locales.',
+        'default_description' => 'Inka Palace Travel es una agencia de turismo en Perú. Diseñamos tours y experiencias auténticas por los destinos del país con expertos locales.',
     ],
 
     // UI compartida (lote 1, arreglo A1 sobre `carousel-shell.blade.php`).
@@ -84,7 +84,7 @@ return [
         'open_menu' => 'Abrir menú',
         'close_menu' => 'Cerrar menú',
         // Port Roavio (2026-09-20): franja delgada sobre el header principal.
-        'topbar_tagline' => 'Agencia de turismo boutique en Cusco, Perú',
+        'topbar_tagline' => 'Agencia de turismo con expertos locales',
     ],
 
     'footer' => [
@@ -106,8 +106,8 @@ return [
         // fallback de solo-marca de layout.blade.php — es el title de mayor
         // valor del sitio. Contenido final a validar con la clienta/Anyerson.
         'meta' => [
-            'title' => 'Agencia de turismo en Cusco, Perú',
-            'description' => 'Agencia de turismo en Cusco, Perú. Diseñamos experiencias auténticas e inolvidables en los destinos más increíbles del país, guiadas por expertos locales.',
+            'title' => 'Agencia de turismo en Perú',
+            'description' => 'Agencia de turismo en Perú. Diseñamos experiencias auténticas e inolvidables en los destinos más increíbles del país, guiadas por expertos locales.',
         ],
 
         'hero' => [
@@ -175,7 +175,7 @@ return [
         ],
 
         'featured_tours' => [
-            'eyebrow' => 'Selección Pacha Viva',
+            'eyebrow' => 'Selección Inka Palace Travel',
             'title' => 'Tours destacados',
             'cta' => 'Ver todos los tours',
         ],
@@ -429,7 +429,7 @@ return [
     // de TeamMember/Setting, nunca de este archivo (D1/D2).
     'nosotros' => [
         'meta' => [
-            'description' => 'Pacha Viva es una agencia de turismo en Cusco, Perú, que conecta viajeros con lo auténtico del país de la mano de expertos locales.',
+            'description' => 'Inka Palace Travel es una agencia de turismo en Perú, que conecta viajeros con lo auténtico del país de la mano de expertos locales.',
         ],
 
         'breadcrumb' => [
@@ -454,7 +454,7 @@ return [
             // PENDIENTE clienta: afirma "impacto positivo en las comunidades
             // y en el medio ambiente" — verificable, no relleno.
             'paragraph_2' => 'Creemos en un turismo responsable que genera un impacto positivo en las comunidades y en el medio ambiente.',
-            'signature' => 'Equipo Pacha Viva',
+            'signature' => 'Equipo Inka Palace Travel',
             'photo_alt' => 'Vista aérea de los andenes circulares de Moray al atardecer',
         ],
 

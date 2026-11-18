@@ -7,9 +7,11 @@
      * (sin sembrar nada) todas las variables de abajo son null y cada
      * tarjeta/bloque que depende de ellas se oculta sola.
      */
-    $contactPhone = Setting::get('contact_phone');
-    $contactEmail = Setting::get('contact_email');
-    $contactAddress = Setting::get('contact_address');
+    // Fuente única: Setting (CMS) y, si está vacío, config('brand.contact')
+    // (la misma cascada del header y el footer). Sin dato en ninguno, se oculta.
+    $contactPhone = Setting::get('contact_phone') ?: config('brand.contact.phone');
+    $contactEmail = Setting::get('contact_email') ?: config('brand.contact.email');
+    $contactAddress = Setting::get('contact_address') ?: config('brand.contact.address');
     $contactSchedule = Setting::get('contact_schedule');
     $privacyPolicyUrl = Setting::get('privacy_policy_url');
 
@@ -131,7 +133,7 @@
 
     {{-- ============ FORMULARIO + INFORMACIÓN DE CONTACTO ============ --}}
     <section class="weave bg-sand">
-        <div class="shell section grid gap-8 lg:grid-cols-[3fr_2fr]">
+        <div class="shell section grid grid-cols-1 gap-8 lg:grid-cols-[3fr_2fr]">
 
             {{-- DEF-A: "formulario" es el destino del ancla del CTA de la
                  ficha de tour (TourController::show -> reserveUrl). El id es
@@ -156,7 +158,7 @@
                 @if($isBookingRequest)
                     <div class="mb-6 rounded-xl border border-line bg-brand-50 p-4">
                         <p class="text-xs font-medium uppercase tracking-wide text-text-2">{{ __('site.contacto.form.booking_tour_label') }}</p>
-                        <p class="mt-1 font-display text-lg font-semibold text-ink">{{ $requestedTour->title }}</p>
+                        <p class="mt-1 text-lg font-semibold text-ink">{{ $requestedTour->title }}</p>
                         @if($requestedTourUrl)
                             <a href="{{ $requestedTourUrl }}" class="mt-1 inline-block text-sm font-medium text-brand-text underline underline-offset-2 hover:text-action-hover">
                                 {{ __('site.contacto.form.booking_tour_link') }}
@@ -189,7 +191,7 @@
                     controller, nunca un error que le confirme que fue
                     detectado.
                 --}}
-                <form method="POST" action="{{ route('contact.store') }}" novalidate class="grid gap-5">
+                <form method="POST" action="{{ route('contact.store') }}" novalidate class="grid grid-cols-1 gap-5">
                     @csrf
 
                     <div aria-hidden="true" style="position:absolute; left:-9999px; top:-9999px;">
@@ -207,7 +209,7 @@
                         <input type="hidden" name="tour" value="{{ $requestedTourSlug }}">
                     @endif
 
-                    <div class="grid gap-5 sm:grid-cols-2">
+                    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
                         <x-ui.form.input
                             name="name"
                             :label="__('site.contacto.form.name_label')"
@@ -227,7 +229,7 @@
                         />
                     </div>
 
-                    <div class="grid gap-5 sm:grid-cols-2">
+                    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
                         <x-ui.form.input
                             name="phone"
                             type="tel"
@@ -312,7 +314,7 @@
                 <x-ui.section-title as="h2">{{ __('site.contacto.info.title') }}</x-ui.section-title>
 
                 @if($hasAnyContactInfo)
-                    <div class="grid gap-4">
+                    <div class="grid grid-cols-1 gap-4">
                         <x-ui.contact-info-card :icon="$iconPhone" :title="__('site.contacto.info.phone_title')" :has="filled($contactPhone)">
                             <a href="tel:{{ preg_replace('/\s+/', '', (string) $contactPhone) }}" class="font-medium text-brand-text hover:underline">
                                 {{ $contactPhone }}
@@ -336,16 +338,16 @@
                         <x-ui.contact-info-card :icon="$iconChat" :title="__('site.contacto.info.social_title')" :has="$hasSocial">
                             <div class="mt-1 flex flex-wrap gap-2">
                                 @if(filled($socialInstagram))
-                                    <a href="{{ $socialInstagram }}" target="_blank" rel="noopener noreferrer" aria-label="{{ __('site.contacto.info.social_instagram') }}" class="flex h-9 w-9 items-center justify-center rounded-full bg-brand-50 text-action hover:bg-action hover:text-on-action">{!! $iconInstagram !!}</a>
+                                    <a href="{{ $socialInstagram }}" target="_blank" rel="noopener noreferrer" aria-label="{{ __('site.contacto.info.social_instagram') }}" class="flex h-9 w-9 items-center justify-center rounded-full bg-brand-50 text-brand-text hover:bg-action hover:text-on-action">{!! $iconInstagram !!}</a>
                                 @endif
                                 @if(filled($socialFacebook))
-                                    <a href="{{ $socialFacebook }}" target="_blank" rel="noopener noreferrer" aria-label="{{ __('site.contacto.info.social_facebook') }}" class="flex h-9 w-9 items-center justify-center rounded-full bg-brand-50 text-action hover:bg-action hover:text-on-action">{!! $iconFacebook !!}</a>
+                                    <a href="{{ $socialFacebook }}" target="_blank" rel="noopener noreferrer" aria-label="{{ __('site.contacto.info.social_facebook') }}" class="flex h-9 w-9 items-center justify-center rounded-full bg-brand-50 text-brand-text hover:bg-action hover:text-on-action">{!! $iconFacebook !!}</a>
                                 @endif
                                 @if(filled($socialYoutube))
-                                    <a href="{{ $socialYoutube }}" target="_blank" rel="noopener noreferrer" aria-label="{{ __('site.contacto.info.social_youtube') }}" class="flex h-9 w-9 items-center justify-center rounded-full bg-brand-50 text-action hover:bg-action hover:text-on-action">{!! $iconYoutube !!}</a>
+                                    <a href="{{ $socialYoutube }}" target="_blank" rel="noopener noreferrer" aria-label="{{ __('site.contacto.info.social_youtube') }}" class="flex h-9 w-9 items-center justify-center rounded-full bg-brand-50 text-brand-text hover:bg-action hover:text-on-action">{!! $iconYoutube !!}</a>
                                 @endif
                                 @if(filled($whatsappLink))
-                                    <a href="{{ $whatsappLink }}" target="_blank" rel="noopener noreferrer" aria-label="{{ __('site.contacto.info.social_whatsapp') }}" class="flex h-9 w-9 items-center justify-center rounded-full bg-brand-50 text-action hover:bg-action hover:text-on-action">{!! $iconChatSmall !!}</a>
+                                    <a href="{{ $whatsappLink }}" target="_blank" rel="noopener noreferrer" aria-label="{{ __('site.contacto.info.social_whatsapp') }}" class="flex h-9 w-9 items-center justify-center rounded-full bg-brand-50 text-brand-text hover:bg-action hover:text-on-action">{!! $iconChatSmall !!}</a>
                                 @endif
                             </div>
                         </x-ui.contact-info-card>
@@ -372,7 +374,7 @@
                 @if($whatsappLink)
                     <div class="mt-6 flex flex-col items-start gap-4 rounded-2xl bg-brand-50 p-5 sm:flex-row sm:items-center sm:justify-between">
                         <div class="flex items-center gap-3">
-                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface text-action" aria-hidden="true">
+                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface text-brand-text" aria-hidden="true">
                                 {!! $iconHeadset !!}
                             </span>
                             <div>
@@ -410,7 +412,7 @@
                 <div class="mt-4 flex flex-col gap-4 rounded-card border border-line bg-surface p-5 shadow-e1 sm:flex-row sm:items-center sm:justify-between">
                     @if($mapsUrl)
                         <div class="flex items-start gap-3">
-                            <span class="mt-0.5 text-action" aria-hidden="true">{!! $iconPin !!}</span>
+                            <span class="mt-0.5 text-brand-text" aria-hidden="true">{!! $iconPin !!}</span>
                             <div>
                                 <p class="text-sm font-semibold text-ink">{{ __('site.contacto.map.visit_us') }}</p>
                                 <p class="text-sm text-text-2">{{ $contactAddress }}</p>

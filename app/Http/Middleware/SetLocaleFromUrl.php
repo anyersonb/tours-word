@@ -159,11 +159,21 @@ class SetLocaleFromUrl
         ];
 
         foreach ($current as $uri) {
-            if ($location === $uri || rtrim($location, '/') === rtrim($uri, '/')) {
+            if ($location === $uri || $this->withoutTrailingSlash($location) === $this->withoutTrailingSlash($uri)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * Quita la barra final del path, tenga o no query: "/es/?a=1" y "/es?a=1"
+     * son la misma ruta para Laravel. rtrim() solo veia la barra al final de
+     * toda la cadena y dejaba un 301 de mas con cualquier query.
+     */
+    private function withoutTrailingSlash(string $url): string
+    {
+        return (string) preg_replace('#/+(?=\?|$)#', '', $url);
     }
 }

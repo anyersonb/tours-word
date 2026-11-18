@@ -4,6 +4,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\DestinationController;
 use App\Http\Controllers\ExperienceController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RobotsController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\TourController;
@@ -35,9 +36,9 @@ Route::prefix('{locale}')
         // Home pública (lote 1, etapa B). Reemplaza la vista de bienvenida
         // del esqueleto de Laravel, que queda huérfana (ver reporte del
         // lote).
-        Route::get('/', function () {
-            return view('home');
-        })->name('home');
+        // Rebrand Inka Palace Travel: deja de ser un closure; los datos del
+        // CMS los arma App\Http\Controllers\HomeController (invocable).
+        Route::get('/', HomeController::class)->name('home');
 
         // Inventario de componentes del sistema de diseño (lote 1, A7). No
         // es parte del sitio público: noindex declarado en la propia vista

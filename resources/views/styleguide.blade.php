@@ -21,7 +21,7 @@
     <div class="mx-auto max-w-7xl space-y-16 px-4 py-12 sm:px-6 lg:px-8">
 
         <header>
-            <p class="text-sm font-semibold uppercase tracking-wide text-action">Lote 1 · Etapa A</p>
+            <p class="text-sm font-semibold uppercase tracking-wide text-brand-text">Lote 1 · Etapa A</p>
             <h1 class="font-display text-3xl font-bold text-ink sm:text-4xl">Guía de estilos — Pacha Viva</h1>
             <p class="mt-2 max-w-2xl text-text-2">
                 Inventario vivo de los componentes del sistema de diseño (A7). Página con
@@ -34,7 +34,7 @@
         <section aria-labelledby="tokens-h">
             <x-ui.section-title id="tokens-h" as="h2">Cadena de tokens (A1)</x-ui.section-title>
             <p class="mb-4 max-w-2xl text-sm text-text-2">
-                Estos cuadros leen <code>bg-brand-*</code> / <code>text-action</code> generados por Tailwind 4 a partir
+                Estos cuadros leen <code>bg-brand-*</code> / <code>text-brand-text</code> generados por Tailwind 4 a partir
                 de <code>tokens.css</code>. Prueba de vida: abre DevTools, cambia
                 <code>--brand-h</code> en <code>:root</code> (por ejemplo a <code>12</code>) y estos colores deben
                 recolorearse sin recompilar nada — si no cambian, la cadena está rota.

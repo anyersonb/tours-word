@@ -88,7 +88,7 @@
                     @click="go(i - 1)"
                     :aria-current="active === i - 1 ? 'true' : 'false'"
                     :aria-label="'{{ $goToCardLabel }}'.replace(':position', i).replace(':total', count)"
-                    class="flex h-6 w-6 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
+                    class="flex h-6 w-6 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
                 >
                     <span
                         :class="active === i - 1 ? 'bg-action w-6' : 'bg-line w-2'"
@@ -100,10 +100,10 @@
         </div>
 
         <div class="flex gap-2">
-            <button type="button" @click="prev()" aria-label="Anterior" class="flex h-9 w-9 items-center justify-center rounded-full border border-line text-ink hover:border-action hover:text-action focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action">
+            <button type="button" @click="prev()" aria-label="Anterior" class="flex h-9 w-9 items-center justify-center rounded-full border border-line text-ink hover:border-action hover:text-brand-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus">
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
             </button>
-            <button type="button" @click="next()" aria-label="Siguiente" class="flex h-9 w-9 items-center justify-center rounded-full border border-line text-ink hover:border-action hover:text-action focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action">
+            <button type="button" @click="next()" aria-label="Siguiente" class="flex h-9 w-9 items-center justify-center rounded-full border border-line text-ink hover:border-action hover:text-brand-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus">
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
             </button>
         </div>

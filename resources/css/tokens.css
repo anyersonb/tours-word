@@ -1,73 +1,102 @@
 /**
- * Pacha Viva — tokens de color (única fuente de verdad).
+ * Inka Palace Travel — tokens (única fuente de verdad).
  *
- * REGLA DURA: ningún componente escribe nunca un hexadecimal ni un
- * --brand-N directo. Solo se consumen los tokens SEMÁNTICOS de abajo
- * (--action, --brand-text, --bg, --text, --border, etc). Si algo necesita
- * un color que no existe todavía como token semántico, el token falta:
- * se crea aquí, no se hardcodea en el componente.
+ * Rebrand (2026-11, docs/lote-1/inka-palace/): reemplaza la identidad verde
+ * "Pacha Viva" por la paleta muestreada del PDF de diseño del Home (imagen
+ * única 2880x18142, sin capas). Se CONSERVAN los NOMBRES de token del sistema
+ * anterior (--action, --brand-*, --ground, --ink-surface...) para que
+ * ui/* y las páginas internas sigan funcionando sin reescribir sus
+ * utilidades de Tailwind: cambia el VALOR, no el contrato.
  *
- * Identidad provisional (lote 0) — la clienta aún no aprobó nada.
+ * REGLA DURA (igual que antes): ningún componente escribe un hexadecimal.
+ * Solo se consumen tokens semánticos. Si falta uno, se crea aquí.
+ *
+ * Mapeo de roles (importante al leer los componentes viejos):
+ *   --action / bg-action        = DORADO (CTA del diseño). Es un RELLENO.
+ *                                 Sobre él va --on-action (café oscuro, 8:1).
+ *   --brand-text / text-brand-text = dorado oscuro para TEXTO sobre claro
+ *                                 (el dorado vivo sobre blanco mide 2.1:1 y
+ *                                 NO sirve como texto). Las vistas que usaban
+ *                                 text-action como color de texto migraron a
+ *                                 text-brand-text.
+ *   --ink-surface               = café oscuro (topbar, footer, bandas).
+ *   --accent-green              = verde bosque (antes era el verde de marca).
+ *
+ * Valores crudos muestreados con GD del PDF; donde se desvían por contraste
+ * AA, el comentario lo dice. Contrastes calculados con la fórmula WCAG 2.1.
  */
 
 :root {
-  /* Cambiar estos dos números reviste el sitio completo */
-  --brand-h: 155; /* 12 = terracota · 205 = azul · 32 = ocre */
-  --brand-s: 1;   /* multiplicador de saturación global */
+  /* ---- Paleta cruda (solo se referencia desde esta hoja) ---- */
+  --c-coffee-900: #291b12;   /* topbar, footer, botón oscuro (muestreado) */
+  --c-coffee-800: #3d2a1c;   /* tarjetas sobre café (muestreado) */
+  --c-gold-100:   #fbefd5;   /* fondo de icono dorado (muestreado) */
+  --c-gold-500:   #e0a63a;   /* CTA y acentos (muestreado) */
+  --c-gold-600:   #cb912a;   /* hover del CTA */
+  --c-gold-700:   #86600f;   /* texto dorado sobre claro: 5.7:1 sobre blanco, 5.2:1 sobre crema (muestreo ~#b8862b, oscurecido para AA) */
+  --c-forest-700: #24483a;   /* bloque Camino Inca, tarjeta de contacto (muestreado) */
+  --c-forest-100: #e7eee6;   /* fondo de icono verde (muestreado) */
+  --c-teal-700:   #1b6d83;   /* turquesa: insignias, icono Cultura (muestreado) */
+  --c-teal-100:   #ddeff3;
+  --c-clay-100:   #f3e9dd;
+  --c-terracotta: #9e2b19;   /* rojo de etiquetas y cinta (muestreado) */
+  --c-ochre:      #875c29;   /* cinta andina (muestreado) */
+  --c-sage:       #607f60;   /* cinta andina (muestreado) */
+  --c-cream-100:  #f7f4ef;   /* fondos alternos (muestreado) */
+  --c-white:      #fff;
+  --c-line:       #e6dfd9;   /* divisores (muestreado) */
+  --c-wa-icon:    #1faf5a;   /* WhatsApp (muestreado) */
+  --c-wa-action:  #158045;   /* WhatsApp con texto blanco: oscurecido para AA 5:1 */
 
-  /* Rampa 50 → 900. Saturación/luminosidad fijas del mockup, no tocar. */
-  --brand-50:  hsl(var(--brand-h) calc(28% * var(--brand-s)) 95%);
-  --brand-100: hsl(var(--brand-h) calc(32% * var(--brand-s)) 88%);
-  --brand-200: hsl(var(--brand-h) calc(30% * var(--brand-s)) 76%);
-  --brand-300: hsl(var(--brand-h) calc(28% * var(--brand-s)) 62%);
-  --brand-400: hsl(var(--brand-h) calc(34% * var(--brand-s)) 47%);
-  --brand-500: hsl(var(--brand-h) calc(47% * var(--brand-s)) 34%);
-  --brand-600: hsl(var(--brand-h) calc(59% * var(--brand-s)) 26%);
-  --brand-700: hsl(var(--brand-h) calc(62% * var(--brand-s)) 20%);
-  --brand-800: hsl(var(--brand-h) calc(64% * var(--brand-s)) 15%);
-  --brand-900: hsl(var(--brand-h) calc(62% * var(--brand-s)) 10%);
+  /* --brand-h/--brand-s ya no generan una rampa HSL: se conservan solo
+   * porque otras reglas (p. ej. .weave) los leen para sus motivos. */
+  --brand-h: 30;
+  --brand-s: 1;
+
+  /* Rampa 50 -> 900, dorado (50-600) a café (700-900). bg-brand-50 =
+   * fondo suave dorado de chips/estados; text-brand-text = dorado oscuro. */
+  --brand-50:  var(--c-gold-100);
+  --brand-100: #f6e0b0;
+  --brand-200: #efca83;
+  --brand-300: #e8b95c;
+  --brand-400: var(--c-gold-500);
+  --brand-500: var(--c-gold-600);
+  --brand-600: #a87718;
+  --brand-700: var(--c-gold-700);
+  --brand-800: var(--c-coffee-800);
+  --brand-900: var(--c-coffee-900);
 
   /* Neutrales */
-  --ground:    #f4f6f3;
-  --surface:   #fff;
-  --surface-2: #eef1ee;
-  --line:      #dbe2dc;
-  --line-soft: #e7ebe7;
-  --ink:       #14201a;
-  --ink-2:     #3d4a42;
-  --ink-3:     #647069; /* corregido lote 1/B10: era #6c7972 (4.19:1 sobre --ground, FALLA AA). Ahora 4.76:1 sobre --ground y 5.17:1 sobre --surface — medido con la fórmula WCAG. */
+  --ground:    var(--c-white);
+  --surface:   var(--c-white);
+  --surface-2: var(--c-cream-100);
+  --line:      var(--c-line);
+  --line-soft: #eee8e2;
+  --ink:       var(--c-coffee-900);
+  --ink-2:     #4a3b31;
+  --ink-3:     #6b5d54; /* 6.2:1 sobre blanco, 5.6:1 sobre crema */
 
   /* Semánticos de estado */
-  --amber:      #c9821f; /* SOLO ícono/relleno decorativo: 3.14:1 sobre --surface, NO sirve como color de texto (falla AA) */
-  --amber-text: #93590c; /* variante oscura para cuando el ámbar es TEXTO: 5.71:1 sobre --surface, 5.26:1 sobre --ground */
-  --danger:     #ab3a30; /* 6.21:1 sobre --surface */
-  --info:       #2c6fa8; /* 5.32:1 con texto blanco encima */
+  --amber:      #c9821f; /* SOLO decorativo, no como texto */
+  --amber-text: #93590c; /* 5.7:1 sobre blanco */
+  --danger:     #ab3a30;
+  --info:       #2c6fa8;
 
-  /*
-   * Acentos de catálogo (lote 1, A8): fuera del hue 155 de marca a propósito
-   * (badges "MÁS VENDIDO"/"RECOMENDADO" de los mockups; el naranja y el azul
-   * NO deben derivarse de --brand-h). El sistema admite exactamente 4 —
-   * no agregar un quinto sin volver a medir contraste:
-   *   1. --accent-green  (= --action)     -> badge "NATURALEZA"
-   *   2. --accent-amber  (= --amber-text) -> badge "CERTIFICADOS POR MINCETUR"
-   *   3. --accent-orange (nuevo, abajo)   -> badge "MÁS VENDIDO"
-   *   4. --accent-blue   (= --info)       -> badge "RECOMENDADO"
-   * Medido con texto blanco encima (uso: pastilla sólida sobre foto):
-   * --accent-orange = 5.18:1, --accent-blue = 5.32:1. Ambos pasan AA normal.
-   */
+  /* Acentos de catálogo (ui/badge, tour-card): pastilla sólida con texto
+   * blanco encima, todas >= 4.5:1. */
   --accent-orange: #c2410c;
-  --accent-green:  var(--action);
+  --accent-green:  var(--c-forest-700); /* 10:1 con blanco */
   --accent-amber:  var(--amber-text);
   --accent-blue:   var(--info);
-  --on-accent:     #fff; /* texto sobre cualquier pastilla --accent-* sólida */
+  --on-accent:     #fff;
 
-  /* Semánticos de marca: es lo ÚNICO que consumen los componentes */
-  --action:       var(--brand-600);
-  --action-hover: var(--brand-700);
-  --on-action:    #fff; /* 6.64:1 sobre --action, 9.04:1 sobre --action-hover */
-  --brand-text:   var(--brand-700); /* 8.32:1 sobre --ground, 9.04:1 sobre --surface — medido */
+  /* Semánticos de marca: lo único que consumen los componentes */
+  --action:       var(--c-gold-500);
+  --action-hover: var(--c-gold-600);
+  --on-action:    var(--c-coffee-900); /* 8.2:1 sobre --action, 6.5:1 sobre --action-hover */
+  --brand-text:   var(--c-gold-700);
 
-  /* Semánticos de superficie y borde, sobre los neutrales */
+  /* Semánticos de superficie y borde */
   --bg:          var(--ground);
   --card:        var(--surface);
   --card-2:      var(--surface-2);
@@ -75,124 +104,55 @@
   --border-soft: var(--line-soft);
   --text:        var(--ink);
   --text-2:      var(--ink-2);
-  /* --text-muted: corregido en el lote 1 (B10). Ahora PASA AA de texto
-   * normal en las dos superficies: 4.76:1 sobre --ground, 5.17:1 sobre
-   * --surface. Ya no hace falta reservarlo a texto grande/iconografía. */
   --text-muted:  var(--ink-3);
+
+  /* Foco visible: dorado oscuro sobre claro, dorado vivo sobre oscuro */
+  --focus:         #7a5200;
+  --focus-on-dark: var(--c-gold-500);
 }
 
 /* ============================================================================
- * PASE VISUAL (2026-09-14) — capa 2 de tokens.
- *
- * Misma regla dura que arriba: los componentes consumen SOLO tokens
- * semánticos. Lo que sigue NO reinventa la paleta: el eje sigue siendo
- * --brand-h: 155. Se agrega alrededor.
- *
- *  1. Un neutro CÁLIDO (arena) para alternar fondos de sección. El sitio
- *     entero sobre --ground (verde grisáceo) + --surface (blanco) se leía
- *     plano; la arena da un tercer escalón sin meter un hue nuevo de marca.
- *  2. Superficie OSCURA de marca (--ink-surface) para el pie y los bloques
- *     de cierre, con sus propios tokens de texto medidos sobre ella.
- *  3. Scrims para foto: un degradado no es "decorativo", es lo que hace que
- *     el texto blanco pase AA sobre una foto. Se declara como token para que
- *     todas las pantallas usen el MISMO, medido una sola vez.
- *  4. Escala tipográfica fluida, ritmo vertical, radios y sombras.
- *
- * Contrastes calculados con la fórmula WCAG 2.1 (relative luminance), no a
- * ojo. El detalle de cada par medido va en el comentario de cada token.
+ * Capa 2: superficies, scrims, escala tipográfica, ritmo y sombras.
+ * Mismos nombres que en el sistema anterior (los consumen utilidades como
+ * bg-sand, bg-ink-surface, text-on-dark-2, scrim-hero...).
  * ========================================================================= */
 :root {
-  /* --- 1. Neutro cálido (arena) -------------------------------------- */
-  /* Tercer fondo de sección. Contrastes medidos sobre --sand:
-   *   --ink 15.17:1 · --text-2 8.41:1 · --text-muted 4.67:1 · --brand-700
-   *   8.18:1 · --action 6.00:1. Los cinco pasan AA de texto normal.
-   * OJO: sobre --sand-deep, --text-muted cae a 4.21:1 (solo texto grande).
-   * Sobre --sand-deep usar --text-2 (7.58:1) o --text (13.68:1). */
-  --sand:      #f7f3ec;
-  --sand-deep: #efe7da; /* variante para bordes/relleno sutil sobre --sand */
-  --sand-line: #e3d9c8; /* borde hairline sobre --sand */
+  /* --- Neutro cálido (crema) -------------------------------------------- */
+  --sand:      var(--c-cream-100);
+  --sand-deep: #efe7da;
+  --sand-line: #e3d9c8;
 
-  /* --- 2. Superficie oscura de marca --------------------------------- */
-  /* hsl(155 62% 10%) = --brand-900. Se le da nombre propio de superficie
-   * porque su rol no es "el tono 900 de la rampa" sino "el fondo oscuro
-   * del sitio", y tiene su propia familia de texto encima.
-   * Medidos sobre --ink-surface (#0a291c):
-   *   #fff 15.59:1 · --on-dark-2 (#c6d6cd) 10.32:1 · --on-dark-3 (#8fa79b) 6.07:1
-   * Y sobre --ink-surface-2: 12.48:1 / 8.26:1 / 4.85:1.
-   * Los tres pasan AA de texto normal. */
-  --ink-surface:   hsl(var(--brand-h) calc(62% * var(--brand-s)) 10%);
-  --ink-surface-2: hsl(var(--brand-h) calc(55% * var(--brand-s)) 15%);
+  /* --- Superficie oscura (café). Medidos sobre #291b12:
+   *   blanco 16:1 · --on-dark-2 12:1 · --on-dark-3 7.7:1 -------------------- */
+  --ink-surface:   var(--c-coffee-900);
+  --ink-surface-2: var(--c-coffee-800);
   --on-dark:       #fff;
-  --on-dark-2:     #c6d6cd;
-  --on-dark-3:     #8fa79b;
-  --on-dark-line:  hsl(var(--brand-h) calc(30% * var(--brand-s)) 24%);
+  --on-dark-2:     #e6dcd3;
+  --on-dark-3:     #b9aca2;
+  --on-dark-line:  rgb(255 255 255 / .2);
 
-  /* --- 3. Tratamiento de imagen -------------------------------------- */
-  /* Scrim de hero: sobre la zona de texto deja una luminancia <= 0.055,
-   * con la que el blanco puro mide >= 4.5:1 incluso si la foto debajo es
-   * un cielo claro. Es lo que hace legal el texto blanco sobre montaña.
-   * NO usar opacidades sueltas en las pantallas: se consume este token.
-   *
-   * Reforzado en el pase cinematográfico (2026-09-18): con las 3 fotos del
-   * slider de hero, la de cordillera-río medía 4.07:1 en la bajada (texto
-   * normal, subtítulo) a 375px — por debajo del 4.5:1 que exige texto no
-   * grande. Los tres stops subieron ~0.05-0.06 de opacidad; medido de
-   * nuevo con el peor píxel del compuesto en las TRES fotos (no solo la
-   * que falló): 4.5-6.8:1 a 375, todas por encima del mínimo. */
-  --scrim-hero:  linear-gradient(180deg,
-                   hsl(158 45% 6% / .60) 0%,
-                   hsl(158 45% 6% / .80) 55%,
-                   hsl(158 45% 6% / .90) 100%);
-  --scrim-hero-h: linear-gradient(90deg,
-                   hsl(158 45% 6% / .88) 0%,
-                   hsl(158 45% 6% / .76) 46%,
-                   hsl(158 45% 6% / .30) 80%,
-                   hsl(158 45% 6% / .12) 100%);
-  /* Banda de cierre a pantalla completa (newsletter/CTA): la foto es
-   * fondo, no protagonista, y TODO el texto va encima. Medido a 360 con
-   * el scrim de hero, --on-dark-2 sobre la panorámica caía a 4.07:1; con
-   * este, sube por encima de AA. */
-  --scrim-band:  linear-gradient(180deg,
-                   hsl(158 45% 6% / .80) 0%,
-                   hsl(158 45% 6% / .88) 100%);
+  /* --- Tratamiento de imagen (derivados del café) ----------------------- */
+  --scrim-hero:  linear-gradient(180deg, rgb(41 27 18 / .60) 0%, rgb(41 27 18 / .80) 55%, rgb(41 27 18 / .90) 100%);
+  --scrim-hero-h: linear-gradient(90deg, rgb(41 27 18 / .88) 0%, rgb(41 27 18 / .76) 46%, rgb(41 27 18 / .30) 80%, rgb(41 27 18 / .12) 100%);
+  --scrim-band:  linear-gradient(180deg, rgb(41 27 18 / .80) 0%, rgb(41 27 18 / .88) 100%);
+  --scrim-card:  linear-gradient(180deg, rgb(41 27 18 / 0) 30%, rgb(41 27 18 / .42) 58%, rgb(41 27 18 / .86) 100%);
+  --photo-tint:  rgb(41 27 18 / .04);
 
-  /* Scrim de tarjeta con rótulo abajo (destinos). Más corto que el de hero
-   * porque el texto ocupa solo el último tercio. */
-  --scrim-card:  linear-gradient(180deg,
-                   hsl(158 45% 6% / 0) 30%,
-                   hsl(158 45% 6% / .42) 58%,
-                   hsl(158 45% 6% / .86) 100%);
-  /* Velo tenue permanente sobre TODA foto de catálogo: unifica fotos de
-   * banco de temperaturas distintas y evita que una foto muy saturada
-   * pelee con la marca. Muy sutil a propósito. */
-  --photo-tint:  hsl(var(--brand-h) 40% 12% / .04);
-
-  /* --- 4. Escala tipográfica fluida ---------------------------------- */
-  /* clamp(min, preferido, max): el mínimo es el valor a 360px y el máximo
-   * el de 1440px. Evita tener que declarar 3 breakpoints por título. */
-  --fs-hero:    clamp(2.125rem, 1.30rem + 3.66vw, 4rem);      /* 34 -> 64 */
-  --fs-h1:      clamp(1.875rem, 1.35rem + 2.33vw, 3rem);      /* 30 -> 48 */
-  --fs-h2:      clamp(1.5rem,  1.17rem + 1.48vw, 2.25rem);    /* 24 -> 36 */
-  --fs-h3:      clamp(1.125rem, 1.02rem + 0.46vw, 1.375rem);  /* 18 -> 22 */
-  --fs-lead:    clamp(1.0625rem, 0.99rem + 0.32vw, 1.25rem);  /* 17 -> 20 */
-  /* Opción tipográfica v2, elegida (2026-09-22, docs/rediseno-2026/14-tipografia-v2.md):
-   * Bodoni Moda es un Didone de contraste extremo -- sus trazos finos se
-   * cierran si se aprietan con tracking negativo (el -0.02em de Fraunces
-   * dejaba los remates de las serifas casi tocándose a tamaño hero). Se
-   * sube a 0 (sin tracking) y el line-height del display sube de 1.08 a
-   * 1.14: los ascendentes/descendentes de un Didone son más largos que los
-   * de Fraunces y a 1.08 el diacrítico de una mayúscula acentuada rozaba la
-   * línea de arriba en el h1 de dos líneas del hero.
-   * Otras dos parejas probadas en el mismo árbol y descartadas (documentadas
-   * en el informe para reconstruirlas): Lora sola -- lh-display 1.16,
-   * ls-display -0.008em; Archivo sola -- lh-display 1.02, ls-display
-   * -0.032em (y font-black en vez de font-semibold en el h1 del hero). */
-  --lh-display: 1.14;
-  --lh-title:   1.18;
-  --ls-display: 0em;
+  /* --- Escala tipográfica fluida ------------------------------------------
+   * Cinzel (display) es más ancha que la Didone anterior; el techo de cada
+   * rol baja un poco para que los títulos de las páginas internas no
+   * desborden a 375. */
+  --fs-hero:    clamp(2rem, 1.2rem + 3.4vw, 3.75rem);
+  --fs-h1:      clamp(1.75rem, 1.3rem + 2vw, 2.75rem);
+  --fs-h2:      clamp(1.375rem, 1.1rem + 1.3vw, 2.125rem);
+  --fs-h3:      clamp(1.0625rem, 1rem + 0.4vw, 1.3125rem);
+  --fs-lead:    clamp(1.0625rem, 0.99rem + 0.32vw, 1.25rem);
+  --lh-display: 1.15;
+  --lh-title:   1.2;
+  --ls-display: 0.01em;
   --ls-eyebrow: 0.14em;
 
-  /* --- 5. Ritmo vertical y radios ------------------------------------ */
+  /* --- Ritmo vertical y radios ------------------------------------------ */
   --section-y:    clamp(3.25rem, 1.9rem + 6vw, 6rem);
   --section-y-sm: clamp(2.25rem, 1.5rem + 3.3vw, 3.75rem);
   --r-sm: 0.5rem;
@@ -200,37 +160,73 @@
   --r-lg: 1.25rem;
   --r-xl: 1.75rem;
 
-  /* --- 6. Sombras -----------------------------------------------------
-   * Teñidas con el hue de marca en vez de negro puro: sobre --ground y
-   * --sand, una sombra gris neutra se ve sucia. */
-  --elev-1:       0 1px 2px hsl(var(--brand-h) 25% 12% / .06);
-  --elev-2:       0 4px 14px -3px hsl(var(--brand-h) 25% 12% / .12),
-                  0 2px 4px -2px hsl(var(--brand-h) 25% 12% / .07);
-  --elev-3:       0 20px 44px -14px hsl(var(--brand-h) 30% 10% / .24),
-                  0 4px 10px -4px hsl(var(--brand-h) 25% 12% / .10);
-  --elev-ring:    inset 0 0 0 1px hsl(var(--brand-h) 20% 30% / .08);
+  /* --- Sombras (teñidas con el café) ------------------------------------ */
+  --elev-1:       0 1px 2px rgb(41 27 18 / .06);
+  --elev-2:       0 4px 14px -3px rgb(41 27 18 / .12), 0 2px 4px -2px rgb(41 27 18 / .07);
+  --elev-3:       0 20px 44px -14px rgb(41 27 18 / .26), 0 4px 10px -4px rgb(41 27 18 / .10);
+  --elev-ring:    inset 0 0 0 1px rgb(41 27 18 / .08);
 }
 
 /* ============================================================================
- * DIRECCIÓN VISUAL — PORT FIEL DE ROAVIO (2026-09-20) — capa 3 de tokens.
- *
- * Decisión del cliente (rechazó dos veces la dirección propia): portar la
- * composición de la plantilla comercial Roavio (Webtend), no reinventarla.
- * Se AÑADEN tokens nuevos; ninguno de los de arriba se toca ni se renombra.
- *
- * 1. Tres anchos de contenedor alternados (medidos en Roavio a 1440px, no
- *    vueltos a medir aquí): 1290 / 1392 / 1432. En rem con base 16:
- *      1392px = 87rem EXACTO (hero boxed, con radio).
- *      1432px = 89.5rem (banda a sangre completa — el mosaico).
- *      1290px = 80.625rem (contenido denso/texto, disponible para más
- *      adelante; no se consume en este lote).
- * 2. Radio uniforme de Roavio: 10px en el 91% de sus elementos. Token propio
- *    (--r-tile) para no reescribir --r-sm/md/lg/xl, que siguen sirviendo al
- *    resto del sistema (tarjetas, paneles).
+ * Capa 3: contenedores y radios que aún consumen utilidades de otras vistas
+ * (herencia del port Roavio) + tokens propios del Home Inka Palace.
  * ========================================================================= */
 :root {
   --container-narrow: 80.625rem; /* 1290px */
   --container-boxed:  87rem;     /* 1392px */
   --container-bleed:  89.5rem;   /* 1432px */
   --r-tile: 0.625rem;            /* 10px */
+
+  /* ---- Tokens del Home / chrome (header, footer, hero) ---- */
+  --bg-alt:       var(--c-cream-100);
+  --bg-dark:      var(--c-coffee-900);
+  --card-dark:    var(--c-coffee-800);
+  --border-on-dark: rgb(255 255 255 / .22);
+  --text-on-dark: var(--c-white);
+  --text-on-dark-muted: rgb(255 255 255 / .8);
+
+  --accent:        var(--c-gold-500);
+  --accent-hover:  var(--c-gold-600);
+  --accent-text:   var(--c-gold-700);
+  --accent-on-dark: var(--c-gold-500);
+  --accent-soft:   var(--c-gold-100);
+  --forest:        var(--c-forest-700);
+  --on-forest:     var(--c-white);
+  --forest-soft:   var(--c-forest-100);
+  --teal:          var(--c-teal-700);
+  --on-teal:       var(--c-white);
+  --teal-soft:     var(--c-teal-100);
+  --clay-soft:     var(--c-clay-100);
+  --alert:         var(--c-terracotta);
+  --on-alert:      var(--c-white);
+  --star:          var(--c-gold-500);
+  --whatsapp:        var(--c-wa-icon);
+  --whatsapp-action: var(--c-wa-action);
+  --on-whatsapp:     var(--c-white);
+
+  /* Cinta andina (decorativa) */
+  --ribbon-1: var(--c-terracotta);
+  --ribbon-2: var(--c-gold-500);
+  --ribbon-3: var(--c-forest-700);
+  --ribbon-4: var(--c-coffee-900);
+  --ribbon-5: var(--c-teal-700);
+  --ribbon-6: var(--c-ochre);
+  --ribbon-7: var(--c-sage);
+
+  /* Sombras / overlays del Home */
+  --shadow-card: 0 18px 40px -18px rgb(41 27 18 / .28), 0 2px 8px rgb(41 27 18 / .06);
+  --shadow-float: 0 22px 50px -20px rgb(41 27 18 / .35);
+  --shadow-search: 0 24px 60px -24px rgb(41 27 18 / .35), 0 2px 10px rgb(41 27 18 / .08);
+  --shadow-btn: 0 10px 22px -10px rgb(224 166 58 / .75);
+  --glow-wa: 0 0 0 6px rgb(31 175 90 / .22), 0 14px 30px -8px rgb(31 175 90 / .55);
+  /* Hero: el degradado se limita al lado del texto (izquierda); la derecha
+   * queda viva como en el PDF. */
+  --shade-hero: linear-gradient(90deg, rgb(41 27 18 / .7) 0%, rgb(41 27 18 / .58) 28%, rgb(41 27 18 / .46) 44%, rgb(41 27 18 / .24) 52%, rgb(41 27 18 / .08) 58%, rgb(41 27 18 / 0) 62%), linear-gradient(180deg, rgb(41 27 18 / .12) 0%, rgb(41 27 18 / 0) 30%, rgb(41 27 18 / .18) 100%);
+  --shade-hero-mobile: linear-gradient(180deg, rgb(41 27 18 / .55) 0%, rgb(41 27 18 / .7) 100%);
+  --shade-band: linear-gradient(90deg, rgb(41 27 18 / .9) 0%, rgb(41 27 18 / .72) 45%, rgb(41 27 18 / .42) 100%);
+  --shade-card: linear-gradient(180deg, rgb(41 27 18 / 0) 38%, rgb(41 27 18 / .55) 62%, rgb(41 27 18 / .92) 100%);
+  --shade-card-soft: linear-gradient(180deg, rgb(41 27 18 / 0) 55%, rgb(41 27 18 / .75) 100%);
+  --glass:        rgb(41 27 18 / .52);
+  --glass-light:  rgb(255 255 255 / .14);
+  --glass-chip:   rgb(41 27 18 / .62);
 }

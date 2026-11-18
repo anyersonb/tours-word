@@ -7,18 +7,18 @@
     'type' => 'button', // button | submit | reset — ignorado si hay href (se renderiza <a>)
 ])
 @php
-    $base = 'inline-flex items-center justify-center gap-2 rounded-full font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action disabled:cursor-not-allowed disabled:opacity-50';
+    $base = 'inline-flex items-center justify-center gap-2 rounded-[6px] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-50';
 
     $sizes = [
-        'sm' => 'px-4 py-2 text-sm',
-        'md' => 'px-5 py-2.5 text-sm',
+        'sm' => 'px-4 py-2 text-sm max-md:min-h-11',
+        'md' => 'px-5 py-2.5 text-sm max-md:min-h-11',
     ];
 
     $variants = [
         'primary' => 'bg-action text-on-action hover:bg-action-hover',
-        'secondary' => 'border border-line text-text-2 hover:border-action hover:text-action bg-surface',
-        'ghost' => 'text-action hover:bg-brand-50',
-        'link' => 'text-action underline-offset-4 hover:underline p-0 rounded-none',
+        'secondary' => 'border border-line text-text-2 hover:border-action hover:text-brand-text bg-surface',
+        'ghost' => 'text-brand-text hover:bg-brand-50',
+        'link' => 'text-brand-text underline-offset-4 hover:underline p-0 rounded-none',
     ];
 
     $classes = $base.' '.($sizes[$size] ?? $sizes['md']).' '.($variants[$variant] ?? $variants['primary']);

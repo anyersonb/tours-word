@@ -1,992 +1,471 @@
 @php
-    use App\Models\Destination;
-    use App\Models\Experience;
-    use App\Models\Tour;
-    use App\Support\PlaceholderImage;
+    use Illuminate\Support\Str;
 
-    /**
-     * Datos reales de MySQL (B5). Cada colección se resuelve vacía si no hay
-     * filas publicadas — ninguna sección asume 3/4 elementos como el mockup:
-     * ver los @if(...->isNotEmpty()) de cada bloque de abajo.
-     */
-    $featuredTours = Tour::query()
-        ->published()
-        ->featured()
-        ->ordered()
-        ->with(['destination', 'experiences', 'images'])
-        ->get();
-
-    $destinations = Destination::query()->where('is_published', true)->orderBy('order')->get();
-    $experiences = Experience::query()->where('is_published', true)->orderBy('order')->get();
-
-    /**
-     * Mosaico Roavio (port fiel, 2026-09-20): 6 tiles con 3 anchos distintos
-     * bajo el hero. NO es contenido nuevo — son las mismas 3 primeras
-     * $destinations y las mismas 3 primeras $experiences que ya bajan a las
-     * secciones de abajo, sólo que acá se presentan como vistazo fotográfico
-     * a sangre completa. Cero @php de datos nuevos, cero contenido inventado.
+    /*
+     * Home de Inka Palace Travel — port del PDF de diseño (docs/lote-1/inka-palace/
+     * referencia/s00..s10.jpg, 1440 px) a main. Contrato de datos:
+     * docs/lote-1/inka-palace/02-contrato-home.md (HomeController).
      *
-     * Posición por SLOT, no por nombre/slug: cada slot fija qué colección y
-     * qué índice de esa colección ocupa, con el object-position elegido
-     * mirando esa foto real en el navegador (nunca "center" a ciegas — ver
-     * encargo). Si el catálogo cambiara de orden, el slot sigue mostrando lo
-     * que hoy ocupe esa posición: no se buscan slugs concretos.
-     */
-    $mosaicSlots = [
-        // 'wide' (556x634 a 1440, la tile más grande) — Valle Sagrado: foto
-        // panorámica (2.80:1), es la más espectacular del banco; se le da el
-        // tile de mayor peso visual aunque igual se recorte a retrato.
-        ['col' => $destinations, 'type' => 'destination', 'i' => 1, 'position' => 'center 72%'],
-        // 'narrow' (296x634, la más angosta) — Cultura: composición
-        // diagonal/vertical (telar), lee bien en un hueco muy estrecho.
-        ['col' => $experiences, 'type' => 'experience', 'i' => 2, 'position' => '68% 45%'],
-        // Par apilado A (296x315 x2)
-        ['col' => $destinations, 'type' => 'destination', 'i' => 0, 'position' => 'center 58%'], // Cusco
-        ['col' => $experiences, 'type' => 'experience', 'i' => 0, 'position' => '76% 58%'],       // Trekking: grupo a la derecha del encuadre
-        // Par apilado B (276x315 x2)
-        ['col' => $destinations, 'type' => 'destination', 'i' => 2, 'position' => 'center 68%'], // Arequipa
-        ['col' => $experiences, 'type' => 'experience', 'i' => 1, 'position' => 'center 48%'],   // Gastronomía
-    ];
-    $mosaicTiles = collect($mosaicSlots)
-        ->map(function ($slot) {
-            $model = $slot['col']->get($slot['i']);
-
-            if (! $model) {
-                return null;
-            }
-
-            return [
-                'model' => $model,
-                'type' => $slot['type'],
-                'position' => $slot['position'],
-                'href' => $slot['type'] === 'destination'
-                    ? route('destinations.show', $model->slug)
-                    : route('experiences.show', $model->slug),
-            ];
-        })
-        ->filter()
-        ->values();
-    // Geometría completa solo con las 6 piezas reales; con menos, cae a una
-    // rejilla simple (mismo criterio que "Tours destacados": ninguna sección
-    // asume una cantidad fija de elementos).
-    $hasFullMosaic = $mosaicTiles->count() === 6;
-
-    // Paleta cíclica SOLO para el placeholder decorativo, usado cuando el
-    // registro todavía no tiene foto real cargada (D · lote 1/etapa D:
-    // Destination/Experience ya tienen columna cover_image_path desde el
-    // esquema del lote 1, pero la base de hoy no tiene ninguna cargada, y
-    // tour_images sigue vacía).
-    $photoPalette = ['1b6949', '2c6fa8', '93590c', 'c2410c', '135338'];
-
-    $experienceIcons = [
-        'trekking' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><path d="m3 20 6-10 4 6 2-3 6 7H3Z"/></svg>',
-        'gastronomia' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><path d="M6 3v7a2 2 0 0 0 2 2 2 2 0 0 0 2-2V3M8 12v9M17 3c-1.5 0-3 1.5-3 4s1.5 4 3 4v9"/></svg>',
-        'cultura' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><path d="M4 8c0-3 3.5-5 8-5s8 2 8 5-3.5 9-8 9-8-6-8-9Z"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/><path d="M9 13c1 1 5 1 6 0"/></svg>',
-    ];
-    $defaultExperienceIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15 9-2 6-6 2 2-6 6-2Z"/></svg>';
-
-    /**
-     * Mockups móvil (lote 16, 2026-09-29): copy y orden del cliente
-     * (Operador local · Reserva segura · Guías expertos · Atención
-     * personalizada · Cancelación flexible) — reemplaza a las 5 claims
-     * anteriores (safe/guides/personalized/prices/sustainable). Sigue siendo
-     * texto de marketing genérico sin cifras (misma regla de siempre), solo
-     * cambian las 5 frases y sus íconos para calzar con lo que aprobó la
-     * clienta en la maqueta.
-     */
-    $heroTrustIcons = [
-        'operator' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><path d="M5 21c8 0 14-6 14-16-10 0-16 6-16 14 0 .7.05 1.35.14 2Z"/><path d="M5 21c3-4 6-7 12-11"/></svg>',
-        'reservation' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><path d="M12 3l8 4v5c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V7l8-4Z"/><path d="m9 12 2 2 4-4"/></svg>',
-        'guides' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M2.5 20c0-3.3 2.9-5.5 6.5-5.5"/><circle cx="17" cy="9" r="2.3"/><path d="M13.8 20c.3-2.5 2-4.3 4.3-4.9"/></svg>',
-        'personalized' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><path d="M4 13v-1a8 8 0 0 1 16 0v1"/><rect x="2.5" y="13" width="4" height="6" rx="1.5"/><rect x="17.5" y="13" width="4" height="6" rx="1.5"/><path d="M20 19v1a3 3 0 0 1-3 3h-3"/></svg>',
-        'cancellation' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="m9 15 2 2 4-4"/></svg>',
-    ];
-
-    $playIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m10 9 5 3-5 3V9Z" fill="currentColor" stroke="none"/></svg>';
-    $headsetIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5" aria-hidden="true"><path d="M4 13v-1a8 8 0 0 1 16 0v1"/><rect x="2.5" y="13" width="4" height="6" rx="1.5"/><rect x="17.5" y="13" width="4" height="6" rx="1.5"/><path d="M20 19v1a3 3 0 0 1-3 3h-3"/></svg>';
-
-    $whyUsIcons = [
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15 9-2 6-6 2 2-6 6-2Z"/></svg>',
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5" aria-hidden="true"><path d="M12 20s-7-4.35-9.5-8.5C.7 8 2 4.5 5.5 4a4.8 4.8 0 0 1 6.5 2 4.8 4.8 0 0 1 6.5-2C22 4.5 23.3 8 21.5 11.5 19 15.65 12 20 12 20Z"/></svg>',
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5" aria-hidden="true"><path d="M12 3l8 4v5c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V7l8-4Z"/><path d="m9 12 2 2 4-4"/></svg>',
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/></svg>',
-    ];
-
-    /**
-     * Slider de hero (pase cinematográfico, 2026-09-18). Las tres fotos YA
-     * EXISTÍAN en public/images/site/ con sus derivadas WebP responsive
-     * (640/1024/1440/1920) — no se agregó ninguna imagen nueva. El "position"
-     * es el foco vertical de cada foto (object-position), elegido mirando
-     * cada una: Machu Picchu deja el horizonte en el tercio alto (igual que
-     * el pase anterior); Valle Sagrado empuja hacia abajo para no dejar el
-     * cielo muy claro justo detrás del titular; Cordillera centra los picos
-     * nevados. El orden acá DEBE coincidir con site.home.hero.slides (mismo
-     * índice = misma foto).
+     * Regla de composición: lo real (CMS) va primero; si faltan elementos
+     * para completar la composición del diseño se rellenan con tarjetas de
+     * MUESTRA, marcadas visiblemente ("Muestra" + nota de sección). Cuando el
+     * CMS tenga datos suficientes, las muestras desaparecen solas. Nada de
+     * cifras, reseñas ni precios inventados: lo que falta es un [MARCADOR].
      *
-     * "positionMobile" (cierre del hero, 2026-09-21): a 375 el marco de V2
-     * cae a 0.449:1 (836/375, medido) — mucho más angosto que el AR nativo
-     * de las 3 fotos (1.478 / 2.391 / 1.692), así que object-fit:cover
-     * SIEMPRE muestra el alto completo de la foto y recorta por los lados;
-     * el eje Y del "position" de escritorio queda inerte a este ancho (no
-     * hay margen vertical que mover) y el que manda es X. Se recalculó X
-     * mirando cada foto en el navegador a 375 (nunca reusando el valor de
-     * escritorio a ciegas — mismo criterio que el mosaico del lote 0):
-     *   - Machu Picchu: X 52% dentro de la franja visible (~30% del ancho
-     *     nativo) mete el pico de Huayna Picchu completo + el arranque de
-     *     las terrazas/ruinas a su derecha.
-     *   - Valle Sagrado: X 75% — a esta foto (panorámica 2.39:1) solo
-     *     queda visible un ~19% del ancho nativo; centrado (50%) caía en
-     *     una montaña genérica, 75% mete el pueblo + el valle cultivado +
-     *     el río, que es el contenido con más lectura de la foto.
-     *   - Cordillera-río: X 50% (centro) — el conjunto de picos nevados y
-     *     el río que converge hacia el centro ya caen ahí, sin ajuste.
+     * Modo revisión (solo APP_ENV=local): /es/?muestra=1 ignora el CMS y pinta
+     * la composición completa del diseño, para compararla contra el PDF.
      */
-    $heroSlides = [
-        ['file' => 'hero-machupicchu-amanecer', 'position' => 'center 42%', 'positionMobile' => '52%'],
-        ['file' => 'hero-valle-sagrado-panoramica', 'position' => 'center 60%', 'positionMobile' => '75%'],
-        ['file' => 'hero-cordillera-rio', 'position' => 'center 46%', 'positionMobile' => 'center'],
+    if (app()->environment('local') && request()->boolean('muestra')) {
+        $destinations = collect(); $experiences = collect(); $featuredTours = collect(); $planTours = collect();
+    }
+    $fx = config('brand.fixed_images');
+    $tr = fn (string $key, string $fallback) => trans()->has($key) ? __($key) : $fallback;
+    $samples = [];   // secciones que incluyen muestras
+
+    // Solo las fotos PROVISIONALES (img/...) se comprueban en disco: una ruta de
+    // brand.images sin archivo daría un 404. Las del CMS (storage) se confían.
+    $okImg = function (?string $url): ?string {
+        if (! $url) {
+            return null;
+        }
+        $prefix = asset('img/');
+        if (str_starts_with($url, $prefix)) {
+            return is_file(public_path('img/'.substr($url, strlen($prefix)))) ? $url : null;
+        }
+
+        return $url;
+    };
+    $asset = fn (?string $path): ?string => $path ? asset($path) : null;
+    $countLabel = fn ($n) => ($n ?? 0) > 0 ? trans_choice('home.destinations.tours_count', $n, ['count' => $n]) : __('home.destinations.placeholder_count');
+    $short = fn (?string $text, int $n = 120): ?string => filled($text) ? Str::limit(trim(strip_tags($text)), $n) : null;
+
+    /* ---- Destinos ---- */
+    $realDests = collect($destinations ?? [])->map(fn ($d) => array_merge($d, ['sample' => false, 'image' => $okImg($d['image'] ?? null), 'tagline' => $short($d['tagline'] ?? null)]));
+    $sampleDests = collect([
+        ['name' => 'Machu Picchu', 'key' => 'machu-picchu'], ['name' => 'Cusco', 'key' => 'cusco'],
+        ['name' => 'Valle Sagrado', 'key' => 'valle-sagrado'], ['name' => 'Ica', 'key' => 'ica'],
+        ['name' => 'Humantay', 'key' => 'humantay'], ['name' => 'Lima', 'key' => 'lima'], ['name' => 'Nazca', 'key' => 'nazca'],
+    ])->map(fn ($d) => $d + ['slug' => $d['key'], 'image' => $okImg($asset(config('brand.images.'.$d['key']))), 'tagline' => $tr('home.destinations.taglines.'.$d['key'], ''), 'city_tagline' => $tr('home.cities.taglines.'.$d['key'], ''), 'tours_count' => null, 'url' => null, 'sample' => true]);
+
+    $pool = $realDests->values();
+    foreach ($sampleDests as $s) {
+        if ($pool->count() >= 5) { break; }
+        if (! $pool->contains('key', $s['key'])) { $pool->push($s); }
+    }
+    if ($pool->contains('sample', true)) { $samples[] = 'destinos'; }
+    $featuredDest = $pool->firstWhere('key', 'machu-picchu') ?? $pool->first();
+    $mosaic = $pool->reject(fn ($d) => $d['key'] === $featuredDest['key'])->take(4)->values();
+
+    $cityOrder = ['ica', 'cusco', 'lima', 'nazca'];
+    $cities = $realDests->filter(fn ($d) => in_array($d['key'], $cityOrder, true))->values();
+    foreach ($sampleDests as $s) {
+        if ($cities->count() >= 4) { break; }
+        if (in_array($s['key'], $cityOrder, true) && ! $cities->contains('key', $s['key'])) { $cities->push($s); }
+    }
+    $cities = $cities->sortBy(fn ($d) => array_search($d['key'], $cityOrder))->values();
+    if ($cities->contains('sample', true)) { $samples[] = 'ciudades'; }
+
+    /* ---- Experiencias ---- */
+    $exps = collect($experiences ?? [])->take(3)->map(fn ($e) => array_merge($e, ['sample' => false, 'image' => $okImg($e['image'] ?? null), 'description' => $short($e['description'] ?? null, 110)]));
+    if ($exps->isEmpty()) {
+        $samples[] = 'experiencias';
+        $exps = collect([['name' => 'Trekking', 'key' => 'trekking'], ['name' => 'Gastronomía', 'key' => 'gastronomia'], ['name' => 'Cultura', 'key' => 'cultura']])
+            ->map(fn ($e) => $e + ['image' => $okImg($asset(config('brand.images.'.$e['key']))), 'description' => __('home.experiences.taglines.'.$e['key']), 'link_label' => __('home.experiences.links.'.$e['key']), 'url' => null, 'sample' => true]);
+    }
+    $expIcons = ['trekking' => ['mountain', 'forest'], 'gastronomia' => ['utensils', 'accent'], 'cultura' => ['landmark', 'teal']];
+
+    /* ---- Tours destacados (4 tarjetas) ---- */
+    $t = $fx['tours'];
+    $tours = collect($featuredTours ?? [])->map(fn ($x) => $x + ['sample' => false]);
+    $sampleTours = collect([
+        ['title' => 'City Tour Lima', 'destination_name' => 'Lima', 'duration_label' => '[N] horas', 'badge' => 'Recomendado', 'image' => $asset($t['city-tour-lima'])],
+        ['title' => 'Laguna Humantay', 'destination_name' => 'Cusco', 'duration_label' => '1 día', 'badge' => 'Tendencia', 'image' => $asset($t['laguna-humantay'])],
+        ['title' => 'Montaña de 7 Colores', 'destination_name' => 'Cusco', 'duration_label' => '1 día', 'badge' => 'Más vendido', 'image' => $asset($t['montana-7-colores'])],
+        ['title' => 'Machu Picchu', 'destination_name' => 'Cusco', 'duration_label' => '[N] días', 'badge' => 'Últimos cupos', 'image' => $asset($t['machu-picchu'])],
+    ])->map(fn ($x) => $x + ['price' => null, 'url' => null, 'sample' => true]);
+    foreach ($sampleTours as $s) {
+        if ($tours->count() >= 4) { break; }
+        $tours->push($s);
+    }
+    if ($tours->contains('sample', true)) { $samples[] = 'tours'; }
+
+    /* ---- Planes por duración (1 por grupo) ---- */
+    $plans = collect($planTours ?? [])->map(fn ($p) => $p + ['sample' => false]);
+    $samplePlans = [
+        '4h' => ['title' => 'City Tour Lima', 'image' => $asset($t['city-tour-lima']), 'price' => null],
+        '1dia' => ['title' => 'Montaña de 7 Colores', 'image' => $asset($t['montana-7-colores']), 'price' => null],
+        '2-3dias' => ['title' => '[Tour sugerido: Ica y Nazca]', 'image' => $asset($fx['plan_nazca']), 'price' => null],
+        '4mas' => ['title' => 'Camino Inca a Machu Picchu, 4 días', 'image' => $asset($fx['camino_inca']), 'price' => $incaTrailPrice ?? null, 'price_usd' => $incaTrailPriceUsd ?? null],
     ];
-    // ['alt' => ..., 'label' => ...] por diapositiva. "alt" queda sin usar en
-    // el <img> (las tres fotos son decorativas: el titular ya dice de qué
-    // trata la página, y cada foto ya se describe en el anunciador aria-live
-    // y en el aria-label de su botón indicador — un alt real duplicaría esa
-    // lectura). Se deja declarado para que la pasada B lo reutilice donde la
-    // foto SÍ sea contenido con significado propio.
-    $heroSlideLabels = __('site.home.hero.slides');
-
-    /**
-     * Port Roavio, lote 1 (2026-09-21): testimonios y aliados/sellos.
-     * CONTENIDO ESTÁTICO QUEMADO EN LA VISTA a propósito — ninguno de los
-     * dos tiene modelo en el proyecto todavía (ver encargo: "no inventes un
-     * modelo ni una migración chiquita"). Cada bloque va marcado
-     * "DEMO: pendiente modelo" en su propio comentario más abajo.
-     *
-     * Testimonios: nombres genéricos (nombre + inicial de apellido) y
-     * ningún avatar de banco/IA — B2 (pase anterior) ya había descartado
-     * esta sección por eso mismo. Acá el avatar es la inicial sobre un
-     * cuadrado de color (x-ui.testimonial-card variant="tile"), nunca una
-     * cara inventada.
-     */
-    $testimonials = collect(__('site.home.testimonials.items'))
-        ->map(fn ($t, $i) => $t + ['tone' => $photoPalette[$i % count($photoPalette)]]);
-
-    /**
-     * APAGADA (2026-09-21, orden explícita de Anyerson: "deja el testimonio
-     * apagado"). La sección se había reactivado en el lote 1 con 6
-     * testimonios DEMO inventados (ver comentario arriba). Se apaga de
-     * nuevo -- MISMO criterio que la decisión original del proyecto (B2,
-     * antes del lote 1): sin modelo de reseñas reales, no se publica
-     * ninguna cara/nombre inventado, ni siquiera con avatar de inicial.
-     *
-     * La maqueta (markup, x-ui.testimonial-card variant="tile", el
-     * carrusel) NO se borra: sigue completa más abajo, envuelta en el
-     * @if($testimonialsEnabled) de la sección "7. LO QUE DICEN NUESTROS
-     * VIAJEROS". Para encenderla cuando la clienta entregue reseñas reales:
-     *   1. Cambiar $testimonialsEnabled a true.
-     *   2. Reemplazar $testimonials (arriba) por datos reales -- lo ideal
-     *      es un modelo Review con name/quote/origin/avatar, no seguir
-     *      quemando el array de lang/{es,en}/site.php#testimonials.items.
-     *   3. Borrar el comentario "DEMO: pendiente modelo de reseñas" de la
-     *      sección y de los lang files.
-     */
-    $testimonialsEnabled = false;
-
-    /**
-     * Aliados + sellos oficiales: SIN ARCHIVOS REALES en el proyecto (ni
-     * logos de aliados ni el sello RNAVT/MINCETUR — ver búsqueda en
-     * public/images, no hay ninguno). Se maqueta el hueco con un wordmark
-     * de texto neutro, nunca con un logo inventado ni un sello con
-     * apariencia oficial (regla dura del encargo). Los dos últimos son
-     * justamente los sellos regulatorios peruanos, marcados aparte.
-     */
-    $partners = [
-        ['label' => 'Aliado 01'], ['label' => 'Aliado 02'], ['label' => 'Aliado 03'],
-        ['label' => 'Aliado 04'], ['label' => 'Aliado 05'], ['label' => 'Aliado 06'],
-        ['label' => 'RNAVT', 'seal' => true], ['label' => 'MINCETUR', 'seal' => true],
-    ];
+    foreach ($samplePlans as $bucket => $sp) {
+        if (! $plans->contains('bucket', $bucket)) {
+            $plans->push($sp + ['bucket' => $bucket, 'bucket_label' => __('home.plans.filters.'.$bucket), 'bucket_kicker' => __('home.plans.bucket_kicker.'.$bucket), 'url' => null, 'sample' => true]);
+        }
+    }
+    $order = ['4h', '1dia', '2-3dias', '4mas'];
+    $plans = $plans->sortBy(fn ($p) => array_search($p['bucket'], $order))->values();
+    if ($plans->contains('sample', true)) { $samples[] = 'planes'; }
+    $planTone = ['4h' => 'teal', '1dia' => 'accent', '2-3dias' => 'forest', '4mas' => 'accent'];
+    $sampleTag = fn (string $k) => in_array($k, $samples, true);
+    $sampleNote = $tr('home.sample_note', 'Incluye tarjetas de muestra (marcadas) hasta que el CMS tenga contenido suficiente.');
+    $sampleLabel = $tr('home.sample_chip', 'Muestra');
+    $waUrl = config('brand.contact.whatsapp_url');
 @endphp
-<x-layout :title="__('site.home.meta.title')" :description="__('site.home.meta.description')">
+<x-layout :title="__('home.meta.title')" :description="__('home.meta.description')" :title-literal="true">
 
-    {{--
-        ============ 1. HERO ============
-        Pase cinematográfico (2026-09-18). Antes: una sola foto fija con
-        scrim. Ahora: slider de 3 fotos con Ken Burns + fundido cruzado, alto
-        real 100svh (min-height, no height: si el contenido de un idioma más
-        largo o un móvil muy angosto necesita más espacio, crece en vez de
-        recortar — nunca 100vh, que en móvil incluye la barra del navegador
-        y corta el pie del hero).
+    <x-home.hero :slides="$hero" />
+    <x-home.search :destinations="$destinations ?? []" />
+    <x-home.guarantees />
 
-        El scrim NO es decoración: es lo que hace que el texto blanco pase AA
-        sobre CUALQUIERA de las tres fotos — se midió el peor píxel del
-        compuesto foto+scrim de cada una, no solo de la primera (ver informe
-        de cierre para los tres contrastes).
-
-        Autoavance pausable (botón dedicado + se detiene solo con
-        hover/foco/pestaña oculta), navegable por teclado (los indicadores
-        son <button> reales) y quieto del todo con prefers-reduced-motion
-        (ver heroSlider() en app.js): el temporizador nunca arranca, y sin
-        JS el <picture> de la primera diapositiva ya es la única visible
-        (opacity:1 por defecto en app.css, ver ".hero-slide:first-child",
-        anulado en cuanto Alpine marca #hero como listo).
-
-        DIFERIDO REAL de las diapositivas 2 y 3 (SEO, 2026-09-18): medido con
-        captura de red, las 3 fotos se descargaban siempre — opacity:0 sobre
-        position:absolute;inset:0 sigue contando como "en viewport" para el
-        lazy-loading nativo, así que loading="lazy"/fetchpriority="low" no
-        servían de nada (~478 KB de las 2 diapositivas invisibles a 1920w,
-        más que el peso declarado de toda la home). Ahora sus <picture> viven
-        inertes dentro de <template> — el navegador NO dispara ninguna
-        petición por su contenido — y heroSlider() los clona al DOM real en
-        el primer avance real del slider (autoplay, flecha o punto), justo
-        antes de activarlos (ver loadSlide()/go() en app.js). La diapositiva
-        1 no se toca: sigue eager/fetchpriority="high" fuera del <template>.
-    --}}
-    <section
-        id="hero"
-        {{--
-            Full-bleed real: sin .shell-boxed, sin radio, sin margen —
-            w-full a secas, hijo directo de <main>, así que ocupa el 100%
-            del ancho disponible sin el patrón 100vw (ese sí puede
-            desbordar si hay scrollbar vertical; w-full de un bloque normal
-            nunca lo hace, verificado con documentElement.scrollWidth a 375
-            — ver informe).
-
-            Alto: min-h 100svh menos el header. DECISIÓN DEL CLIENTE
-            (2026-09-21): "vamos con la versión V2 · Pantalla completa" —
-            cierra la ambigüedad "fullhero apaisado" que había dejado dos
-            variantes vivas en el código (V1, banda cinematográfica por
-            aspect-ratio, y V2, pantalla completa; ver
-            docs/rediseno-2026/08-lote0-roavio.md §4 para el historial). V1
-            se retiró del código — sigue en git si hace falta revisarla.
-        --}}
-        class="relative isolate flex w-full flex-col bg-ink-surface min-h-[calc(100svh-4rem)]"
-        x-data="heroSlider({{ count($heroSlides) }})"
-        x-init="init()"
-        @keydown.left="prev()"
-        @keydown.right="next()"
-        role="region"
-        aria-label="{{ __('site.home.hero.carousel_label') }}"
-    >
-        <div class="absolute inset-0" aria-hidden="true">
-            @foreach($heroSlides as $i => $slide)
-                <div class="hero-slide" :class="active === {{ $i }} ? 'is-active' : ''">
-                    <div class="photo scrim-hero-h h-full w-full" data-hero-photo="{{ $i }}">
-                        @if($i === 0)
-                            {{-- LCP: única foto servida de entrada, prioridad alta. --}}
-                            <x-ui.picture
-                                src="{{ asset('images/site/'.$slide['file'].'.jpg') }}"
-                                alt=""
-                                sizes="100vw"
-                                loading="eager"
-                                fetchpriority="high"
-                                decoding="sync"
-                                :position="$slide['position']"
-                                :position-sm="$slide['positionMobile']"
-                                imgClass="hero-slide__img h-full w-full object-cover"
-                            />
-                        @else
-                            {{-- Inerte a propósito: dentro de <template> el navegador
-                                 no la pide. heroSlider() la clona a data-hero-photo
-                                 en el primer avance que la active (ver app.js). --}}
-                            <template data-hero-template="{{ $i }}">
-                                <x-ui.picture
-                                    src="{{ asset('images/site/'.$slide['file'].'.jpg') }}"
-                                    alt=""
-                                    sizes="100vw"
-                                    :position="$slide['position']"
-                                    :position-sm="$slide['positionMobile']"
-                                    imgClass="hero-slide__img h-full w-full object-cover"
-                                />
-                            </template>
-                        @endif
-                    </div>
+    {{-- ================= Destinos ================= --}}
+    <section class="ip-sec ip-sec--dest" id="destinos" aria-labelledby="t-destinos">
+        <div class="container">
+            <div class="sec-head">
+                <div class="sec-head__main">
+                    <p class="ip-eyebrow">{{ __('home.destinations.eyebrow') }}</p>
+                    <h2 class="sec-title" id="t-destinos">{{ __('home.destinations.title') }}</h2>
+                    <p class="sec-text">{{ __('home.destinations.text') }}</p>
                 </div>
-            @endforeach
-        </div>
-
-        {{-- Anunciador para lector de pantalla: cambia con el slide activo,
-             sin depender de un alt de foto (decorativa). --}}
-        <p class="sr-only" role="status" aria-live="polite">
-            @foreach($heroSlideLabels as $i => $slideLabel)
-                <span x-show="active === {{ $i }}" x-cloak>{{ $slideLabel['label'] }}</span>
-            @endforeach
-        </p>
-
-        {{-- Full-bleed real: la sección ya no pone su propio padding-inline
-             (no hay .shell-boxed), así que el gutter horizontal del
-             contenido vuelve a vivir en ESTE .shell, igual que antes del
-             port Roavio. --}}
-        <div class="relative z-10 flex flex-1 flex-col justify-center py-28 sm:py-32 lg:py-24">
-            <div class="shell">
-                <div class="max-w-xl lg:max-w-2xl">
-                    {{-- B3: no imprime nada sin Setting::get('rnavt_number') --}}
-                    <x-ui.mincetur-badge class="mb-5" />
-
-                    <h1 class="font-display text-hero font-semibold text-white">
-                        {{ __('site.home.hero.title_before') }}
-                        {{-- Defecto D (pase anterior): el acento era
-                             text-brand-100 y se perdía sobre la zona clara de
-                             la foto. Ver .accent-on-photo en app.css, con los
-                             contrastes medidos: el énfasis es de PESO, no de
-                             color, así que sigue funcionando igual sobre las
-                             tres fotos nuevas. --}}
-                        <span class="accent-on-photo">{{ __('site.home.hero.title_highlight') }}</span>
-                        {{ __('site.home.hero.title_after') }}
-                    </h1>
-
-                    <p class="mt-5 max-w-xl text-lead text-on-dark-2">
-                        {{ __('site.home.hero.subtitle') }}
-                    </p>
-
-                    <div class="mt-8 flex flex-wrap items-center gap-3">
-                        <x-ui.button href="{{ Route::has('tours.index') ? route('tours.index') : '#' }}" class="px-6 py-3 text-base shadow-e2">
-                            {{ __('site.home.hero.cta_primary') }}
-                        </x-ui.button>
-                        {{-- Sobre foto, la variante "ghost" (texto verde sin
-                             fondo) no se lee: el secundario pasa a contorno
-                             blanco, que sí contrasta contra el scrim. --}}
-                        <a
-                            href="{{ Route::has('destinations.index') ? route('destinations.index') : '#' }}"
-                            class="inline-flex items-center justify-center gap-2 rounded-full border border-white/50 bg-ink-surface/65 px-6 py-3 text-base font-medium text-white backdrop-blur-sm transition-colors hover:bg-white hover:text-ink"
-                        >
-                            {!! $playIcon !!}
-                            {{ __('site.home.hero.cta_secondary') }}
-                        </a>
-                    </div>
-                </div>
-
-                {{-- B1: x-ui.stats-strip no imprime nada sin Setting stat_*.
-                     Sin datos no queda ninguna caja vacía. --}}
-                <x-ui.stats-strip class="mt-10 max-w-3xl" />
+                <x-home.link-more :href="route('destinations.index')">{{ __('home.destinations.see_all') }}</x-home.link-more>
             </div>
-        </div>
+            @if ($sampleTag('destinos'))<p class="sample-tag">{{ $sampleNote }}</p>@endif
 
-        {{--
-            Pie del hero (mockup móvil, lote 16): la franja de confianza YA
-            NO vive acá — se movió a una sección propia con fondo claro
-            debajo del buscador/píldoras (ver "1a" más abajo), como en la
-            maqueta. Acá solo quedan los controles del propio slider (puntos
-            + pausa), centrados, y el cue de scroll. Todo dentro del flujo
-            normal del section (flex-col), no absolute: así nunca se
-            superpone con el contenido si un idioma más largo empuja el alto
-            del hero por encima de 100svh.
-        --}}
-        <div class="relative z-10">
-            <div class="border-t border-white/15 bg-ink-surface/55 backdrop-blur-sm">
-                <div class="shell flex items-center justify-center gap-3 py-3">
-                    <div class="flex items-center gap-1.5" role="group" aria-label="{{ __('site.home.hero.carousel_label') }}">
-                        @foreach($heroSlideLabels as $i => $slideLabel)
-                            <button
-                                type="button"
-                                @click="go({{ $i }})"
-                                class="hero-dot focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                                :class="active === {{ $i }} ? 'is-active' : ''"
-                                :aria-current="active === {{ $i }} ? 'true' : 'false'"
-                                aria-label="{{ __('site.home.hero.go_to_slide', ['label' => $slideLabel['label']]) }}"
-                            >
-                                <span class="hero-dot__mark" aria-hidden="true"></span>
-                            </button>
-                        @endforeach
-                    </div>
-
-                    <button
-                        type="button"
-                        @click="toggle()"
-                        class="flex h-8 w-8 items-center justify-center rounded-full text-white/80 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                        :aria-pressed="paused ? 'true' : 'false'"
-                        :aria-label="paused ? '{{ __('site.home.hero.play') }}' : '{{ __('site.home.hero.pause') }}'"
-                    >
-                        <svg x-show="!paused" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg>
-                        <svg x-show="paused" x-cloak viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><path d="m10 9 5 3-5 3V9Z" fill="currentColor" stroke="none"/></svg>
-                    </button>
-                </div>
-            </div>
-
-            {{-- Cue de scroll: enlace real a la siguiente sección (funciona
-                 sin JS). Port Roavio original apuntaba al mosaico; ahora
-                 "Destinos imperdibles" es la sección de contenido que sigue
-                 de verdad tras el buscador/píldoras/franja (nuevo orden,
-                 lote 16), así que el ancla se actualiza a #destinos. --}}
-            <div class="hidden justify-center pb-5 sm:flex">
-                <a
-                    href="#destinos"
-                    class="hero-scroll-cue inline-flex flex-col items-center gap-1 rounded-full px-2 py-1 text-white/80 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                >
-                    <span class="text-xs font-medium uppercase tracking-wide">{{ __('site.home.hero.scroll_cue') }}</span>
-                    <svg class="hero-scroll-cue__icon h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    {{--
-        ============ 1a. BUSCADOR + PÍLDORAS DE DESTINO + FRANJA DE CONFIANZA (mockup móvil, lote 16) ============
-        Tarjeta flotante: hermana del <section id="hero"> con margen negativo
-        y z-10 propio (MISMO patrón que la tarjeta "Asistencia 24/7" de "Por
-        qué elegirnos" — nunca position:absolute dentro de un contenedor con
-        overflow oculto), así queda a caballo entre la foto y el fondo claro
-        de abajo, igual que en la maqueta, sin recortarse ni empujar el alto
-        del hero (que sigue siendo 100svh-4rem, decisión ya cerrada).
-
-        Buscador: SIN backend de búsqueda por texto libre — TourController@index
-        (ver su docblock) solo valida `destino`/`experiencia` por SLUG exacto,
-        nunca un término libre. Un <input> que no filtra nada de verdad es un
-        control falso (regla dura del encargo), así que esto es un <a> real
-        con la piel de un buscador, directo al catálogo de tours — cero
-        cambios en el controller.
-
-        Píldoras: 3 destinos PUBLICADOS reales, los primeros por `order`
-        (nunca nombres quemados), con su foto de portada real (o el
-        placeholder de catálogo de siempre) y enlace a su ficha real.
-
-        Franja de confianza: mismo dato/orden que antes vivía dentro del
-        hero ($heroTrustIcons, arriba), solo que ahora tone="light" (la
-        maqueta la separa del scrim oscuro de la foto) en una banda propia
-        --sand--, con el copy que aprobó la clienta en la maqueta.
-    --}}
-    <div class="relative z-10 -mt-9 px-4 sm:-mt-11 sm:px-6">
-        <a
-            href="{{ Route::has('tours.index') ? route('tours.index') : '#' }}"
-            class="mx-auto flex max-w-2xl items-center gap-3 rounded-full border border-line bg-surface px-5 py-4 shadow-e3 transition-colors hover:border-action sm:px-6"
-            aria-label="{{ __('site.home.hero.search_aria') }}"
-        >
-            <svg class="h-5 w-5 shrink-0 text-ink-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></svg>
-            <span class="truncate text-sm text-text-muted sm:text-base">{{ __('site.home.hero.search_placeholder') }}</span>
-        </a>
-    </div>
-
-    @if($destinations->isNotEmpty())
-        <section class="bg-surface pb-8 pt-5 sm:pb-10" aria-label="{{ __('site.home.hero.pills_aria') }}">
-            <div class="shell">
-                <ul class="flex justify-center gap-3 overflow-x-auto px-1 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] sm:flex-wrap sm:overflow-visible sm:pb-0 [&::-webkit-scrollbar]:hidden">
-                    @foreach($destinations->take(3) as $i => $destination)
-                        <li class="shrink-0">
-                            <a
-                                href="{{ route('destinations.show', $destination->slug) }}"
-                                class="flex items-center gap-2.5 rounded-full border border-line bg-surface py-1.5 pl-1.5 pr-5 text-sm font-medium text-ink transition-colors hover:border-action hover:text-action"
-                            >
-                                <span class="photo h-9 w-9 shrink-0 overflow-hidden rounded-full">
-                                    <x-ui.picture
-                                        :src="$destination->coverImageUrl() ?? PlaceholderImage::svg(80, 80, $destination->name, $photoPalette[$i % count($photoPalette)])"
-                                        :alt="filled($destination->cover_image_alt) ? $destination->cover_image_alt : $destination->name"
-                                        sizes="72px"
-                                        imgClass="h-full w-full object-cover"
-                                    />
-                                </span>
-                                {{ $destination->name }}
-                            </a>
-                        </li>
-                    @endforeach
-                </ul>
-            </div>
-        </section>
-    @endif
-
-    <section class="bg-sand" aria-label="{{ __('site.home.hero.trust_title') }}">
-        <div class="shell py-5 sm:py-6">
-            <div class="flex justify-start gap-x-6 overflow-x-auto px-1 [-ms-overflow-style:none] [scrollbar-width:none] sm:flex-wrap sm:justify-center sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden">
-                @foreach($heroTrustIcons as $key => $icon)
-                    <x-ui.trust-badge :icon="$icon" tone="light" class="shrink-0">{{ __('site.home.hero.trust.'.$key) }}</x-ui.trust-badge>
+            <div class="mosaic">
+                @php $d = $featuredDest; @endphp
+                @if ($d)
+                    <a class="dest dest--big" href="{{ $d['url'] ?? route('destinations.index') }}">
+                        @if ($d['image'])<x-ui.picture :src="$d['image']" alt="" sizes="(min-width: 1024px) 34vw, 100vw" img-class="" />@endif
+                        @if (! empty($d['sample']))<span class="sample-chip">{{ $sampleLabel }}</span>@endif
+                        <span class="badge badge--accent dest__badge">★ {{ __('home.destinations.most_wanted') }}</span>
+                        <span class="dest__body">
+                            <span class="dest__name">{{ $d['name'] }}</span>
+                            @if ($d['tagline'])<span class="dest__tag">{{ $d['tagline'] }}</span>@endif
+                            <span class="dest__count">{{ $countLabel($d['tours_count'] ?? 0) }}@if (($incaTrailPrice ?? null) && $d['key'] === 'machu-picchu'), {{ Str::lower(__('home.featured.from')) }} {{ $incaTrailPrice }}@endif</span>
+                        </span>
+                        <span class="round-btn" aria-hidden="true"><x-glyph name="arrow-right" :size="18" /></span>
+                    </a>
+                @endif
+                @foreach ($mosaic as $d)
+                    <a class="dest dest--s{{ $loop->iteration }}" href="{{ $d['url'] ?? route('destinations.index') }}">
+                        @if ($d['image'])<x-ui.picture :src="$d['image']" alt="" sizes="(min-width: 1024px) 24vw, 50vw" img-class="" />@endif
+                        @if (! empty($d['sample']))<span class="sample-chip">{{ $sampleLabel }}</span>@endif
+                        <span class="dest__body">
+                            <span class="dest__name">{{ $d['name'] }}</span>
+                            @if ($d['tagline'])<span class="dest__tag">{{ $d['tagline'] }}</span>@endif
+                        </span>
+                        <span class="round-btn" aria-hidden="true"><x-glyph name="arrow-right" :size="18" /></span>
+                    </a>
                 @endforeach
             </div>
         </div>
     </section>
 
-    {{--
-        ============ 2. DESTINOS IMPERDIBLES — carrusel con destacado (mockup móvil, lote 16) ============
-        Reemplaza la rejilla auto-fit: mockup pide un carrusel con la
-        tarjeta CENTRAL más grande (el destino destacado) y las vecinas
-        asomando a los lados, flechas + puntos. x-ui.carousel-shell (mismo
-        scroll-snap + Alpine de siempre, sin librería nueva) con `track-class`
-        (prop aditiva nueva del componente) para el padding lateral que deja
-        asomar la tarjeta vecina en móvil, y snap-center en vez de snap-start.
-
-        "Destino destacado" (decisión cerrada): el PRIMERO por `order` — no
-        existe un flag propio en Destination y no se crea uno solo para esto.
-        La pastilla "Destino destacado" y el scale-110 de escritorio van en
-        el <li>, NUNCA en x-ui.destination-card (componente compartido, sigue
-        con el mismo contrato) — y el scale nunca cambia el ANCHO del slide,
-        para que el cálculo de `active`/`maxScroll` del carrusel (que asume
-        slides del mismo ancho) siga siendo correcto.
-
-        Título dentro de .shell (alineado con el resto de la página); el
-        carrusel vive FUERA de .shell a propósito, a todo el ancho del
-        viewport, para que el padding porcentual de `track-class` deje asomar
-        la tarjeta vecina de verdad (con el título habría quedado acotado a
-        1280px y el "asomo" se habría notado solo en pantallas grandes).
-    --}}
-    <section id="destinos" class="weave bg-sand">
-        <div class="section">
-            <div class="shell">
-                <x-ui.eyebrow data-reveal class="mb-3">{{ __('site.home.destinations.eyebrow') }}</x-ui.eyebrow>
-                <x-ui.section-title as="h2" data-reveal style="--reveal-delay:60ms">
-                    <x-slot:action>
-                        <x-ui.button variant="link" href="{{ Route::has('destinations.index') ? route('destinations.index') : '#' }}">
-                            {{ __('site.home.destinations.cta') }} &rarr;
-                        </x-ui.button>
-                    </x-slot:action>
-                    {{ __('site.home.destinations.title') }}
-                </x-ui.section-title>
+    {{-- ================= Tours destacados + Camino Inca ================= --}}
+    <section class="ip-sec" id="tours" aria-labelledby="t-tours">
+        <div class="container">
+            <div class="sec-head">
+                <div class="sec-head__main">
+                    <p class="ip-eyebrow">{{ __('home.featured.eyebrow') }}</p>
+                    <h2 class="sec-title" id="t-tours">{{ __('home.featured.title') }}</h2>
+                    <p class="sec-text">{{ __('home.featured.text') }}</p>
+                </div>
+                <x-home.link-more :href="route('tours.index')">{{ __('home.featured.see_all') }}</x-home.link-more>
             </div>
-
-            @if($destinations->isNotEmpty())
-                <x-ui.carousel-shell
-                    label="{{ __('site.home.destinations.title') }}"
-                    track-class="px-[13%] sm:px-[19%] lg:justify-center lg:px-0"
-                >
-                    @foreach($destinations as $i => $destination)
-                        @php $isDestacado = $i === 0; @endphp
-                        <li
-                            class="relative shrink-0 snap-center w-[74%] transition-transform duration-300 sm:w-[46%] lg:w-[30%] {{ $isDestacado ? 'z-[1] lg:scale-110' : 'lg:scale-95 lg:opacity-90' }}"
-                            data-reveal
-                            style="--reveal-delay:{{ min($i, 5) * 80 }}ms"
-                        >
-                            @if($isDestacado)
-                                {{-- Pastilla fuera del componente compartido: ver comentario de arriba. --}}
-                                <x-ui.badge variant="green" class="absolute left-4 top-4 z-[3]">
-                                    {{ __('site.home.destinations.featured_badge') }}
-                                </x-ui.badge>
-                            @endif
-                            {{--
-                                D · lote 1/etapa D: foto real de catálogo con el
-                                placeholder SVG como respaldo (nunca al revés).
-                                El alt real viene de cover_image_alt; sin ese dato
-                                cae al nombre del destino.
-                            --}}
-                            <x-ui.destination-card
-                                :image="$destination->coverImageUrl() ?? PlaceholderImage::svg(480, 600, $destination->name, $photoPalette[$i % count($photoPalette)])"
-                                :image-alt="filled($destination->cover_image_alt) ? $destination->cover_image_alt : $destination->name"
-                                :name="$destination->name"
-                                :tagline="$destination->description"
-                                href="{{ route('destinations.show', $destination->slug) }}"
-                            />
-                        </li>
-                    @endforeach
-                </x-ui.carousel-shell>
-            @else
-                <div class="shell"><x-ui.empty-state data-reveal>{{ __('site.home.empty.destinations') }}</x-ui.empty-state></div>
-            @endif
-        </div>
-    </section>
-
-    {{--
-        ============ 3. ACTIVIDADES — carrusel de tarjetas verticales (mockup móvil, lote 16) ============
-        Mismo dato de siempre ($experiences, cero query nueva), pero en
-        carrusel en vez de rejilla auto-fit: la maqueta muestra tarjetas
-        RETRATO (no aspect-video como el pase Roavio anterior) con ícono
-        redondo arriba a la izquierda, deslizables con flechas + puntos.
-        x-ui.mosaic-tile no cambia — solo el aspecto que le pasa el caller
-        (aspect-[3/4] en vez de aspect-video) y el contenedor (carrusel en
-        vez de grid).
-    --}}
-    <section id="actividades" class="bg-surface">
-        <div class="section-tight">
-            <div class="shell">
-                <x-ui.eyebrow data-reveal class="mb-3">{{ __('site.home.activities.eyebrow') }}</x-ui.eyebrow>
-                <x-ui.section-title as="h2" data-reveal style="--reveal-delay:60ms">
-                    <x-slot:action>
-                        <x-ui.button variant="link" href="{{ Route::has('experiences.index') ? route('experiences.index') : '#' }}">
-                            {{ __('site.home.activities.cta') }} &rarr;
-                        </x-ui.button>
-                    </x-slot:action>
-                    {{ __('site.home.activities.title') }}
-                </x-ui.section-title>
+            @if ($sampleTag('tours'))<p class="sample-tag">{{ $sampleNote }}</p>@endif
+            {{-- En móvil las tarjetas van en carrusel con la vecina asomando (mockups del cliente);
+                 desde 1024 vuelven a la rejilla de 4 del PDF. --}}
+            <div class="grid-4 grid-4--snap" tabindex="0" role="region" aria-label="{{ __('home.featured.title') }}">
+                @foreach ($tours as $tour)<x-home.tour-card :tour="$tour" />@endforeach
             </div>
-
-            @if($experiences->isNotEmpty())
-                <x-ui.carousel-shell
-                    label="{{ __('site.home.activities.title') }}"
-                    track-class="px-[13%] sm:px-[19%] lg:justify-center lg:px-0"
-                >
-                    @foreach($experiences as $i => $experience)
-                        <li class="shrink-0 snap-center w-[72%] sm:w-[42%] lg:w-[23%]" data-reveal style="--reveal-delay:{{ min($i, 5) * 80 }}ms">
-                            <x-ui.mosaic-tile
-                                class="aspect-[3/4]"
-                                :image="$experience->coverImageUrl() ?? PlaceholderImage::svg(480, 360, $experience->name, $photoPalette[$i % count($photoPalette)])"
-                                :image-alt="filled($experience->cover_image_alt) ? $experience->cover_image_alt : $experience->name"
-                                :title="$experience->name"
-                                :subtitle="\Illuminate\Support\Str::limit($experience->description, 60)"
-                                :icon="$experienceIcons[$experience->slug] ?? $defaultExperienceIcon"
-                                :href="route('experiences.show', $experience->slug)"
-                                sizes="(min-width: 1024px) 24vw, (min-width: 640px) 42vw, 72vw"
-                            />
-                        </li>
-                    @endforeach
-                </x-ui.carousel-shell>
-            @else
-                <div class="shell"><x-ui.empty-state data-reveal>{{ __('site.home.empty.experiences') }}</x-ui.empty-state></div>
-            @endif
         </div>
-    </section>
 
-    {{--
-        ============ 4. TOURS DESTACADOS — carrusel con tarjeta de mockup (lote 16) ============
-        Reemplaza la rejilla auto-fit. x-ui.tour-card con `:show-attributes="true"`
-        (prop aditiva nueva, ver el componente): activa los badges de foto
-        ("Destacado" solo si is_featured, la duración real si duration_label
-        trae dato — NUNCA "Más reservado", ver decisión cerrada) y la grilla
-        2x2 de atributos DEMO en vez de la fila duration/category. Ningún
-        otro llamador de x-ui.tour-card (tours/index, styleguide) pasa esta
-        prop, así que su salida no cambia ni un píxel.
-    --}}
-    <section id="tours-destacados" class="bg-surface">
-        <div class="section">
-            <div class="shell-boxed">
-                <x-ui.eyebrow data-reveal class="mb-3">{{ __('site.home.featured_tours.eyebrow') }}</x-ui.eyebrow>
-                <x-ui.section-title as="h2" data-reveal style="--reveal-delay:60ms">
-                    <x-slot:action>
-                        <x-ui.button variant="link" href="{{ Route::has('tours.index') ? route('tours.index') : '#' }}">
-                            {{ __('site.home.featured_tours.cta') }} &rarr;
-                        </x-ui.button>
-                    </x-slot:action>
-                    {{ __('site.home.featured_tours.title') }}
-                </x-ui.section-title>
-            </div>
-
-            @if($featuredTours->isNotEmpty())
-                <x-ui.carousel-shell
-                    label="{{ __('site.home.featured_tours.title') }}"
-                    track-class="px-[10%] sm:px-[16%] lg:justify-center lg:px-0"
-                >
-                    @foreach($featuredTours as $tour)
-                        <li class="shrink-0 snap-center w-[80%] sm:w-[48%] lg:w-[31%]" data-reveal style="--reveal-delay:{{ min($loop->index, 5) * 80 }}ms">
-                            <x-ui.tour-card
-                                variant="flat"
-                                class="h-full"
-                                :image="optional($tour->images->first())->url() ?? PlaceholderImage::svg(480, 360, $tour->title, $photoPalette[$loop->index % count($photoPalette)])"
-                                :image-alt="$tour->title"
-                                :title="$tour->title"
-                                :summary="$tour->summary"
-                                :duration="$tour->duration_label"
-                                :is-featured="$tour->is_featured"
-                                :show-attributes="true"
-                                :location="optional($tour->destination)->name"
-                                :pen-cents="$tour->price_pen_cents"
-                                :usd-cents="$tour->price_usd_cents"
-                                href="{{ route('tours.show', $tour->slug) }}"
-                                sizes="(min-width: 1024px) 30vw, (min-width: 640px) 46vw, 78vw"
-                            />
-                        </li>
-                    @endforeach
-                </x-ui.carousel-shell>
-            @else
-                <div class="shell-boxed"><x-ui.empty-state data-reveal>{{ __('site.home.empty.tours') }}</x-ui.empty-state></div>
-            @endif
-        </div>
-    </section>
-
-    {{--
-        ============ 5. ¿POR QUÉ ELEGIR VIAJAR CON NOSOTROS? (about Roavio) ============
-        Port Roavio (lote 1, 2026-09-21): columnas 5/7, no 50/50 — el
-        zig-zag simétrico es tic de plantilla genérica (encargo). Contenedor
-        .shell-boxed (1392, no el .shell de 1280 de siempre) para que
-        contraste con "Destinos" justo arriba. Radio 10px y CERO
-        box-shadow en toda la sección (antes: rounded-panel/shadow-e3 en la
-        foto y la tarjeta flotante, del pase cinematográfico anterior a este
-        lote) — se ajustan acá para cumplir la regla dura del encargo; el
-        parallax, la holgura del marco y la velocidad NO se tocan.
-    --}}
-    <section id="about" class="bg-surface">
-        <div class="shell-boxed section">
-            <div class="grid gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-center lg:gap-16">
-                {{-- La foto va a la izquierda en pantallas grandes: ancla el
-                     bloque y el texto deja de flotar. --}}
-                <div class="order-2 lg:order-1" data-reveal>
-                    {{-- Parallax por capas (pase cinematográfico): la foto
-                         vive en .parallax-frame, con 14% de holgura vertical
-                         (ver app.css), y JS la traslada a una fracción de la
-                         velocidad del scroll mientras la tarjeta flotante de
-                         abajo (parte del CONTENIDO, no del fondo) se mueve a
-                         velocidad normal. Se apaga solo bajo 1024px, con
-                         puntero "coarse" o con reduced-motion — ver
-                         setupParallax() en app.js. --}}
-                    <div class="photo aspect-[4/3] rounded-tile">
-                        {{-- Velocidad subida de 0.15 a 0.26 (2026-09-18): a 0.15 el
-                             desplazamiento medido con playwright-core era real pero
-                             quedaba por debajo del umbral de percepción humana dentro
-                             de una sola pasada de scroll (~44px en la ventana visible
-                             de la sección). Con 0.26 el mismo tramo de scroll produce
-                             ~80px, visible contra la tarjeta flotante fija. El clamp
-                             (12% del alto del marco, ver app.css) no se toca: sigue
-                             siendo el tope de seguridad frente al 14% de holgura. --}}
-                        <div class="parallax-frame" data-parallax="0.26">
-                            <x-ui.picture
-                                src="{{ asset('images/site/nosotros-viajeros-ruta.jpg') }}"
-                                :alt="__('site.home.why_us.photo_alt')"
-                                sizes="(min-width: 1024px) 30rem, 92vw"
-                                position="center 40%"
-                            />
-                        </div>
+        <div class="container inca-wrap">
+            <div class="inca">
+                <div class="inca__copy">
+                    <p class="inca__badge"><x-glyph name="clock" :size="13" />{{ __('home.inca_trail.badge') }}</p>
+                    <h2 class="inca__title">{{ __('home.inca_trail.title') }}</h2>
+                    <p class="inca__text">{{ __('home.inca_trail.text') }}</p>
+                    <ul class="inca__list">
+                        @foreach (__('home.inca_trail.includes') as $inc)<li><x-glyph name="check" :size="14" />{{ $inc }}</li>@endforeach
+                    </ul>
+                    <div class="inca__actions">
+                        <a class="btn btn--accent btn--lg" href="{{ route('contact') }}">{{ __('home.inca_trail.cta_primary') }}<x-glyph name="arrow-right" :size="18" /></a>
+                        <a class="btn btn--ghost btn--lg" href="{{ $waUrl }}" target="_blank" rel="noopener"><x-glyph name="message" :size="16" />{{ __('home.inca_trail.cta_secondary') }}</a>
                     </div>
-                    {{-- Tarjeta flotante: hermana con margen negativo y
-                         z-index propio, no absolute dentro de un contenedor
-                         con overflow oculto — así no se recorta ni empuja el
-                         alto de la sección. --}}
-                    <div class="relative z-10 -mt-10 ml-4 mr-8 flex items-center gap-3 rounded-tile border border-line bg-surface p-4 sm:-mt-12 sm:ml-8 sm:mr-16">
-                        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-50 text-action" aria-hidden="true">
-                            {!! $headsetIcon !!}
+                </div>
+                <div class="inca__photo">
+                    <x-ui.picture :src="asset($fx['camino_inca'])" alt="" sizes="(min-width: 1024px) 46vw, 100vw" img-class="" />
+                    @if (! empty($incaTrailPrice))
+                        <p class="inca__price"><span>{{ __('home.inca_trail.price_label') }}</span>
+                            <strong>
+                                @if (! empty($incaTrailPriceUsd))
+                                    <span x-data><span x-show="$store.currency.code === 'PEN'">{{ $incaTrailPrice }}</span><span x-show="$store.currency.code === 'USD'" x-cloak>{{ $incaTrailPriceUsd }}</span><noscript>{{ $incaTrailPrice }}</noscript></span>
+                                @else
+                                    {{ $incaTrailPrice }}
+                                @endif
+                            </strong>
+                        </p>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{-- ================= Tours por ciudad ================= --}}
+    <section class="ip-sec ip-sec--alt" aria-labelledby="t-ciudad">
+        <div class="container">
+            <div class="sec-head">
+                <div class="sec-head__main">
+                    <p class="ip-eyebrow">{{ __('home.cities.eyebrow') }}</p>
+                    <h2 class="sec-title" id="t-ciudad">{{ __('home.cities.title') }}</h2>
+                    <p class="sec-text">{{ __('home.cities.text') }}</p>
+                </div>
+                <x-home.link-more :href="route('destinations.index')">{{ __('home.cities.see_all') }}</x-home.link-more>
+            </div>
+            @if ($sampleTag('ciudades'))<p class="sample-tag">{{ $sampleNote }}</p>@endif
+            <div class="grid-4 grid-4--cities">
+                @foreach ($cities as $c)
+                    <a class="city" href="{{ $c['url'] ?? route('destinations.index') }}">
+                        @if ($c['image'])<x-ui.picture :src="$c['image']" alt="" sizes="(min-width: 1024px) 24vw, (min-width: 640px) 46vw, 100vw" img-class="" />@endif
+                        @if (! empty($c['sample']))<span class="sample-chip sample-chip--br">{{ $sampleLabel }}</span>@endif
+                        <span class="count-pill">{{ $countLabel($c['tours_count'] ?? 0) }}</span>
+                        <span class="city__body">
+                            <span class="dest__name">{{ $c['name'] }}</span>
+                            @php $ct = ($c['city_tagline'] ?? null) ?: ($c['tagline'] ?? null); @endphp
+                            @if ($ct)<span class="dest__tag">{{ $ct }}</span>@endif
                         </span>
-                        <div>
-                            <p class="text-sm font-semibold text-ink">{{ __('site.home.why_us.assistance_title') }}</p>
-                            <p class="text-xs leading-relaxed text-text-2">{{ __('site.home.why_us.assistance_description') }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="order-1 lg:order-2">
-                    <x-ui.eyebrow data-reveal class="mb-3">{{ __('site.home.why_us.eyebrow') }}</x-ui.eyebrow>
-                    <x-ui.section-title as="h2" data-reveal style="--reveal-delay:60ms">
-                        {{ __('site.home.why_us.title_before') }}
-                        <span class="text-brand-text">{{ __('site.home.why_us.title_highlight') }}</span>{{ __('site.home.why_us.title_after') }}
-                    </x-ui.section-title>
-
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        @foreach(__('site.home.why_us.features') as $i => $feature)
-                            <x-ui.feature-card
-                                :icon="$whyUsIcons[$i] ?? $whyUsIcons[0]"
-                                :title="$feature['title']"
-                                :description="$feature['description']"
-                                data-reveal
-                                style="--reveal-delay:{{ min($i, 5) * 80 }}ms"
-                            />
-                        @endforeach
-                    </div>
-                </div>
+                        <span class="round-btn" aria-hidden="true"><x-glyph name="arrow-right" :size="18" /></span>
+                    </a>
+                @endforeach
             </div>
         </div>
     </section>
 
-    {{--
-        ============ 6. MOSAICO (port Roavio, 2026-09-20 — reubicado lote 16) ============
-        Reordenado al final del recorrido de catálogo (decisión cerrada del
-        lote 16: "...después Mosaico, Aliados y Newsletter en su orden
-        actual" — Mosaico ya no va pegado al hero, va después de "Por qué
-        elegirnos"). Contenido y geometría SIN CAMBIOS respecto al pase
-        Roavio original: banda a sangre completa (.shell-bleed, 1432px a
-        1440 de viewport), 6 tiles en 3 anchos (1 angosta, 1 ancha, dos
-        pares apilados) con UN SOLO grid (4 columnas por fr literal
-        296fr/556fr/296fr/276fr + row-span-2 en las columnas altas, solo en
-        lg+). Sin H2 visible (Roavio tampoco lleva uno ahí) — región con su
-        propio aria-label. Contenido: NO son fotos nuevas, son las mismas 3
-        $destinations y las mismas 3 $experiences que ya bajaron en sus
-        propias secciones de arriba ($mosaicTiles solo las reordena por
-        slot) — cero contenido inventado, cero query nueva. Radio
-        rounded-tile (10px, --r-tile), el medido en Roavio.
-    --}}
-    @if($mosaicTiles->isNotEmpty())
-    <section id="mosaico" aria-label="{{ __('site.home.showcase.aria_label') }}" class="bg-surface pb-10 pt-2 sm:pb-12 lg:pb-16">
-        <div class="shell-bleed">
-            @if($hasFullMosaic)
-                {{--
-                    Responsive en UN solo grid, sin duplicar markup:
-                    - <640: 2 columnas parejas, cada tile aspect-[3/4].
-                    - 640-1023: 3 columnas parejas (mismo aspecto).
-                    - >=1024: la retícula asimétrica de Roavio — 4 columnas
-                      por fr LITERAL (296/556/296/276, el valor medido, no
-                      una fracción redondeada) y las dos columnas "altas"
-                      (slot 0 = ancha, slot 1 = angosta) pasan a row-span-2
-                      SOLO en este breakpoint (lg:row-span-2, nunca
-                      row-span-2 a secas: a 2-3 columnas ese salto de fila
-                      dejaría huecos en la rejilla).
-                --}}
-                <div
-                    class="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-2.5 lg:gap-3 lg:[grid-template-columns:296fr_556fr_296fr_276fr] lg:[grid-template-rows:repeat(2,clamp(11.5rem,21.9vw,19.7rem))]"
-                >
-                    @foreach($mosaicTiles as $i => $tile)
-                        @php
-                            $isTallSlot = $i === 0 || $i === 1; // wide + narrow: cubren las 2 filas (solo en lg+)
-                            $fallbackSize = $tile['type'] === 'destination' ? [480, 600] : [480, 360];
-                        @endphp
-                        <x-ui.mosaic-tile
-                            :image="$tile['model']->coverImageUrl() ?? PlaceholderImage::svg($fallbackSize[0], $fallbackSize[1], $tile['model']->name, $photoPalette[$i % count($photoPalette)])"
-                            :image-alt="filled($tile['model']->cover_image_alt) ? $tile['model']->cover_image_alt : $tile['model']->name"
-                            :title="$tile['model']->name"
-                            :subtitle="\Illuminate\Support\Str::limit($tile['model']->description, 42)"
-                            :href="$tile['href']"
-                            :position="$tile['position']"
-                            sizes="(min-width: 1024px) 40vw, (min-width: 640px) 33vw, 50vw"
-                            :class="'aspect-[3/4] lg:aspect-auto '.($isTallSlot ? 'lg:row-span-2' : '')"
-                            data-reveal
-                            style="--reveal-delay:{{ min($i, 5) * 60 }}ms"
-                        />
-                    @endforeach
+    {{-- ================= Experiencias ================= --}}
+    <section class="ip-sec" id="experiencias" aria-labelledby="t-exp">
+        <div class="container">
+            <div class="sec-head">
+                <div class="sec-head__main">
+                    <p class="ip-eyebrow">{{ __('home.experiences.eyebrow') }}</p>
+                    <h2 class="sec-title" id="t-exp">{{ __('home.experiences.title') }}</h2>
+                    <p class="sec-text">{{ __('home.experiences.text') }}</p>
                 </div>
-            @elseif($mosaicTiles->isNotEmpty())
-                {{-- Menos de 6 piezas reales (p. ej. catálogo recién sembrado):
-                     la geometría asimétrica de Roavio no tiene sentido con
-                     menos elementos, así que cae a una rejilla simple con el
-                     mismo tratamiento de foto, en vez de dejar huecos vacíos
-                     en la retícula fija. --}}
-                <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-2.5 lg:gap-3">
-                    @foreach($mosaicTiles as $i => $tile)
-                        @php $fallbackSize = $tile['type'] === 'destination' ? [480, 600] : [480, 360]; @endphp
-                        <x-ui.mosaic-tile
-                            class="aspect-[3/4]"
-                            :image="$tile['model']->coverImageUrl() ?? PlaceholderImage::svg($fallbackSize[0], $fallbackSize[1], $tile['model']->name, $photoPalette[$i % count($photoPalette)])"
-                            :image-alt="filled($tile['model']->cover_image_alt) ? $tile['model']->cover_image_alt : $tile['model']->name"
-                            :title="$tile['model']->name"
-                            :subtitle="\Illuminate\Support\Str::limit($tile['model']->description, 42)"
-                            :href="$tile['href']"
-                            :position="$tile['position']"
-                            sizes="(min-width: 640px) 30vw, 45vw"
-                            data-reveal
-                            style="--reveal-delay:{{ min($i, 5) * 60 }}ms"
-                        />
-                    @endforeach
-                </div>
-            @endif
+            </div>
+            @if ($sampleTag('experiencias'))<p class="sample-tag">{{ $sampleNote }}</p>@endif
+            <div class="exp-grid">
+                @foreach ($exps as $e)
+                    @php [$ico, $tone] = $expIcons[$e['key'] ?? ''] ?? ['mountain', 'forest']; @endphp
+                    <a class="exp exp--{{ $loop->iteration }}" href="{{ $e['url'] ?? route('experiences.index') }}">
+                        @if ($e['image'])<x-ui.picture :src="$e['image']" alt="" sizes="(min-width: 1024px) 34vw, (min-width: 768px) 50vw, 100vw" img-class="" />@endif
+                        @if (! empty($e['sample']))<span class="sample-chip">{{ $sampleLabel }}</span>@endif
+                        <span class="exp__body">
+                            <span class="icon-tile icon-tile--solid-{{ $tone }}"><x-glyph :name="$ico" :size="22" /></span>
+                            <span class="dest__name">{{ $e['name'] }}</span>
+                            @if ($e['description'])<span class="dest__tag">{{ $e['description'] }}</span>@endif
+                            <span class="exp__link">{{ $e['link_label'] }}<x-glyph name="arrow-right" :size="14" /></span>
+                        </span>
+                    </a>
+                @endforeach
+            </div>
         </div>
     </section>
-    @endif
 
-    {{--
-        ============ 7. LO QUE DICEN NUESTROS VIAJEROS (testimonios Roavio) ============
-        Decisión anterior (B2): esta sección NO se renderizaba — `reviews` no
-        tiene migración y los 3 testimonios del mockup eran reseñas falsas
-        (caras de IA, nombres inventados). El encargo de este lote la anula
-        explícitamente: "Testimonios NO tienen modelo — maquétalos con
-        contenido estático quemado en la vista, con comentario DEMO en cada
-        uno" (ver el array $testimonials armado arriba, de
-        lang/es/site.php#testimonials.items — cada fila queda marcada
-        "DEMO: pendiente modelo" en el comentario del propio lang file).
+    {{-- ================= Paisajes ================= --}}
+    <section class="band" aria-labelledby="t-paisajes">
+        <x-ui.picture :src="asset($fx['paisajes'])" alt="" sizes="100vw" img-class="band__bg" />
+        <div class="band__shade" aria-hidden="true"></div>
+        <div class="container band__inner">
+            <p class="ip-eyebrow ip-eyebrow--dark">{{ __('home.landscapes.eyebrow') }}</p>
+            <h2 class="band__title" id="t-paisajes">{{ __('home.landscapes.title') }}</h2>
+            <p class="band__text">{{ __('home.landscapes.text') }}</p>
+            <div class="band__actions">
+                <a class="btn btn--accent btn--lg" href="{{ route('tours.index') }}">{{ __('home.landscapes.cta_primary') }}<x-glyph name="arrow-right" :size="18" /></a>
+                <a class="btn btn--ghost btn--lg" href="{{ $waUrl }}" target="_blank" rel="noopener"><x-glyph name="message" :size="16" />{{ __('home.landscapes.cta_secondary') }}</a>
+            </div>
+            <dl class="band__stats">
+                @foreach (__('home.landscapes.stats') as $s)
+                    <div><dd>{{ $s['value'] }}</dd><dt>{{ $s['label'] }}</dt></div>
+                @endforeach
+            </dl>
+        </div>
+    </section>
+    <x-home.ribbon />
 
-        El problema original de "caras de IA" NO vuelve: nombre + inicial de
-        apellido (no una identidad completa inventada) y CERO foto de
-        banco/IA — el avatar es la inicial sobre un cuadrado de color
-        (x-ui.testimonial-card variant="tile", 100x101, radio 0, el spec
-        exacto del encargo).
+    {{-- ================= Planes por tiempo ================= --}}
+    <section class="ip-sec ip-sec--dark" aria-labelledby="t-planes" x-data="{ f: 'all' }">
+        <div class="container">
+            <div class="sec-head sec-head--dark sec-head--filters">
+                <div class="sec-head__main">
+                    <p class="ip-eyebrow ip-eyebrow--dark">{{ __('home.plans.eyebrow') }}</p>
+                    <h2 class="sec-title" id="t-planes">{{ __('home.plans.title') }}</h2>
+                    <p class="sec-text">{{ __('home.plans.text') }}</p>
+                </div>
+                <div class="filters" role="group" aria-label="{{ $tr('home.plans.filter_label', 'Filtrar por duración') }}">
+                    <button type="button" class="filter is-active" :class="{ 'is-active': f === 'all' }" @click="f = 'all'" :aria-pressed="(f === 'all').toString()" aria-pressed="true">{{ __('home.plans.filters.all') }}</button>
+                    @foreach (['4h', '1dia', '2-3dias', '4mas'] as $fb)
+                        <button type="button" class="filter" :class="{ 'is-active': f === '{{ $fb }}' }" @click="f = '{{ $fb }}'" :aria-pressed="(f === '{{ $fb }}').toString()" aria-pressed="false">{{ __('home.plans.filters.'.$fb) }}</button>
+                    @endforeach
+                </div>
+            </div>
+            @if ($sampleTag('planes'))<p class="sample-tag sample-tag--dark">{{ $sampleNote }}</p>@endif
+            <div class="grid-4">
+                @foreach ($plans as $p)
+                    <article class="plan" x-show="f === 'all' || f === '{{ $p['bucket'] }}'">
+                        <div class="plan__media">
+                            @if (! empty($p['image']))<x-ui.picture :src="$p['image']" alt="" sizes="(min-width: 1024px) 24vw, (min-width: 640px) 46vw, 100vw" img-class="" />@endif
+                            @if (! empty($p['sample']))<span class="sample-chip">{{ $sampleLabel }}</span>@endif
+                            <span class="badge badge--{{ $planTone[$p['bucket']] ?? 'accent' }}">{{ $p['bucket_label'] }}</span>
+                        </div>
+                        <div class="plan__body">
+                            <p class="plan__kicker">{{ $p['bucket_kicker'] }}</p>
+                            <h3 class="plan__title">{{ $p['title'] }}</h3>
+                            <div class="plan__foot">
+                                <p class="plan__price">{{ __('home.plans.from') }}
+                                    <strong>
+                                        @if (! empty($p['price_pen_cents']) && ! empty($p['price_usd_cents']))
+                                            <x-ui.money :pen-cents="$p['price_pen_cents']" :usd-cents="$p['price_usd_cents']" />
+                                        @elseif (! empty($p['price']) && ! empty($p['price_usd']))
+                                            <span x-data><span x-show="$store.currency.code === 'PEN'">{{ $p['price'] }}</span><span x-show="$store.currency.code === 'USD'" x-cloak>{{ $p['price_usd'] }}</span><noscript>{{ $p['price'] }}</noscript></span>
+                                        @elseif (! empty($p['price']))
+                                            {{ $p['price'] }}
+                                        @else
+                                            {{ __('home.plans.price_placeholder') }}
+                                        @endif
+                                    </strong>
+                                </p>
+                                <a class="plan__link" href="{{ $p['url'] ?? route('tours.index') }}" aria-label="{{ __('home.plans.view_plans') }}: {{ $p['title'] }}">{{ __('home.plans.view_plans') }}<x-glyph name="arrow-right" :size="13" /></a>
+                            </div>
+                        </div>
+                    </article>
+                @endforeach
+            </div>
+        </div>
+    </section>
 
-        Roavio usa un Swiper de 6; acá, x-ui.carousel-shell (el mismo
-        carrusel real — scroll-snap + flechas + puntos — que ya usaba esta
-        página para tours, sin sumar una librería nueva). Contenedor
-        .shell-narrow (1290, el tercer ancho Roavio, sin consumidor hasta
-        este lote — ver tokens.css) para no repetir el .shell-bleed del
-        Mosaico justo arriba (reubicado antes de esta sección, lote 16).
-    --}}
-    @if($testimonialsEnabled)
-    <section id="testimonios" class="bg-sand weave">
-        <div class="shell-narrow section">
-            <x-ui.eyebrow data-reveal class="mb-3">{{ __('site.home.testimonials.eyebrow') }}</x-ui.eyebrow>
-            <x-ui.section-title as="h2" data-reveal style="--reveal-delay:60ms">
-                {{ __('site.home.testimonials.title') }}
-            </x-ui.section-title>
-
-            <x-ui.carousel-shell label="{{ __('site.home.testimonials.title') }}">
-                @foreach($testimonials as $i => $t)
-                    <li class="w-[300px] shrink-0 snap-start sm:w-[360px]" data-reveal style="--reveal-delay:{{ min($i, 5) * 80 }}ms">
-                        {{-- DEMO: pendiente modelo de reseñas (ver comentario arriba). --}}
-                        <x-ui.testimonial-card
-                            variant="tile"
-                            class="h-full"
-                            :quote="$t['quote']"
-                            :name="$t['name']"
-                            :origin="$t['origin']"
-                            :avatar-tone="$t['tone']"
-                        />
+    {{-- ================= Razones + testimonios ================= --}}
+    <section class="ip-sec ip-sec--alt ip-sec--reasons" id="por-que-elegirnos" aria-labelledby="t-razones">
+        <div class="container">
+            <div class="sec-head sec-head--center">
+                <div class="sec-head__main">
+                    <p class="ip-eyebrow">{{ __('home.reasons.eyebrow') }}</p>
+                    <h2 class="sec-title" id="t-razones">{{ __('home.reasons.title') }}</h2>
+                </div>
+            </div>
+            <ul class="grid-4 reasons">
+                @php $rIcons = [['flag', 'accent-soft'], ['headset', 'forest-soft'], ['shield-check', 'teal-soft'], ['clock', 'accent-soft']]; @endphp
+                @foreach (__('home.reasons.items') as $i => $r)
+                    <li class="reason">
+                        <span class="icon-tile icon-tile--lg icon-tile--{{ $rIcons[$i][1] }}"><x-glyph :name="$rIcons[$i][0]" :size="22" /></span>
+                        <h3 class="reason__title">{{ $r['title'] }}</h3>
+                        <p class="reason__text">{{ $r['text'] }}</p>
                     </li>
                 @endforeach
-            </x-ui.carousel-shell>
-        </div>
-    </section>
-    @endif
+            </ul>
 
-    {{--
-        ============ 8. ALIADOS Y CERTIFICACIONES (marquee Roavio) ============
-        Roavio lleva 21 logos; acá van aliados + los sellos oficiales
-        peruanos (RNAVT/MINCETUR — ver x-ui.mincetur-badge, que ya existe y
-        no imprime nada sin Setting::get('rnavt_number')). NINGÚN archivo
-        real en el proyecto todavía: ni un logo de aliado ni el sello oficial
-        (búsqueda en public/images/, sin resultados). Regla dura del
-        encargo: "si el sello no está, deja el hueco maquetado, nunca un
-        placeholder con aspecto de sello oficial" — por eso CADA tile, aliado
-        o sello, es el mismo wordmark de texto neutro (nada que se pueda
-        confundir con una certificación real). Pendiente anotado acá y en el
-        informe de cierre, no como copy visible en la página (mismo criterio
-        que el resto del sitio: nunca lenguaje de obra de cara al visitante).
-
-        Bucle CSS puro (.marquee-track, ver app.css): el array se recorre
-        DOS VECES seguidas para que el tramo duplicado entre justo cuando
-        sale el primero — nunca Swiper/JS nuevo. Contenedor .shell-bleed
-        (1432, a sangre) — la ficha de "logos en fila" pide ancho completo,
-        y contrasta con el .shell-narrow de Testimonios justo arriba.
-    --}}
-    <section id="aliados" aria-labelledby="aliados-title" class="border-y border-line-soft bg-surface py-10 sm:py-12">
-        <div class="shell-bleed">
-            <p id="aliados-title" class="eyebrow mb-6 text-center text-text-muted">{{ __('site.home.partners.eyebrow') }}</p>
-
-            {{-- aria-hidden: contenido decorativo (wordmarks placeholder,
-                 sin enlaces) duplicado para el bucle CSS — sin esto un
-                 lector de pantalla lo anunciaría dos veces seguidas. --}}
-            <div class="marquee-viewport overflow-hidden" data-reveal aria-hidden="true">
-                <div class="marquee-track">
-                    @foreach([...$partners, ...$partners] as $partner)
-                        <div
-                            @class([
-                                'mx-3 flex h-14 w-40 shrink-0 items-center justify-center rounded-tile border px-4 text-center text-xs font-semibold uppercase tracking-wide text-text-muted',
-                                'border-dashed border-line' => true,
-                            ])
-                            title="{{ ($partner['seal'] ?? false) ? 'Sello oficial — pendiente de archivo real' : 'Aliado — pendiente de logo real' }}"
-                        >
-                            {{ $partner['label'] }}
+            <div class="sec-head sec-head--center sec-head--gap">
+                <div class="sec-head__main">
+                    <p class="ip-eyebrow">{{ __('home.testimonials.eyebrow') }}</p>
+                    <h2 class="sec-title">{{ __('home.testimonials.title') }}</h2>
+                </div>
+            </div>
+            {{-- Testimonios y sellos: MARCADORES visibles ([Nombre del viajero], [4,9]):
+                 no hay módulo de reseñas, y una reseña inventada es un defecto, no un pendiente. --}}
+            <ul class="grid-3 testimonials">
+                @php $avTone = ['forest', 'gold', 'teal']; @endphp
+                @foreach (__('home.testimonials.items') as $i => $ti)
+                    <li class="testi">
+                        <p class="testi__quote" aria-hidden="true">&ldquo;</p>
+                        <p class="rating__stars testi__stars" aria-hidden="true">@for ($k = 0; $k < 5; $k++)<x-glyph name="star" :size="12" />@endfor</p>
+                        <blockquote class="testi__text">{{ $ti['text'] }}</blockquote>
+                        <div class="testi__who">
+                            <span class="avatar avatar--{{ $avTone[$i] ?? 'forest' }}" aria-hidden="true">{{ $ti['initial'] }}</span>
+                            <span><strong>{{ $ti['name'] }}</strong><span class="testi__meta">{{ $ti['meta'] }}</span></span>
                         </div>
-                    @endforeach
+                    </li>
+                @endforeach
+            </ul>
+            <ul class="seals">
+                @foreach (__('home.testimonials.seals') as $s)
+                    <li class="seal"><span class="rating__stars" aria-hidden="true">@for ($k = 0; $k < 5; $k++)<x-glyph name="star" :size="11" />@endfor</span>{{ $s['text'] }}</li>
+                @endforeach
+            </ul>
+        </div>
+    </section>
+
+    {{-- ================= FAQ ================= --}}
+    <section class="ip-sec ip-sec--faq" id="faq" aria-labelledby="t-faq">
+        <div class="container faq">
+            <div class="faq__side">
+                <p class="ip-eyebrow">{{ __('home.faq.eyebrow') }}</p>
+                <h2 class="sec-title" id="t-faq">{{ __('home.faq.title') }}</h2>
+                <p class="sec-text">{{ __('home.faq.text') }}</p>
+                <div class="contact-card">
+                    <div class="contact-card__head">
+                        <span class="contact-card__avatar" aria-hidden="true">{{ config('brand.manager.initials') }}</span>
+                        <span><strong>{{ config('brand.manager.name') }}</strong><span class="contact-card__role">{{ config('brand.manager.role') }}</span></span>
+                    </div>
+                    <p><x-glyph name="whatsapp" :size="16" /><a href="{{ $waUrl }}" target="_blank" rel="noopener">{{ config('brand.contact.phone') }}</a></p>
+                    <p><x-glyph name="mail" :size="16" /><a href="mailto:{{ config('brand.contact.email') }}">{{ config('brand.contact.email') }}</a></p>
+                    <a class="btn btn--wa btn--block" href="{{ $waUrl }}" target="_blank" rel="noopener"><x-glyph name="whatsapp" :size="18" />{{ __('home.faq.contact_cta') }}</a>
                 </div>
+            </div>
+            {{-- Acordeón: Alpine.data('accordion') en app.js (uno abierto a la vez, flechas/Inicio/Fin). --}}
+            <div class="accordion" x-data="accordion(0)">
+                @foreach (__('home.faq.items') as $i => $fq)
+                    <div class="acc {{ $i === 0 ? 'is-open' : '' }}" :class="{ 'is-open': open === {{ $i }} }">
+                        <h3 class="acc__h">
+                            <button type="button" class="acc__btn" id="faq-b{{ $i }}" @click="toggle({{ $i }})" @keydown="key($event, {{ $i }})" :aria-expanded="(open === {{ $i }}).toString()" aria-expanded="{{ $i === 0 ? 'true' : 'false' }}" aria-controls="faq-p{{ $i }}">
+                                <span>{{ $fq['q'] }}</span>
+                                <span class="acc__icon" aria-hidden="true"><x-glyph name="plus" :size="14" class="acc__plus" /><x-glyph name="minus" :size="14" class="acc__minus" /></span>
+                            </button>
+                        </h3>
+                        <div class="acc__panel" id="faq-p{{ $i }}" role="region" aria-labelledby="faq-b{{ $i }}" x-show="open === {{ $i }}" @if ($i !== 0) style="display: none" @endif>
+                            <p>{{ $fq['a'] }}</p>
+                        </div>
+                    </div>
+                @endforeach
             </div>
         </div>
     </section>
 
-    {{-- ============ 9. NEWSLETTER ============ --}}
-    <section class="relative isolate overflow-hidden bg-ink-surface">
-        <div class="photo scrim-band absolute inset-0">
-            {{-- Mismo tratamiento de parallax que la foto de "por qué
-                 elegir viajar con nosotros" (ver comentario ahí): capa de
-                 fondo a fracción de la velocidad del scroll, apagada bajo
-                 1024px / puntero coarse / reduced-motion. Velocidad subida
-                 de 0.12 a 0.22 (2026-09-18) por el mismo motivo: amplitud
-                 imperceptible dentro de la ventana real de scroll. --}}
-            <div class="parallax-frame" data-parallax="0.22">
-                <x-ui.picture
-                    src="{{ asset('images/site/hero-valle-sagrado-panoramica.jpg') }}"
-                    :alt="__('site.home.newsletter.photo_alt')"
-                    sizes="100vw"
-                    position="center 55%"
-                />
-            </div>
-        </div>
-
-        <div class="shell section-tight relative z-10">
-            <div class="mx-auto max-w-2xl text-center" data-reveal>
-                <h2 class="font-display text-h2 font-semibold text-white">{{ __('site.home.newsletter.title') }}</h2>
-                <p class="mt-3 text-on-dark-2">{{ __('site.home.newsletter.description') }}</p>
-
-                {{--
-                    B4: sin entidad ni endpoint de newsletter (no hay tabla,
-                    no hay contrato de datos). Campo y botón DESHABILITADOS y
-                    declarados con title/aria-label — mismo patrón que el
-                    buscador del header — nunca un formulario que finge
-                    funcionar.
-                --}}
-                <div class="mx-auto mt-7 flex max-w-lg flex-col gap-3 sm:flex-row">
-                    <label for="newsletter-email" class="sr-only">{{ __('site.home.newsletter.email_label') }}</label>
-                    <input
-                        id="newsletter-email"
-                        type="email"
-                        placeholder="{{ __('site.home.newsletter.email_placeholder') }}"
-                        disabled
-                        title="{{ __('site.home.newsletter.unavailable') }}"
-                        class="w-full rounded-full border border-white/30 bg-white/10 px-5 py-3 text-sm text-white placeholder:text-on-dark-3 disabled:cursor-not-allowed disabled:opacity-70"
-                    >
-                    <x-ui.button
-                        disabled
-                        title="{{ __('site.home.newsletter.unavailable') }}"
-                        aria-label="{{ __('site.home.newsletter.unavailable') }}"
-                        class="shrink-0 px-6 py-3"
-                    >
-                        {{ __('site.home.newsletter.submit') }}
-                    </x-ui.button>
+    {{-- ================= Instagram ================= --}}
+    @php $ig = array_slice($fx['instagram'], 0, 5); @endphp
+    <section class="ig" aria-label="Instagram">
+        @foreach ($ig as $k => $src)
+            @if ($k === 3)
+                <div class="ig__cell ig__cell--text">
+                    <x-glyph name="camera" :size="26" />
+                    <p class="ig__handle">{{ config('brand.contact.instagram_handle') }}</p>
+                    <p class="ig__text">{{ __('home.instagram.text') }}</p>
+                    @if (config('brand.social.instagram'))
+                        <a class="btn btn--accent btn--sm" href="{{ config('brand.social.instagram') }}" target="_blank" rel="noopener">{{ __('home.instagram.cta') }}</a>
+                    @else
+                        <span class="btn btn--accent btn--sm btn--off">{{ __('home.instagram.cta') }}</span>
+                    @endif
                 </div>
+            @endif
+            <div class="ig__cell"><x-ui.picture :src="asset($src)" :alt="__('home.instagram.alts')[$k] ?? ''" sizes="(min-width: 1024px) 17vw, 50vw" img-class="" /></div>
+        @endforeach
+    </section>
+
+    {{-- ================= Newsletter =================
+         Solo UI: no hay backend de correo todavía. El mensaje al enviar lo dice
+         con claridad (no finge una suscripción). --}}
+    <section class="news" aria-labelledby="t-news">
+        <div class="container news__inner">
+            <div>
+                <h2 class="news__title" id="t-news">{{ __('home.newsletter.title') }}</h2>
+                <p class="news__text">{{ __('home.newsletter.text') }}</p>
             </div>
+            <form class="news__form" novalidate x-data="{ msg: '' }" @submit.prevent="msg = ($refs.email.checkValidity() && $refs.email.value) ? @js($tr('home.newsletter.inactive', 'Gracias. La suscripción aún no está activa en esta versión del sitio.')) : @js($tr('home.newsletter.invalid', 'Escribe un correo válido.'))">
+                <label class="sr-only" for="news-email">{{ __('home.newsletter.placeholder') }}</label>
+                <x-glyph name="mail" :size="18" />
+                <input id="news-email" x-ref="email" type="email" name="email" placeholder="{{ __('home.newsletter.placeholder') }}" autocomplete="email" required>
+                <button type="submit" class="btn btn--dark">{{ __('home.newsletter.submit') }}</button>
+                <p class="news__status" role="status" x-text="msg"></p>
+            </form>
         </div>
     </section>
 
+    <x-home.whatsapp-float />
 </x-layout>

@@ -26,7 +26,7 @@
     <span class="photo photo-zoom block aspect-[4/3] w-full">
         <x-ui.picture :src="$image" :alt="$imageAlt" :sizes="$sizes" />
         @if($icon)
-            <span class="absolute left-3 top-3 z-[2] flex h-9 w-9 items-center justify-center rounded-full bg-surface text-action shadow-e1" aria-hidden="true">
+            <span class="absolute left-3 top-3 z-[2] flex h-9 w-9 items-center justify-center rounded-full bg-surface text-brand-text shadow-e1" aria-hidden="true">
                 {!! $icon !!}
             </span>
         @endif
@@ -40,8 +40,8 @@
          decoración con aria-hidden y no debe entrar en el esquema. --}}
     <div class="flex flex-1 flex-col gap-2 p-5">
         <div class="flex items-center gap-2">
-            <h{{ $hl }} class="font-display text-h3 font-semibold text-ink">{{ $title }}</h{{ $hl }}>
-            <svg class="h-4 w-4 shrink-0 text-action opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:opacity-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            <h{{ $hl }} class="text-h3 font-semibold text-ink">{{ $title }}</h{{ $hl }}>
+            <svg class="h-4 w-4 shrink-0 text-brand-text opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:opacity-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </div>
         @if($description)
             <span class="line-clamp-3 text-sm leading-relaxed text-text-2">{{ $description }}</span>

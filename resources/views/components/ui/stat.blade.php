@@ -9,7 +9,7 @@
 --}}
 @if(filled($value))
     <div {{ $attributes->class(['flex flex-col items-center gap-1 text-center']) }}>
-        <span class="font-display text-2xl font-semibold text-action sm:text-3xl">{{ $value }}</span>
+        <span class="font-display text-2xl font-semibold text-brand-text sm:text-3xl">{{ $value }}</span>
         <span class="text-xs text-text-2 sm:text-sm">{{ $label }}</span>
     </div>
 @endif

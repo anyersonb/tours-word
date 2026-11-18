@@ -188,64 +188,43 @@
     <meta name="twitter:image" content="{{ $ogImageUrl }}">
 
     {{--
-        Tipografías de marca — v2 (2026-09-22, docs/rediseno-2026/14-tipografia-v2.md):
-        Public Sans (sans/cuerpo) y Bodoni Moda (display) reemplazan a Inter
-        Tight/Fraunces del port Roavio -- esa pareja leía "plantilla de IA"
-        (encargo de Anyerson, tercer rechazo visual del proyecto). Las dos
-        son SIL OFL 1.1 y se sirven AUTOALOJADAS desde public/fonts/ (ver
-        @font-face más abajo) — nunca desde fonts.googleapis.com. El preload
-        es solo de esas dos: son las que carga TODA página del sitio (body +
-        h1..h6). Caveat (script, uso puntual en Nosotros) es la única que
-        queda en Google Fonts: no forma parte de este lote y una sola
-        familia de más no justifica bajarla y mantenerla también en disco.
+        Tipografías de marca — Inka Palace Travel (rebrand 2026-11): Cinzel
+        (titulares) y Poppins (cuerpo/UI), SIL OFL 1.1, AUTOALOJADAS desde
+        public/fonts/ (nunca desde fonts.googleapis.com). Reemplazan a
+        Bodoni Moda + Public Sans. Preload solo de las tres que pinta TODA
+        página above-the-fold (cuerpo 400, botones/menú 600, titular 700);
+        las demás pesas cargan bajo demanda. Caveat (script, uso puntual en
+        Nosotros) también va autoalojada, sin preload (no es crítica).
+
+        Subdirectorio (docs/rediseno-2026/11-fix-fuentes-subdirectorio.md):
+        los @font-face van INLINE y con asset(), nunca en el CSS de Vite, que
+        dejaría un url('/fonts/...') literal -> 404 bajo
+        limaviewtours.com/tour-word/public/. Mismo mecanismo en los preload.
     --}}
-    <link rel="preload" href="{{ asset('fonts/public-sans/PublicSans-Variable.woff2') }}" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="{{ asset('fonts/bodoni-moda/BodoniModa-Variable.woff2') }}" as="font" type="font/woff2" crossorigin>
-    {{--
-        Fix subdirectorio (2026-09-21, docs/rediseno-2026/11-fix-fuentes-subdirectorio.md):
-        estos @font-face vivían en resources/css/app.css con `url('/fonts/...')`
-        absoluto. Vite no reescribe esa URL (no es relativa al archivo fuente ni
-        pasa por su pipeline de assets) y queda literal en el CSS compilado: en
-        local resuelve porque el sitio sirve en la raíz, pero en staging
-        (limaviewtours.com/tour-word/) esa barra pelada apunta a la raíz de OTRO
-        sitio -> 404 -> fallback a fuente de sistema. Inline aquí, construido con
-        asset(), que sí conoce el prefijo real de despliegue -- mismo mecanismo
-        que ya usan los <link rel="preload"> de arriba. Se eligió inline en vez de
-        un public/fonts/fonts.css aparte para no sumar un request más a la fuente
-        que ya compite con el CSS de Vite. Conserva font-family, los rangos de
-        peso, font-style, font-display y los format() tal cual estaban -- solo
-        cambian las dos familias (v2, 2026-09-22).
-    --}}
+    <link rel="preload" href="{{ asset('fonts/poppins/poppins-latin-400-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ asset('fonts/poppins/poppins-latin-600-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ asset('fonts/cinzel/cinzel-latin-700-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
     <style>
-        @font-face {
-            font-family: 'Public Sans';
-            font-style: normal;
-            font-weight: 100 900;
-            font-display: swap;
-            src: url('{{ asset('fonts/public-sans/PublicSans-Variable.woff2') }}') format('woff2-variations'),
-                 url('{{ asset('fonts/public-sans/PublicSans-Variable.woff2') }}') format('woff2');
-        }
-        @font-face {
-            font-family: 'Bodoni Moda';
-            font-style: normal;
-            font-weight: 400 900;
-            font-display: swap;
-            src: url('{{ asset('fonts/bodoni-moda/BodoniModa-Variable.woff2') }}') format('woff2-variations'),
-                 url('{{ asset('fonts/bodoni-moda/BodoniModa-Variable.woff2') }}') format('woff2');
-        }
+        @font-face { font-family: 'Cinzel'; font-style: normal; font-weight: 700; font-display: swap; src: url('{{ asset('fonts/cinzel/cinzel-latin-700-normal.woff2') }}') format('woff2'); }
+        @font-face { font-family: 'Cinzel'; font-style: normal; font-weight: 600; font-display: swap; src: url('{{ asset('fonts/cinzel/cinzel-latin-600-normal.woff2') }}') format('woff2'); }
+        @font-face { font-family: 'Poppins'; font-style: normal; font-weight: 300; font-display: swap; src: url('{{ asset('fonts/poppins/poppins-latin-300-normal.woff2') }}') format('woff2'); }
+        @font-face { font-family: 'Poppins'; font-style: normal; font-weight: 400; font-display: swap; src: url('{{ asset('fonts/poppins/poppins-latin-400-normal.woff2') }}') format('woff2'); }
+        @font-face { font-family: 'Poppins'; font-style: normal; font-weight: 500; font-display: swap; src: url('{{ asset('fonts/poppins/poppins-latin-500-normal.woff2') }}') format('woff2'); }
+        @font-face { font-family: 'Poppins'; font-style: normal; font-weight: 600; font-display: swap; src: url('{{ asset('fonts/poppins/poppins-latin-600-normal.woff2') }}') format('woff2'); }
+        @font-face { font-family: 'Caveat'; font-style: normal; font-weight: 500; font-display: swap; src: url('{{ asset('fonts/caveat/caveat-latin-500-normal.woff2') }}') format('woff2'); }
+        @font-face { font-family: 'Caveat'; font-style: normal; font-weight: 600; font-display: swap; src: url('{{ asset('fonts/caveat/caveat-latin-600-normal.woff2') }}') format('woff2'); }
+        @font-face { font-family: 'Poppins'; font-style: normal; font-weight: 700; font-display: swap; src: url('{{ asset('fonts/poppins/poppins-latin-700-normal.woff2') }}') format('woff2'); }
     </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&display=swap" rel="stylesheet">
 
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-ground font-sans text-ink antialiased flex flex-col">
+    <a class="skip-link" href="#contenido">{{ trans()->has('home.menu.skip') ? __('home.menu.skip') : (app()->getLocale() === 'en' ? 'Skip to content' : 'Saltar al contenido') }}</a>
     <x-site.header />
 
-    <main class="flex-1">
+    <main id="contenido" class="flex-1">
         {{ $slot }}
     </main>
 

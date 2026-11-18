@@ -21,7 +21,7 @@
                  borde computado seguia en verde con border-danger puesto),
                  asi que la marca visible es un anillo. --}}
             {{ $attributes->class([
-                'mt-0.5 h-4 w-4 shrink-0 rounded text-action focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action',
+                'mt-0.5 h-4 w-4 shrink-0 rounded text-brand-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus',
                 'border-danger ring-2 ring-danger ring-offset-1' => $error,
                 'border-line' => ! $error,
             ]) }}

@@ -7,7 +7,7 @@
     // consistente que ya usa el resto del sitio.
     $galleryImages = collect($destination['gallery'])->map(fn ($image) => ['src' => $image['src'], 'alt' => $image['alt']])->all();
     if (empty($galleryImages)) {
-        $galleryImages = [['src' => PlaceholderImage::svg(1200, 800, $destination['name'], '2c6fa8'), 'alt' => $destination['name']]];
+        $galleryImages = [['src' => PlaceholderImage::svg(1200, 800, $destination['name']), 'alt' => $destination['name']]];
     }
 
     $breadcrumbItems = [
@@ -104,7 +104,7 @@
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach($relatedTours as $tour)
                         <x-ui.tour-card
-                            :image="$tour['images'][0]['src'] ?? PlaceholderImage::svg(480, 360, $tour['title'], '2c6fa8')"
+                            :image="$tour['images'][0]['src'] ?? PlaceholderImage::svg(480, 360, $tour['title'])"
                             :image-alt="$tour['images'][0]['alt'] ?? $tour['title']"
                             :title="$tour['title']"
                             :summary="$tour['summary']"

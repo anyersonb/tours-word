@@ -16,43 +16,21 @@
  *    JS de v3 sin necesidad.
  */
 @import './tokens.css';
+@import './inka.css';
 
 /*
- * Tipografía de marca — v2 (2026-09-22, docs/rediseno-2026/14-tipografia-v2.md).
- * Reemplaza Inter Tight/Fraunces (port Roavio, 2026-09-20): esa pareja es
- * justo la combinación por defecto de sitios generados con IA (Fraunces es
- * el serif "wonky" de moda en startups, Inter la sans de interfaz por
- * defecto de toda la industria) -- Anyerson la rechazó por tercera vez con
- * "muy IA, poco profesional". Public Sans (SIL OFL 1.1, cuerpo/sans) y
- * Bodoni Moda (SIL OFL 1.1, display) sirven AUTOALOJADAS desde
- * public/fonts/ — nunca desde fonts.googleapis.com (ver
- * components/layout.blade.php: el <link> de Google Fonts que queda solo
- * sirve Caveat, la script de Nosotros, fuera de este lote).
- * Cada archivo es la variante "variable" (un solo .woff2 cubre todo el
- * rango de peso declarado), subset "latin" (cubre acentos y ñ del español:
- * U+0000-00FF), descargada una sola vez desde Google Fonts y servida en
- * disco — no hay build step que la regenere.
+ * Tipografía de marca — Inka Palace Travel (rebrand 2026-11): Cinzel
+ * (titulares; sus minúsculas son versalitas nativas, como en el PDF) y
+ * Poppins (cuerpo y UI). Ambas SIL OFL 1.1, AUTOALOJADAS en public/fonts/
+ * (subset latin: cubre acentos y ñ). Reemplazan a Bodoni Moda + Public Sans
+ * (v2, aprobadas por la clienta antes del PDF).
  *
- * Otras dos parejas se probaron en código real sobre este mismo árbol y se
- * documentan en el informe para reconstruirlas (Lora sola -- serif
- * humanista cálido en los dos roles -- y Archivo sola -- grotesca con
- * jerarquía por peso/tracking). Se descartaron a favor de esta por el
- * argumento del informe, no por defecto técnico: las tres cargan y
- * renderizan correctamente.
- *
- * Fix subdirectorio (2026-09-21, docs/rediseno-2026/11-fix-fuentes-subdirectorio.md):
- * los @font-face vivían AQUÍ con `src: url('/fonts/...')` absoluto. Vite no
- * reescribe esa URL (avisa "didn't resolve at build time, it will remain
- * unchanged") porque no es relativa al archivo fuente ni pasa por su
- * pipeline de assets — queda literal en el CSS compilado. En local resuelve
- * porque el proyecto sirve en la raíz; en staging
- * (limaviewtours.com/tour-word/) esa barra pelada apunta a la raíz de OTRO
- * sitio → 404 en las dos fuentes → fallback a fuente de sistema (el
- * síntoma "plano, muy wordpress" que el cliente ya rechazó). Los
- * @font-face se movieron a un <style> en components/layout.blade.php,
- * construidos con asset() — el único punto que conoce el prefijo real de
- * despliegue. El @theme de abajo sigue mapeando 'Public Sans' / 'Bodoni
- * Moda' por font-family, así que no cambia nada más.
+ * Los @font-face NO viven aquí: van inline en components/layout.blade.php,
+ * construidos con asset(). Un url('/fonts/...') en este archivo queda
+ * literal tras Vite y rompe en el despliegue por subdirectorio
+ * (limaviewtours.com/tour-word/public/), ver
+ * docs/rediseno-2026/11-fix-fuentes-subdirectorio.md. El @theme de abajo
+ * solo mapea la familia por nombre.
  */
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -71,18 +49,11 @@
 @source '../**/*.js';
 
 @theme {
-    /* Tipografía v2 (2026-09-22, docs/rediseno-2026/14-tipografia-v2.md):
-     * Public Sans entra de sans/cuerpo, Bodoni Moda de display -- pareja
-     * editorial de alto contraste (serif Didone + grotesca neutral),
-     * elegida sobre Inter Tight/Fraunces (leía "plantilla de IA", tercer
-     * rechazo visual de Anyerson) y sobre otras dos parejas evaluadas en el
-     * mismo árbol (Lora sola / Archivo sola, documentadas en el informe
-     * para reconstruirlas). self-hosted, ver @font-face en layout.blade.php.
-     * body/h1..h6 se resuelven desde ACÁ (--font-sans / --font-display),
-     * nunca desde SCSS suelto en una vista — es la regla del proyecto. */
-    --font-sans: 'Public Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    /* Cinzel = display (h1..h6 salen de --font-display), Poppins = cuerpo.
+     * @font-face inline en layout.blade.php (ver nota arriba). */
+    --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
-    --font-display: 'Bodoni Moda', ui-serif, Georgia, 'Times New Roman', serif;
+    --font-display: 'Cinzel', 'Times New Roman', serif;
     --font-script: 'Caveat', cursive;
 
     /* Rampa de marca -> utilidades bg-brand-*, text-brand-*, border-brand-* */
@@ -98,6 +69,7 @@
     --color-brand-900: var(--brand-900);
 
     /* Semánticos de marca y superficie -> bg-action, text-brand-text, bg-ground... */
+    --color-focus: var(--focus);
     --color-action: var(--action);
     --color-action-hover: var(--action-hover);
     --color-on-action: var(--on-action);
@@ -173,13 +145,25 @@
         color: var(--text);
     }
 
-    h1, h2, h3, h4, h5, h6 {
+    /* Cinzel solo en H1/H2 (y en títulos sobre foto, que lo piden con
+     * .font-display / .dest__name). H3..H6 de tarjetas, planes, razones y
+     * fichas van en Poppins, como la referencia. */
+    h1, h2 {
         font-family: var(--font-display);
     }
+    h3, h4, h5, h6 {
+        font-family: var(--font-sans);
+    }
 
+    /* Foco: dorado oscuro sobre claro (--focus, 6:1); sobre superficies
+     * oscuras (topbar, footer, hero, bandas) pasa a dorado vivo. El dorado
+     * de marca (--action) sobre blanco mide 2.1:1 y no sirve de foco. */
     :focus-visible {
-        outline: 2px solid var(--action);
+        outline: 2px solid var(--focus);
         outline-offset: 2px;
+    }
+    :is(.bg-ink-surface, .scrim-hero, .scrim-hero-h, .scrim-band, .scrim-card, [data-on-dark]) :focus-visible {
+        outline-color: var(--focus-on-dark);
     }
 
     [x-cloak] {
@@ -201,12 +185,11 @@
     /* Caja horizontal única del sitio. */
     .shell {
         width: 100%;
-        max-width: 80rem; /* 1280 = max-w-7xl, el que ya usaban home/índices */
+        max-width: 90rem; /* 1440, 20px/40px: igual que .container (header/footer/home) para que los bordes coincidan */
         margin-inline: auto;
-        padding-inline: 1rem;
+        padding-inline: 20px;
     }
-    @media (min-width: 640px) { .shell { padding-inline: 1.5rem; } }
-    @media (min-width: 1024px) { .shell { padding-inline: 2rem; } }
+    @media (min-width: 1024px) { .shell { padding-inline: 40px; } }
 
     /* Caja estrecha para texto corrido (fichas): 65-70 caracteres. */
     .shell-prose { max-width: 46rem; }
@@ -362,94 +345,14 @@
 
     /* ============================================================================
      * PASE CINEMATOGRÁFICO (2026-09-18) — infraestructura de animación.
-     * Reutilizable por la pasada B (fichas de tour): slider de hero, Ken
-     * Burns, parallax por capas y revelados al hacer scroll. Cero librerías
+     * Parallax por capas y revelados al hacer scroll (fichas y cabeceras). Cero librerías
      * nuevas — Alpine 3 (ya instalado) + CSS + IntersectionObserver/rAF
      * nativos. El detalle de cada pieza va en su comentario.
      * ========================================================================= */
 
-    /* --- Slider de hero -------------------------------------------------
-     * Diapositivas apiladas (position:absolute inset:0 dentro de un
-     * contenedor position:relative) que cambian por fundido de opacidad.
-     * pointer-events:none porque el slide es puramente decorativo — el
-     * contenido interactivo (título, botones) vive aparte, por encima. */
-    .hero-slide {
-        position: absolute;
-        inset: 0;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 1.1s ease;
-    }
-    .hero-slide.is-active {
-        opacity: 1;
-        z-index: 1;
-    }
-    /* Respaldo sin JS: mientras heroSlider() no haya corrido (Alpine no
-     * cargó, o el visitante tiene JS desactivado), la diapositiva 1 se ve
-     * igual — no depende de la clase is-active, que solo la pone Alpine.
-     * En cuanto init() marca #hero[data-hero-ready], esta regla deja de
-     * aplicar y manda solo is-active (ver heroSlider() en app.js). Las
-     * diapositivas 2 y 3 nunca necesitan este respaldo: su <picture> vive
-     * dentro de <template>, así que sin JS no hay nada que mostrar ahí. */
-    #hero:not([data-hero-ready]) .hero-slide:first-child {
-        opacity: 1;
-        z-index: 1;
-    }
-
-    /* Ken Burns: solo con motion permitido, y solo en la diapositiva activa.
-     * Dos variantes de dirección alternadas por posición para que las tres
-     * fotos no repitan el mismo barrido. La imagen ya vive dentro de un
-     * .photo con overflow:hidden, así que la escala nunca se sale de caja. */
-    @media (prefers-reduced-motion: no-preference) {
-        .hero-slide.is-active .hero-slide__img {
-            animation: pv-kenburns-a 17s ease-in-out infinite alternate;
-        }
-        .hero-slide:nth-of-type(2).is-active .hero-slide__img {
-            animation-name: pv-kenburns-b;
-        }
-        .hero-slide:nth-of-type(3).is-active .hero-slide__img {
-            animation-name: pv-kenburns-c;
-        }
-    }
-    @keyframes pv-kenburns-a {
-        from { transform: scale(1) translate3d(0, 0, 0); }
-        to   { transform: scale(1.09) translate3d(-1.4%, -1%, 0); }
-    }
-    @keyframes pv-kenburns-b {
-        from { transform: scale(1.05) translate3d(1%, 0, 0); }
-        to   { transform: scale(1.12) translate3d(-1%, -1.6%, 0); }
-    }
-    @keyframes pv-kenburns-c {
-        from { transform: scale(1) translate3d(-0.6%, 0.4%, 0); }
-        to   { transform: scale(1.09) translate3d(1.2%, -0.8%, 0); }
-    }
-
-    /* Indicadores del slider: pastilla-punto sobre foto, mismo lenguaje que
-     * el resto del sitio (ver carousel-shell) pero en tono claro, para leerse
-     * sobre cualquiera de las tres fotos. */
-    .hero-dot {
-        display: flex; align-items: center; justify-content: center;
-        height: 1.5rem; width: 1.5rem; border-radius: 9999px;
-    }
-    .hero-dot__mark {
-        height: .5rem; width: .5rem; border-radius: 9999px;
-        background-color: hsl(0 0% 100% / .5);
-        transition: all .3s ease;
-    }
-    .hero-dot.is-active .hero-dot__mark {
-        width: 1.5rem;
-        background-color: #fff;
-    }
-
-    /* Botón "desplázate" al pie del hero. El rebote es puramente decorativo
-     * (aria-hidden en el ícono) y se anula con reduced-motion. */
-    @media (prefers-reduced-motion: no-preference) {
-        .hero-scroll-cue__icon { animation: pv-bounce 2s ease-in-out infinite; }
-    }
-    @keyframes pv-bounce {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(.4rem); }
-    }
+    /* El slider de hero del Home (rebrand Inka Palace) vive en inka.css
+     * (.hero*); aquí se retiraron .hero-slide / Ken Burns / .hero-dot /
+     * .hero-scroll-cue, que ya no usa ninguna vista. */
 
     /* --- Parallax por capas ---------------------------------------------
      * .parallax-frame vive DENTRO de un .photo (position:relative,
@@ -509,36 +412,6 @@
             repeating-linear-gradient(135deg,
                 hsl(var(--brand-h) 40% 70% / .06) 0 1px,
                 transparent 1px 14px);
-    }
-
-    /* ============================================================================
-     * PORT ROAVIO — lote 1 (2026-09-21): marquee de aliados/sellos.
-     * Bucle CSS puro, cero JS/Swiper: el track duplica su contenido una vez
-     * (ver home.blade.php, el @foreach corre dos veces sobre el mismo array)
-     * y se traslada -50% de su propio ancho — el segundo tramo entra justo
-     * cuando el primero sale, sin salto ni reinicio visible. Pausado con
-     * prefers-reduced-motion, y también al pasar el mouse o al enfocar un
-     * tile con teclado, para no perder el punto de partida a media lectura.
-     * ========================================================================= */
-    .marquee-viewport {
-        -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
-        mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
-    }
-    .marquee-track {
-        display: flex;
-        width: max-content;
-        animation: pv-marquee 36s linear infinite;
-    }
-    .marquee-viewport:hover .marquee-track,
-    .marquee-viewport:focus-within .marquee-track {
-        animation-play-state: paused;
-    }
-    @keyframes pv-marquee {
-        from { transform: translateX(0); }
-        to   { transform: translateX(-50%); }
-    }
-    @media (prefers-reduced-motion: reduce) {
-        .marquee-track { animation: none; }
     }
 }
 

@@ -164,7 +164,7 @@
                         @foreach($teamMembers as $member)
                             <li class="w-[240px] shrink-0 snap-start sm:w-[260px]">
                                 <x-ui.team-member-card
-                                    :photo="$member->photoUrl() ?? PlaceholderImage::svg(320, 240, $member->name, '3d4a42')"
+                                    :photo="$member->photoUrl() ?? PlaceholderImage::svg(320, 240, $member->name)"
                                     :name="$member->name"
                                     :role="$member->role"
                                     :bio="$member->description"
@@ -180,7 +180,7 @@
                 @else
                     <div class="max-w-xs">
                         <x-ui.team-member-card
-                            :photo="$teamMembers->first()->photoUrl() ?? PlaceholderImage::svg(320, 240, $teamMembers->first()->name, '3d4a42')"
+                            :photo="$teamMembers->first()->photoUrl() ?? PlaceholderImage::svg(320, 240, $teamMembers->first()->name)"
                             :name="$teamMembers->first()->name"
                             :role="$teamMembers->first()->role"
                             :bio="$teamMembers->first()->description"

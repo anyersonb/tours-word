@@ -15,10 +15,10 @@
     cambia de color, mismo lenguaje de feedback sin sombra.
 --}}
 <div {{ $attributes->class(['flex h-full flex-col gap-3 rounded-tile border border-line bg-surface p-5 transition-colors duration-300 hover:border-action']) }}>
-    <span class="flex h-11 w-11 items-center justify-center rounded-full bg-brand-50 text-action" aria-hidden="true">
+    <span class="flex h-11 w-11 items-center justify-center rounded-full bg-brand-50 text-brand-text" aria-hidden="true">
         {!! $icon !!}
     </span>
-    <h3 class="font-display text-h3 font-semibold text-ink">{{ $title }}</h3>
+    <h3 class="text-h3 font-semibold text-ink">{{ $title }}</h3>
     @if($description)
         <p class="text-sm leading-relaxed text-text-2">{{ $description }}</p>
     @endif

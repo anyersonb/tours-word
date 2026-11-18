@@ -7,7 +7,7 @@ return [
     // out of scope for this lote). No figures or regulatory claims: see
     // docs/lote-1/00-sistema-diseno.md.
     'seo' => [
-        'default_description' => 'Pacha Viva is a tour operator based in Cusco, Peru. We design authentic tours and experiences across the country with local experts.',
+        'default_description' => 'Inka Palace Travel is a tour operator in Peru. We design authentic tours and experiences across the country with local experts.',
     ],
 
     // Shared UI (lote 1, arreglo A1 on `carousel-shell.blade.php`).
@@ -79,7 +79,7 @@ return [
         'open_menu' => 'Open menu',
         'close_menu' => 'Close menu',
         // Roavio port (2026-09-20): thin strip above the main header.
-        'topbar_tagline' => 'Boutique travel agency in Cusco, Peru',
+        'topbar_tagline' => 'Travel agency with local experts',
     ],
 
     'footer' => [
@@ -101,8 +101,8 @@ return [
         // layout.blade.php's brand-only fallback — it's the site's highest
         // value title. Final copy to be validated with the client/Anyerson.
         'meta' => [
-            'title' => 'Tour operator in Cusco, Peru',
-            'description' => 'Tour operator in Cusco, Peru. We design authentic, unforgettable experiences in the country\'s most amazing destinations, guided by local experts.',
+            'title' => 'Tour operator in Peru',
+            'description' => 'Tour operator in Peru. We design authentic, unforgettable experiences in the country\'s most amazing destinations, guided by local experts.',
         ],
 
         'hero' => [
@@ -156,7 +156,7 @@ return [
         ],
 
         'featured_tours' => [
-            'eyebrow' => 'Pacha Viva selection',
+            'eyebrow' => 'Inka Palace Travel selection',
             'title' => 'Featured tours',
             'cta' => 'View all tours',
         ],
@@ -361,7 +361,7 @@ return [
     // TeamMember/Setting, never from this file (D1/D2).
     'nosotros' => [
         'meta' => [
-            'description' => 'Pacha Viva is a tour operator based in Cusco, Peru, connecting travelers with the authentic side of the country through local experts.',
+            'description' => 'Inka Palace Travel is a tour operator in Peru, connecting travelers with the authentic side of the country through local experts.',
         ],
 
         'breadcrumb' => [
@@ -385,7 +385,7 @@ return [
             // PENDING client: claims "positive impact on communities and the
             // environment" — verifiable, not filler.
             'paragraph_2' => 'We believe in responsible tourism that creates a positive impact on communities and the environment.',
-            'signature' => 'Pacha Viva Team',
+            'signature' => 'Inka Palace Travel Team',
             'photo_alt' => 'Aerial view of the circular terraces of Moray at sunset',
         ],
 

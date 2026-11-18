@@ -11,11 +11,11 @@
     componente nuevo en vez de reusar feature-card con estilos distintos.
 --}}
 <div {{ $attributes->class(['flex flex-col gap-3']) }}>
-    <span class="flex h-11 w-11 items-center justify-center rounded-full bg-brand-50 text-action" aria-hidden="true">
+    <span class="flex h-11 w-11 items-center justify-center rounded-full bg-brand-50 text-brand-text" aria-hidden="true">
         {!! $icon !!}
     </span>
     <div>
-        <h3 class="font-display text-base font-semibold text-ink">{{ $title }}</h3>
+        <h3 class="text-base font-semibold text-ink">{{ $title }}</h3>
         @if($description)
             <p class="mt-1 text-sm text-text-2">{{ $description }}</p>
         @endif

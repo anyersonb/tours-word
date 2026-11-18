@@ -86,7 +86,7 @@
                     @foreach($destinations as $i => $destination)
                         <x-ui.destination-card
                             variant="flat"
-                            :image="$destination['gallery'][0]['src'] ?? PlaceholderImage::svg(480, 600, $destination['name'], '2c6fa8')"
+                            :image="$destination['gallery'][0]['src'] ?? PlaceholderImage::svg(480, 600, $destination['name'])"
                             :image-alt="$destination['cover_image_alt'] ?? $destination['name']"
                             :name="$destination['name']"
                             :tagline="$destination['description']"

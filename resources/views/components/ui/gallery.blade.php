@@ -46,7 +46,7 @@
             type="button"
             @click="show(active)"
             aria-label="{{ __('site.ui.gallery.expand') }}"
-            class="absolute bottom-3 right-3 z-[2] flex h-10 w-10 items-center justify-center rounded-full bg-ink-surface/70 text-white backdrop-blur-sm transition-colors hover:bg-ink-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            class="absolute bottom-3 right-3 z-[2] flex h-11 w-11 items-center justify-center rounded-full bg-ink-surface/70 text-white backdrop-blur-sm transition-colors hover:bg-ink-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
         >
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m0 8v3a2 2 0 0 0 2 2h3m8 0h3a2 2 0 0 0 2-2v-3m0-8V5a2 2 0 0 0-2-2h-3"/></svg>
         </button>
@@ -74,7 +74,7 @@
                     :aria-current="active === {{ $i }} ? 'true' : 'false'"
                     :class="active === {{ $i }} ? 'border-action opacity-100' : 'border-transparent opacity-70 hover:opacity-100'"
                     aria-label="{{ __('site.ui.gallery.show_photo', ['position' => $i + 1, 'total' => count($images)]) }}"
-                    class="photo h-16 w-20 shrink-0 rounded-md border-2 transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
+                    class="photo h-16 w-20 shrink-0 rounded-md border-2 transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
                 >
                     <x-ui.picture :src="$image['src']" alt="" sizes="80px" />
                 </button>

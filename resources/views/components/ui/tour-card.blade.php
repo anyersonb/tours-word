@@ -103,7 +103,7 @@
     </div>
 
     <div class="flex flex-1 flex-col gap-3 p-5">
-        <h{{ $hl }} class="font-display text-h3 font-semibold text-ink">
+        <h{{ $hl }} class="text-h3 font-semibold text-ink">
             <a href="{{ $href }}" class="before:absolute before:inset-0 before:content-['']">
                 {{ $title }}
             </a>
@@ -117,13 +117,13 @@
             <div class="flex flex-wrap gap-x-4 gap-y-2 text-xs text-text-muted">
                 @if($duration)
                     <span class="inline-flex items-center gap-1.5">
-                        <svg class="h-4 w-4 text-action" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" /></svg>
+                        <svg class="h-4 w-4 text-brand-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" /></svg>
                         {{ $duration }}
                     </span>
                 @endif
                 @if($category)
                     <span class="inline-flex items-center gap-1.5">
-                        <svg class="h-4 w-4 text-action" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 21V8l8-5 8 5v13" /><path d="M9 21v-6h6v6" /></svg>
+                        <svg class="h-4 w-4 text-brand-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 21V8l8-5 8 5v13" /><path d="M9 21v-6h6v6" /></svg>
                         {{ $category }}
                     </span>
                 @endif
@@ -135,7 +135,7 @@
             <div class="grid grid-cols-2 gap-3 text-xs text-text-2">
                 @foreach($demoAttributes as $attr)
                     <div class="flex items-center gap-2">
-                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-50 text-action" aria-hidden="true">{!! $attr['icon'] !!}</span>
+                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-text" aria-hidden="true">{!! $attr['icon'] !!}</span>
                         <span>{{ $attr['label'] }}</span>
                     </div>
                 @endforeach
@@ -143,8 +143,8 @@
         @endif
 
         <div class="mt-auto flex flex-wrap items-end justify-between gap-3 border-t border-line-soft pt-4">
-            <x-ui.money :pen-cents="$penCents" :usd-cents="$usdCents" :prefix="__('site.ui.tour_card.price_prefix')" class="font-display text-h3 font-semibold text-ink" />
-            <span class="relative z-[1] inline-flex items-center justify-center gap-2 rounded-full bg-action px-4 py-2 text-sm font-medium text-on-action transition-colors group-hover:bg-action-hover">
+            <x-ui.money :pen-cents="$penCents" :usd-cents="$usdCents" :prefix="__('site.ui.tour_card.price_prefix')" class="text-h3 font-semibold text-ink" />
+            <span class="relative z-[1] inline-flex items-center justify-center gap-2 rounded-[6px] bg-action px-4 py-2 text-sm font-medium text-on-action transition-colors group-hover:bg-action-hover">
                 {{ __('site.ui.tour_card.cta') }}
                 <svg class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
             </span>

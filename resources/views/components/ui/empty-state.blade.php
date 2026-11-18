@@ -8,7 +8,7 @@
     lang/{es,en}/site.php (home.empty.*) sin que nada lo usara.
 --}}
 <div {{ $attributes->class(['flex flex-col items-center gap-3 rounded-panel border border-dashed border-line bg-surface/60 px-6 py-12 text-center']) }}>
-    <span class="flex h-12 w-12 items-center justify-center rounded-full bg-brand-50 text-action" aria-hidden="true">
+    <span class="flex h-12 w-12 items-center justify-center rounded-full bg-brand-50 text-brand-text" aria-hidden="true">
         @if($icon)
             {!! $icon !!}
         @else

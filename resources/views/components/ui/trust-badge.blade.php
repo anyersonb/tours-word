@@ -5,7 +5,7 @@
 ])
 @php
     $tones = [
-        'light' => ['text' => 'text-text-2', 'chip' => 'bg-brand-50 text-action'],
+        'light' => ['text' => 'text-text-2', 'chip' => 'bg-brand-50 text-brand-text'],
         // Medido: --on-dark-2 (#c6d6cd) sobre el scrim del hero pasa AA de
         // texto normal con margen; la pastilla del ícono usa blanco puro.
         'dark' => ['text' => 'text-on-dark-2', 'chip' => 'bg-white/15 text-white ring-1 ring-white/20'],

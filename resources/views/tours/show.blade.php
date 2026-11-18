@@ -22,7 +22,7 @@
 
     $galleryImages = collect($tour['images'])->map(fn ($image) => ['src' => $image['src'], 'alt' => $image['alt']])->all();
     if (empty($galleryImages)) {
-        $galleryImages = [['src' => PlaceholderImage::svg(1200, 800, $tour['title'], '2c6fa8'), 'alt' => $tour['title']]];
+        $galleryImages = [['src' => PlaceholderImage::svg(1200, 800, $tour['title']), 'alt' => $tour['title']]];
     }
 
     $breadcrumbItems = [
@@ -34,7 +34,7 @@
     // Íconos: mismo lenguaje visual (stroke-width 2, viewBox 24x24) que el
     // resto del sitio (home/nosotros/contacto), para no introducir un
     // segundo estilo.
-    $iconCheck = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5 shrink-0 text-action" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+    $iconCheck = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5 shrink-0 text-brand-text" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
     $iconX = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5 shrink-0 text-text-muted" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>';
     $iconClock = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>';
     $iconGauge = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true"><path d="m12 14 3-5"/><circle cx="12" cy="14" r="1"/><path d="M4 15a8 8 0 1 1 16 0"/></svg>';
@@ -232,7 +232,7 @@
                             :pen-cents="$tour['price_pen_cents']"
                             :usd-cents="$tour['price_usd_cents']"
                             :prefix="__('site.tours.show.price_prefix')"
-                            class="font-display text-h2 font-semibold text-ink"
+                            class="text-h2 font-bold text-ink"
                         />
                     </div>
 
@@ -253,7 +253,7 @@
                             <dl class="mt-6 flex flex-col gap-4 border-t border-line-soft pt-5 text-sm">
                                 @if($tour['duration_label'])
                                     <div class="flex items-start gap-3">
-                                        <span class="mt-0.5 text-action">{!! $iconClock !!}</span>
+                                        <span class="mt-0.5 text-brand-text">{!! $iconClock !!}</span>
                                         <div>
                                             <dt class="font-medium text-ink">{{ __('site.tours.show.duration_label') }}</dt>
                                             <dd class="text-text-2">{{ $tour['duration_label'] }}</dd>
@@ -262,7 +262,7 @@
                                 @endif
                                 @if($tour['difficulty'])
                                     <div class="flex items-start gap-3">
-                                        <span class="mt-0.5 text-action">{!! $iconGauge !!}</span>
+                                        <span class="mt-0.5 text-brand-text">{!! $iconGauge !!}</span>
                                         <div>
                                             {{-- El valor es App\Enums\TourDifficulty (Tour::$casts),
                                                  nunca un string: por eso ->value. Ver el comentario
@@ -274,7 +274,7 @@
                                 @endif
                                 @if($tour['meeting_point'])
                                     <div class="flex items-start gap-3">
-                                        <span class="mt-0.5 text-action">{!! $iconPin !!}</span>
+                                        <span class="mt-0.5 text-brand-text">{!! $iconPin !!}</span>
                                         <div>
                                             <dt class="font-medium text-ink">{{ __('site.tours.show.meeting_point_title') }}</dt>
                                             <dd class="text-text-2">{{ $tour['meeting_point'] }}</dd>
@@ -360,7 +360,7 @@
               <div class="mx-auto grid max-w-4xl gap-6 sm:grid-cols-2">
                 @if(!empty($tour['inclusions']))
                     <div class="rounded-panel border border-line bg-surface p-6 shadow-e1" data-reveal @if($inclusionsLangAttr) lang="{{ $inclusionsLangAttr }}" @endif>
-                        <h2 class="font-display text-h3 font-semibold text-ink">{{ __('site.tours.show.inclusions_title') }}</h2>
+                        <h2 class="text-h3 font-semibold text-ink">{{ __('site.tours.show.inclusions_title') }}</h2>
                         <x-ui.content-fallback-notice :locale="$inclusionsFallbackLocale" />
                         <ul class="mt-4 flex flex-col gap-3">
                             @foreach($tour['inclusions'] as $item)
@@ -372,7 +372,7 @@
 
                 @if(!empty($tour['exclusions']))
                     <div class="rounded-panel border border-line bg-surface p-6 shadow-e1" data-reveal style="--reveal-delay:80ms" @if($exclusionsLangAttr) lang="{{ $exclusionsLangAttr }}" @endif>
-                        <h2 class="font-display text-h3 font-semibold text-ink">{{ __('site.tours.show.exclusions_title') }}</h2>
+                        <h2 class="text-h3 font-semibold text-ink">{{ __('site.tours.show.exclusions_title') }}</h2>
                         <x-ui.content-fallback-notice :locale="$exclusionsFallbackLocale" />
                         <ul class="mt-4 flex flex-col gap-3">
                             @foreach($tour['exclusions'] as $item)
@@ -393,7 +393,7 @@
                 <p class="max-w-xl font-display text-h3 font-semibold text-white">
                     {{ __('site.tours.show.cta_banner_title', ['destination' => $tour['destination']['name']]) }}
                 </p>
-                <a href="{{ route('tours.index', ['destino' => $tour['destination']['slug']]) }}" class="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-medium text-ink transition-colors hover:bg-brand-100 sm:w-auto">
+                <a href="{{ route('tours.index', ['destino' => $tour['destination']['slug']]) }}" class="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-[6px] bg-white px-6 py-3 text-sm font-medium text-ink transition-colors hover:bg-brand-100 sm:w-auto">
                     {{ __('site.tours.show.cta_banner_button') }}
                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
                 </a>
@@ -445,7 +445,7 @@
                 :pen-cents="$tour['price_pen_cents']"
                 :usd-cents="$tour['price_usd_cents']"
                 :prefix="__('site.tours.show.price_prefix')"
-                class="min-w-0 font-display text-h3 font-semibold text-ink"
+                class="min-w-0 text-h3 font-bold text-ink"
             />
             <x-ui.button
                 :href="$reserveUrl"

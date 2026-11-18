@@ -5,7 +5,7 @@
 ])
 @php
     $tones = [
-        'light' => ['sep' => 'text-text-muted', 'link' => 'text-text-2 hover:text-action', 'current' => 'text-ink'],
+        'light' => ['sep' => 'text-text-muted', 'link' => 'text-text-2 hover:text-brand-text', 'current' => 'text-ink'],
         'dark' => ['sep' => 'text-on-dark-3', 'link' => 'text-on-dark-2 hover:text-white', 'current' => 'text-white'],
     ];
     $t = $tones[$tone] ?? $tones['light'];
@@ -19,14 +19,14 @@
 <nav aria-label="Miga de pan" {{ $attributes->class(['text-sm']) }}>
     <ol class="flex flex-wrap items-center gap-1.5">
         @foreach($items as $item)
-            <li class="flex items-center gap-1.5">
+            <li class="flex min-w-0 max-w-full items-center gap-1.5">
                 @if(!$loop->first)
                     <span aria-hidden="true" class="{{ $t['sep'] }}">/</span>
                 @endif
                 @if(!empty($item['href']) && !$loop->last)
-                    <a href="{{ $item['href'] }}" class="{{ $t['link'] }} transition-colors">{{ $item['label'] }}</a>
+                    <a href="{{ $item['href'] }}" class="{{ $t['link'] }} transition-colors max-md:inline-flex max-md:min-h-11 max-md:min-w-11 max-md:items-center max-md:justify-center">{{ $item['label'] }}</a>
                 @else
-                    <span class="{{ $t['current'] }}" @if($loop->last) aria-current="page" @endif>{{ $item['label'] }}</span>
+                    <span class="{{ $t['current'] }} min-w-0 truncate" @if($loop->last) aria-current="page" @endif>{{ $item['label'] }}</span>
                 @endif
             </li>
         @endforeach

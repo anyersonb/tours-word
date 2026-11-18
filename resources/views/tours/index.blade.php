@@ -111,7 +111,7 @@
                                  variant="card" (radio grande + sombra) que
                                  traía este índice desde el pase anterior. --}}
                             variant="flat"
-                            :image="$tour['images'][0]['src'] ?? PlaceholderImage::svg(480, 360, $tour['title'], '2c6fa8')"
+                            :image="$tour['images'][0]['src'] ?? PlaceholderImage::svg(480, 360, $tour['title'])"
                             :image-alt="$tour['images'][0]['alt'] ?? $tour['title']"
                             :title="$tour['title']"
                             :summary="$tour['summary']"

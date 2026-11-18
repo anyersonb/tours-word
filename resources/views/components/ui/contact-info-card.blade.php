@@ -13,12 +13,12 @@
 --}}
 @if($has)
     <div {{ $attributes->class(['flex items-start gap-3 rounded-2xl border border-line bg-surface p-4']) }}>
-        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-action" aria-hidden="true">
+        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-text" aria-hidden="true">
             {!! $icon !!}
         </span>
         <div class="min-w-0">
             <p class="text-sm font-semibold text-ink">{{ $title }}</p>
-            <div class="mt-0.5 text-sm text-text-2">{{ $slot }}</div>
+            <div class="mt-0.5 break-words text-sm text-text-2 [overflow-wrap:anywhere]">{{ $slot }}</div>
         </div>
     </div>
 @endif

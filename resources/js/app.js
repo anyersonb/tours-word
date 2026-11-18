@@ -42,6 +42,9 @@ Alpine.data('heroSlider', (count = 3, intervalMs = 6500) => ({
     active: 0,
     count,
     paused: false,
+    // true mientras el autoavance está detenido por hover/foco/pestaña oculta
+    // (la barra de progreso del hero se congela con la misma señal).
+    halted: false,
     reducedMotion: false,
     timer: null,
     loadedSlides: new Set([0]),
@@ -79,6 +82,18 @@ Alpine.data('heroSlider', (count = 3, intervalMs = 6500) => ({
         this.root.addEventListener('focusout', (event) => {
             if (!this.root.contains(event.relatedTarget) && !this.paused) this.play();
         });
+        // Teclado: ArrowLeft/ArrowRight con el foco dentro del slider o de
+        // sus miniaturas (todo vive dentro de #hero). Se ignoran los campos
+        // de texto/selects (p. ej. el buscador del hero) para no robarles
+        // las flechas.
+        this.root.addEventListener('keydown', (event) => {
+            if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+            if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+            if (event.target.closest('input, textarea, select, [contenteditable="true"]')) return;
+            event.preventDefault();
+            if (event.key === 'ArrowRight') this.next();
+            else this.prev();
+        });
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) this.stop();
             else if (!this.paused) this.play();
@@ -88,12 +103,14 @@ Alpine.data('heroSlider', (count = 3, intervalMs = 6500) => ({
     play() {
         if (this.reducedMotion) return;
         this.stop();
+        this.halted = false;
         this.timer = window.setInterval(() => this.next(), intervalMs);
     },
 
     stop() {
         window.clearInterval(this.timer);
         this.timer = null;
+        this.halted = true;
     },
 
     toggle() {
@@ -122,10 +139,35 @@ Alpine.data('heroSlider', (count = 3, intervalMs = 6500) => ({
         const next = ((index % this.count) + this.count) % this.count;
         this.loadSlide(next);
         this.active = next;
+        // Una navegación manual reinicia el reloj: el siguiente avance automático
+        // llega a los intervalMs completos y la barra de progreso no se desfasa.
+        if (this.timer !== null) this.play();
     },
 
     next() { this.go(this.active + 1); },
     prev() { this.go(this.active - 1); },
+}));
+
+/**
+ * Acordeón del FAQ del Home (rebrand Inka Palace): un panel abierto a la vez,
+ * navegable con flechas arriba/abajo, Inicio y Fin (patrón WAI-ARIA de
+ * acordeón). El estado visual (+/-) lo pinta CSS desde .is-open; aria-expanded
+ * y el panel salen de `open`. Sin JS el primer panel queda abierto por HTML.
+ */
+Alpine.data('accordion', (initial = 0) => ({
+    open: initial,
+
+    toggle(index) {
+        this.open = this.open === index ? null : index;
+    },
+
+    key(event, index) {
+        const buttons = Array.from(this.$root.querySelectorAll('.acc__btn'));
+        const map = { ArrowDown: index + 1, ArrowUp: index - 1, Home: 0, End: buttons.length - 1 };
+        if (!(event.key in map)) return;
+        event.preventDefault();
+        buttons[(map[event.key] + buttons.length) % buttons.length]?.focus();
+    },
 }));
 
 /**
