@@ -23,7 +23,7 @@ class ContactMessageController extends Controller
         if ($request->filled('website')) {
             Log::info('contact_message.honeypot_triggered', ['ip' => $request->ip()]);
 
-            return back()->with('contact_success', true);
+            return $this->thanks($request);
         }
 
         // DEF-A (docs/lote-3/validacion-visual-2026-09-14.md, punto 4): the
@@ -75,6 +75,19 @@ class ContactMessageController extends Controller
             }
         }
 
-        return back()->with('contact_success', true);
+        return $this->thanks($request);
+    }
+
+    /**
+     * CRO C-2: el éxito redirige a /{locale}/gracias (URL propia, medible como
+     * conversión) en vez de volver al formulario. El flash se conserva por
+     * compatibilidad con quien lo lea. Los errores de validación siguen
+     * volviendo al formulario con los mensajes inline (comportamiento por defecto).
+     */
+    private function thanks(StoreContactMessageRequest $request): RedirectResponse
+    {
+        return redirect()
+            ->route('contact.thanks', ['locale' => (string) $request->route('locale')])
+            ->with('contact_success', true);
     }
 }

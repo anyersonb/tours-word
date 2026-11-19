@@ -23,7 +23,7 @@ class TeamMemberForm
                         SecureImageUpload::configure(
                             FileUpload::make('photo_path')->label('Foto')->required(),
                             'team'
-                        ),
+                        )->helperText('JPG, PNG o WebP, máximo 4 MB. Mejor una foto vertical o cuadrada, con el rostro bien visible.'),
                     ]),
 
                 TranslatableTabs::make(fn (string $locale) => [
@@ -33,6 +33,7 @@ class TeamMemberForm
                         ->maxLength(120),
                     TextInput::make("role.{$locale}")
                         ->label('Rol')
+                        ->placeholder('Ej: Guía oficial de turismo')
                         ->required($locale === 'es')
                         ->maxLength(120),
                     Textarea::make("description.{$locale}")
@@ -40,7 +41,8 @@ class TeamMemberForm
                         ->rows(3)
                         ->maxLength(500),
                     TextInput::make("photo_alt.{$locale}")
-                        ->label('Texto alternativo de la foto'),
+                        ->label('Texto alternativo de la foto')
+                        ->helperText('Describe la imagen en una frase corta. Ayuda a Google y a personas que usan lector de pantalla.'),
                 ]),
 
                 Section::make('Redes sociales')
@@ -49,6 +51,7 @@ class TeamMemberForm
                         TextInput::make('instagram_url')
                             ->label('Instagram')
                             ->url()
+                            ->helperText('Enlace completo, ej: https://www.instagram.com/usuario')
                             ->maxLength(255),
                         TextInput::make('facebook_url')
                             ->label('Facebook')
@@ -66,12 +69,14 @@ class TeamMemberForm
                     ->schema([
                         Toggle::make('is_published')
                             ->label('Publicado')
-                            ->default(false),
+                            ->default(false)
+                            ->helperText('Si lo desactivas, esta persona deja de verse en la página Nosotros, pero no se borra.'),
                         TextInput::make('order')
                             ->label('Orden')
                             ->numeric()
                             ->default(0)
-                            ->required(),
+                            ->required()
+                            ->helperText('Número más bajo = aparece primero. Para reordenar más fácil, arrastra las filas en la lista.'),
                     ]),
             ]);
     }

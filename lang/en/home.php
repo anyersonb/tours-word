@@ -248,7 +248,7 @@ return [
         'text' => "Can't find your answer? Write to us and we will help.",
         'contact_cta' => 'Talk on WhatsApp',
         'items' => [
-            ['q' => 'How do I book a tour?', 'a' => 'Pick your tour, choose the date and number of travelers and confirm online. You can also book by messaging us on WhatsApp at +51 959 173 246.'],
+            ['q' => 'How do I book a tour?', 'a' => 'Pick your tour, choose the date and number of travelers and confirm online. You can also book by messaging us on WhatsApp at :phone.'],
             ['q' => 'Can I cancel or change my booking?', 'a' => '[Answer pending: cancellation policy]'],
             ['q' => 'Is hotel pickup included?', 'a' => '[Answer pending]'],
             ['q' => 'What languages are the tours in?', 'a' => '[Answer pending]'],

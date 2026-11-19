@@ -23,12 +23,15 @@ class ContactMessagesTable
                     ->sortable(),
                 TextColumn::make('name')
                     ->label('Nombre')
-                    ->searchable(),
+                    ->searchable()
+                    ->wrap(),
                 TextColumn::make('email')
                     ->label('Correo')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('subject')
                     ->label('Asunto')
+                    ->wrap()
                     ->formatStateUsing(fn (?string $state): string => $state ? __('site.contacto.form.subject_options.'.$state) : ''),
                 // DEF-A: instantánea del tour, buscable. Sin esto la bandeja
                 // no distingue una solicitud de reserva del Camino Inca de
@@ -37,7 +40,9 @@ class ContactMessagesTable
                     ->label('Tour consultado')
                     ->placeholder('—')
                     ->searchable()
-                    ->toggleable(),
+                    ->toggleable()
+                    ->limit(40)
+                    ->wrap(),
                 TextColumn::make('status')
                     ->label('Estado')
                     ->badge()
@@ -54,7 +59,11 @@ class ContactMessagesTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->modalHeading('¿Eliminar los elementos seleccionados?')
+                        ->modalDescription('Se borrarán para siempre y no se puede deshacer. ' . 'Si ya los atendiste, mejor cambia su estado a "Atendido".')
+                        ->modalSubmitActionLabel('Sí, eliminar')
+                        ->modalCancelActionLabel('No, volver'),
                 ]),
             ]);
     }

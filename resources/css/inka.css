@@ -265,11 +265,16 @@ section[id], footer[id] { scroll-margin-top: 96px; }
 .wa-float:hover .wa-float__btn { transform: scale(1.06); }
 .wa-float__btn .icon { width: 26px; height: 26px; }
 @media (min-width: 1024px) {
-  .wa-float { right: 28px; bottom: 28px; }
-  .wa-float__bubble { display: flex; }
-  .wa-float__btn { width: 62px; height: 62px; }
-  .wa-float__btn .icon { width: 32px; height: 32px; }
+  .wa-float { right: 24px; bottom: 24px; }
+  .wa-float__btn { width: 56px; height: 56px; }
+  .wa-float__btn .icon { width: 28px; height: 28px; }
 }
+/* Loop back 1 (BUG-01/02): setupWaFloat() (app.js) añade .is-away mientras el
+ * botón cubriría footer, panel de reserva, CTAs del hero o formularios. */
+.wa-float { transition: opacity .2s ease-out, transform .2s ease-out, visibility .2s; }
+.wa-float.is-away { opacity: 0; visibility: hidden; transform: translateY(8px); }
+.wa-float.is-away > * { pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .wa-float { transition: none; } }
 
 /* ------------------------------------------- secciones: cabeceras comunes */
 .ip-sec { padding-top: 64px; }
@@ -706,6 +711,13 @@ picture { display: contents; }
   .grid-4--snap { display: flex; gap: 16px; margin-inline: -20px; padding: 4px 20px 22px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 20px; -webkit-overflow-scrolling: touch; }
   .grid-4--snap > * { flex: 0 0 min(82%, 340px); scroll-snap-align: start; }
 }
+/* BUG-11: puntos del carrusel (los crea setupCarouselDots en app.js) */
+.snap-dots { display: flex; justify-content: center; gap: 0; margin-top: -8px; }
+.snap-dots__dot { position: relative; width: 28px; height: 44px; background: transparent; border: 0; padding: 0; cursor: pointer; }
+.snap-dots__dot::before { content: ''; position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: var(--text-muted); opacity: .45; transition: opacity .2s ease-out, transform .2s ease-out; }
+.snap-dots__dot[aria-current]::before { opacity: 1; transform: scale(1.4); background: var(--accent-text); }
+.snap-dots__dot:focus-visible { outline: 3px solid var(--focus); outline-offset: -4px; border-radius: 8px; }
+@media (min-width: 1024px) { .snap-dots { display: none; } }
 .switch__opt { position: relative; }
 .switch__opt::after { content: ''; position: absolute; inset: -6px 0; }
 /* Pausa del hero (WCAG 2.2.2): círculo de vidrio visible sobre cualquier foto */
@@ -763,3 +775,70 @@ picture { display: contents; }
 .cart:disabled { opacity: 1; color: var(--text-2); border-color: var(--text-muted); }
 /* Rol "teal" = espresso: sobre fondos oscuros (Cultura) el icono sólido se invierte a ivory */
 .icon-tile--solid-teal { background: var(--ivory); color: var(--espresso); }
+
+/* =========================================================================
+ * CRO mobile (docs/rediseno-2026/19-cro-mobile.md, "Fixes aplicados")
+ * ========================================================================= */
+
+/* A-2 · WhatsApp flotante en todas las páginas. En la ficha sube sobre la
+ * barra sticky de reserva (z-40, ~72px) para no solaparla en móvil/tablet. */
+@media (max-width: 1023px) {
+  .wa-float--lift { bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* C-1 · "Consultar precio" (sin precio cargado): enlace a WhatsApp, 44px. */
+.price-ask { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: 14px; font-weight: 600; color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.price-ask:hover { text-decoration-thickness: 2px; }
+
+/* A-3 · Header: CTA WhatsApp de 44px en lugar del carrito muerto. */
+.cart--wa { background: var(--whatsapp-action); border-color: var(--whatsapp-action); color: var(--on-whatsapp); transition: filter .2s ease-out; }
+.cart--wa:hover { filter: brightness(1.08); }
+.cart--wa:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+/* M-6 · Aviso "Camino Inca" ahora es enlace: área táctil >= 44px sin crecer la barra. */
+a.topbar__notice { position: relative; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; color: var(--on-alert); text-decoration: none; }
+a.topbar__notice::after { content: none; }
+a.topbar__notice:hover { text-decoration: underline; }
+a.topbar__notice:focus-visible { outline: 3px solid var(--focus-on-dark); outline-offset: 3px; }
+
+/* A-5 · Hero: el texto saliente se apaga ANTES de que entre el nuevo (no se
+ * superponen durante el crossfade de las fotos) + línea fija de propuesta. */
+.hero__copy { opacity: 0; transition: opacity .15s ease-out; }
+.hero__slide.is-active .hero__copy { opacity: 1; transition: opacity .4s ease-out .3s; }
+/* BUG-10 (loop back 1): el slide saliente apaga su texto (.15s) antes de que
+ * el contenedor empiece a desvanecerse (retraso .2s) y el entrante enciende el
+ * suyo recién a .3s: los textos nunca coinciden en pantalla. */
+.hero__slide { transition: opacity .6s ease-out .2s, visibility .6s linear .2s; }
+.hero__slide.is-active { transition: opacity .6s ease-out, visibility 0s; }
+.hero__value-wrap { position: absolute; inset: 0 0 auto 0; z-index: 2; pointer-events: none; padding-top: 14px; }
+.hero__value { display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-on-dark); text-shadow: 0 1px 6px rgb(0 0 0 / .45); }
+@media (min-width: 1024px) { .hero__value-wrap { padding-top: 40px; } .hero__value { font-size: 13px; } }
+@media (prefers-reduced-motion: reduce) { .hero__copy, .hero__slide.is-active .hero__copy { transition: none; } }
+
+/* A-4 · Home más corta en móvil: mosaico de destinos 2 columnas compacto;
+ * ciudades y planes en carrusel (como tours destacados). Sin quitar contenido. */
+@media (max-width: 639px) {
+  .mosaic { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .dest--big { grid-column: 1 / -1; min-height: 280px; }
+  .dest { min-height: 200px; }
+  .dest .dest__body { padding: 0 52px 16px 16px; }
+  .dest .dest__name { font-size: 20px; }
+  .dest:not(.dest--big) .dest__tag { display: none; }
+  .dest:not(.dest--big) .round-btn { width: 36px; height: 36px; right: 12px; bottom: 12px; }
+  .ip-sec { padding-top: 44px; }
+}
+@media (max-width: 1023px) {
+  .grid-4--cities .city, .grid-4--snap .plan { min-height: 0; }
+  .grid-4--cities.grid-4--snap .city { min-height: 340px; }
+  .grid-4--snap .plan { height: auto; }
+}
+
+/* C-2 · Página de gracias */
+.thanks { padding-block: 56px 72px; text-align: center; }
+.thanks__inner { display: flex; flex-direction: column; align-items: center; }
+.thanks__icon { display: inline-flex; align-items: center; justify-content: center; width: 72px; height: 72px; margin-bottom: 20px; border-radius: 50%; background: var(--forest); color: var(--on-forest); }
+.thanks__title { margin-top: 8px; }
+.thanks__text { max-width: 34em; margin-top: 12px; }
+.thanks__next { margin-top: 32px; font-size: 16px; font-weight: 600; }
+.thanks__actions { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 420px; margin-top: 16px; }
+@media (min-width: 640px) { .thanks__actions { flex-direction: row; flex-wrap: wrap; justify-content: center; width: auto; max-width: none; } }

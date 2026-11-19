@@ -13,7 +13,11 @@ class EditExperience extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            DeleteAction::make(),
+            DeleteAction::make()
+                ->modalHeading('¿Eliminar esta experiencia?')
+                ->modalDescription('Se borrará para siempre y no se puede deshacer. ' . 'Si solo quieres ocultarla del sitio, mejor desactiva "Publicado".')
+                ->modalSubmitActionLabel('Sí, eliminar')
+                ->modalCancelActionLabel('No, volver'),
         ];
     }
 }

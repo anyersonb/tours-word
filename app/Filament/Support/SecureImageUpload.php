@@ -37,6 +37,7 @@ class SecureImageUpload
         return $upload
             ->acceptedFileTypes(self::ALLOWED_MIME_TYPES)
             ->maxSize(4096)
+            ->helperText('JPG, PNG o WebP, máximo 4 MB.')
             ->disk('public')
             ->directory($directory)
             ->getUploadedFileNameForStorageUsing(

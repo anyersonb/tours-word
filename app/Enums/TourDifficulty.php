@@ -2,16 +2,24 @@
 
 namespace App\Enums;
 
+use Filament\Support\Contracts\HasLabel;
+
 /**
  * Difficulty level of a tour. Not translatable by design: it's a fixed
  * taxonomy, its label is resolved through lang files (resources/lang),
  * not stored per-locale in the database.
  */
-enum TourDifficulty: string
+enum TourDifficulty: string implements HasLabel
 {
     case Facil = 'facil';
     case Moderado = 'moderado';
     case Dificil = 'dificil';
+
+    /** Etiqueta que usa Filament en Select/badges (con tilde). */
+    public function getLabel(): string
+    {
+        return $this->label();
+    }
 
     public function label(): string
     {

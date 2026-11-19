@@ -18,7 +18,7 @@
         @if($required) required aria-required="true" @endif
         @if($error) aria-invalid="true" aria-describedby="{{ $id }}-error" @endif
         {{ $attributes->class([
-            'rounded-lg border bg-surface px-3.5 py-2.5 text-sm text-ink focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-focus',
+            'rounded-lg border bg-surface min-h-11 px-3.5 py-2.5 text-base text-ink sm:text-sm focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-focus',
             'border-danger' => $error,
             'border-line' => ! $error,
         ]) }}

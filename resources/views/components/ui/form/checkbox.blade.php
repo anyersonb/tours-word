@@ -21,12 +21,12 @@
                  borde computado seguia en verde con border-danger puesto),
                  asi que la marca visible es un anillo. --}}
             {{ $attributes->class([
-                'mt-0.5 h-4 w-4 shrink-0 rounded text-brand-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus',
+                'mt-3 h-5 w-5 shrink-0 rounded text-brand-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus',
                 'border-danger ring-2 ring-danger ring-offset-1' => $error,
                 'border-line' => ! $error,
             ]) }}
         >
-        <label for="{{ $id }}" class="text-sm text-text-2">
+        <label for="{{ $id }}" class="min-h-11 py-2.5 text-sm text-text-2">
             {{ $slot->isEmpty() ? $label : $slot }}
         </label>
     </div>

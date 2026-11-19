@@ -26,7 +26,7 @@ class ExperienceForm
                         SecureImageUpload::configure(
                             FileUpload::make('cover_image_path')->label('Imagen'),
                             'experiences'
-                        ),
+                        )->helperText('JPG, PNG o WebP, máximo 4 MB. Mejor en formato horizontal y de al menos 1600 píxeles de ancho.'),
                     ]),
                 TranslatableTabs::make(fn (string $locale) => [
                     TextInput::make("name.{$locale}")
@@ -43,6 +43,7 @@ class ExperienceForm
                         ->label('Slug')
                         ->required($locale === 'es')
                         ->maxLength(140)
+                        ->helperText('Es la parte final de la dirección web (por ejemplo, /experiencias/nombre-del-elemento). Se completa sola a partir del nombre; solo letras minúsculas, números y guiones.')
                         ->rule('alpha_dash')
                         // O-1 (docs/lote-3/seguridad-2026-09-14.md, Bajo):
                         // mismo fix que DestinationForm -- el catálogo
@@ -61,7 +62,8 @@ class ExperienceForm
                         ->label('Descripción')
                         ->rows(3),
                     TextInput::make("cover_image_alt.{$locale}")
-                        ->label('Texto alternativo de la imagen'),
+                        ->label('Texto alternativo de la imagen')
+                        ->helperText('Describe la imagen en una frase corta. Ayuda a Google y a personas que usan lector de pantalla.'),
                     // Defecto 3 (auditoria CRO/SEO): sin esto, <title> y
                     // "meta description" de la ficha caian al nombre/
                     // descripcion tal cual (vacios cuando la clienta aun no
@@ -78,10 +80,12 @@ class ExperienceForm
                         ->maxLength(320),
                 ]),
                 Section::make('Galería')
+                    ->description('Hasta 20 imágenes (JPG, PNG o WebP, máximo 4 MB cada una). Arrastra para cambiar el orden.')
                     ->schema([
                         Repeater::make('gallery')
                             ->relationship('gallery')
-                            ->label('')
+                            ->label('Galería')
+                            ->hiddenLabel()
                             ->schema([
                                 SecureImageUpload::configure(
                                     FileUpload::make('path')->label('Imagen')->required(),
@@ -108,12 +112,14 @@ class ExperienceForm
                     ->schema([
                         Toggle::make('is_published')
                             ->label('Publicado')
-                            ->default(false),
+                            ->default(false)
+                            ->helperText('Si lo desactivas, deja de verse en el sitio, pero no se borra: puedes volver a activarlo cuando quieras.'),
                         TextInput::make('order')
                             ->label('Orden')
                             ->numeric()
                             ->default(0)
-                            ->required(),
+                            ->required()
+                            ->helperText('Número más bajo = aparece primero. Para reordenar más fácil, arrastra las filas en la lista.'),
                     ]),
             ]);
     }

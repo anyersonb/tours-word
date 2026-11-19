@@ -16,8 +16,9 @@
         ['label' => __('site.nav.destinations'), 'route' => route('destinations.index'), 'active' => request()->routeIs('destinations.*')],
         ['label' => __('site.nav.experiences'), 'route' => route('experiences.index'), 'active' => request()->routeIs('experiences.*')],
         ['label' => __('site.nav.about'), 'route' => route('about'), 'active' => request()->routeIs('about')],
-        // "Preguntas": ancla a la FAQ del Home (en el Home mismo, scroll suave).
-        ['label' => __('home.menu.faq'), 'route' => route('home').'#faq', 'active' => false],
+        // "Preguntas": ancla a la FAQ de Contacto (CRO B-2: una sola FAQ; la del Home
+        // tiene respuestas por completar).
+        ['label' => __('home.menu.faq'), 'route' => route('contact').'#preguntas', 'active' => false],
         ['label' => __('site.nav.contact'), 'route' => route('contact'), 'active' => request()->routeIs('contact*')],
     ];
 
@@ -33,7 +34,7 @@
     // aún no lo cargó, el dato del diseño (config/brand.php).
     $phone = Setting::get('contact_phone') ?: config('brand.contact.phone');
     $waDigits = preg_replace('/\D+/', '', (string) $phone);
-    $waUrl = filled(Setting::get('contact_phone')) ? 'https://wa.me/'.$waDigits : config('brand.contact.whatsapp_url');
+    $waUrl = \App\Support\WhatsApp::url(__('site.whatsapp.default_text'));
 @endphp
 
 {{-- Topbar (PDF): café, 3 mensajes + aviso Camino Inca. En móvil solo el aviso. --}}
@@ -44,7 +45,8 @@
             <li class="topbar__item topbar__item--resp"><x-glyph name="clock" :size="15" /><span>{{ __('home.topbar.response') }}</span></li>
             <li class="topbar__item topbar__item--wa"><x-glyph name="message" :size="15" /><span>{{ __('home.topbar.whatsapp') }} <a class="topbar__phone" href="{{ $waUrl }}" target="_blank" rel="noopener">{{ $phone }}</a></span></li>
         </ul>
-        <p class="topbar__notice">{{ __('home.topbar.notice') }}</p>
+        {{-- CRO M-6: el aviso lleva a la sección Camino Inca del Home. --}}
+        <a class="topbar__notice" href="{{ route('home') }}#camino-inca">{{ __('home.topbar.notice') }}</a>
     </div>
 </div>
 <x-home.ribbon size="sm" />
@@ -108,13 +110,12 @@
                 <x-header.currency-switcher :currencies="$currencies" />
                 <x-header.locale-switcher :locales="$locales" :current="$currentLocale" :alternate-urls="$localeAlternateUrls" />
             </div>
-            {{-- Carrito: aún no existe (lote 4). Afordancia deshabilitada y
-                 declarada, como el buscador de main; el contador sigue en el
-                 DOM, oculto mientras valga 0. --}}
-            <button type="button" class="cart" disabled aria-disabled="true" aria-label="{{ __('home.menu.cart') }}" title="{{ __('home.menu.cart') }}">
-                <x-glyph name="cart" :size="18" />
-                <span class="cart__count" data-cart-count hidden>0</span>
-            </button>
+            {{-- CRO A-3: el carrito aún no existe (lote 4) y un botón muerto en el header
+                 móvil resta. Mientras tanto, CTA de conversión de 44px: cotizar por WhatsApp.
+                 Cuando exista el carrito, se restituye el <button class="cart">. --}}
+            <a class="cart cart--wa" href="{{ $waUrl }}" target="_blank" rel="noopener" aria-label="{{ __('site.whatsapp.label') }}" title="{{ __('site.whatsapp.label') }}">
+                <x-glyph name="whatsapp" :size="20" />
+            </a>
             <a class="btn btn--dark header__cta" href="{{ route('contact') }}"><x-glyph name="message" :size="16" />{{ __('home.menu.contact_cta') }}</a>
             <button
                 type="button"

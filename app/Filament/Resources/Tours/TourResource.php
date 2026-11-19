@@ -28,6 +28,8 @@ class TourResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Catálogo';
 
+    protected static ?int $navigationSort = 1;
+
     public static function form(Schema $schema): Schema
     {
         return TourForm::configure($schema);

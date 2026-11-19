@@ -27,9 +27,18 @@ class ContactMessageResource extends Resource
 
     protected static ?string $navigationLabel = 'Mensajes de contacto';
 
+    protected static string|\UnitEnum|null $navigationGroup = 'Mensajes';
+
+    protected static ?int $navigationSort = 1;
+
     protected static ?string $modelLabel = 'mensaje';
 
     protected static ?string $pluralModelLabel = 'mensajes de contacto';
+
+    public static function getTitleCasePluralModelLabel(): string
+    {
+        return 'Mensajes de contacto';
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -61,5 +70,15 @@ class ContactMessageResource extends Resource
         $pending = static::getModel()::query()->where('status', ContactMessageStatus::Nuevo)->count();
 
         return $pending > 0 ? (string) $pending : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'danger';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Mensajes nuevos sin atender';
     }
 }

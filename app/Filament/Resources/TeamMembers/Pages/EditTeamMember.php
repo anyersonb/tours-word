@@ -13,7 +13,11 @@ class EditTeamMember extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            DeleteAction::make(),
+            DeleteAction::make()
+                ->modalHeading('¿Eliminar a este integrante del equipo?')
+                ->modalDescription('Se borrará para siempre y no se puede deshacer. ' . 'Si solo quieres ocultarlo del sitio, mejor desactiva "Publicado".')
+                ->modalSubmitActionLabel('Sí, eliminar')
+                ->modalCancelActionLabel('No, volver'),
         ];
     }
 }

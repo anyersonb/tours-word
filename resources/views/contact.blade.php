@@ -158,9 +158,9 @@
                 @if($isBookingRequest)
                     <div class="mb-6 rounded-xl border border-line bg-brand-50 p-4">
                         <p class="text-xs font-medium uppercase tracking-wide text-text-2">{{ __('site.contacto.form.booking_tour_label') }}</p>
-                        <p class="mt-1 text-lg font-semibold text-ink">{{ $requestedTour->title }}</p>
+                        <p class="mt-1 text-lg font-semibold text-ink">{{ \App\Support\Placeholder::title($requestedTour->title) }}</p>
                         @if($requestedTourUrl)
-                            <a href="{{ $requestedTourUrl }}" class="mt-1 inline-block text-sm font-medium text-brand-text underline underline-offset-2 hover:text-ink">
+                            <a href="{{ $requestedTourUrl }}" class="mt-1 inline-flex min-h-11 items-center text-sm font-medium text-brand-text underline underline-offset-2 hover:text-ink">
                                 {{ __('site.contacto.form.booking_tour_link') }}
                             </a>
                         @endif
@@ -174,7 +174,7 @@
                 @endif
 
                 @if($errors->any())
-                    <div class="mb-6 rounded-xl border border-danger/30 bg-danger/5 p-4 text-sm text-danger" role="alert">
+                    <div class="mb-6 scroll-mt-28 rounded-xl border border-danger/30 bg-danger/5 p-4 text-sm text-danger" role="alert" data-form-errors>
                         {{ __('contact-form.flash.error_summary') }}
                     </div>
                 @endif
@@ -212,6 +212,7 @@
                     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
                         <x-ui.form.input
                             name="name"
+                            autocomplete="name"
                             :label="__('site.contacto.form.name_label')"
                             :placeholder="__('site.contacto.form.name_placeholder')"
                             :value="old('name')"
@@ -221,6 +222,8 @@
                         <x-ui.form.input
                             name="email"
                             type="email"
+                            autocomplete="email"
+                            inputmode="email"
                             :label="__('site.contacto.form.email_label')"
                             :placeholder="__('site.contacto.form.email_placeholder')"
                             :value="old('email')"
@@ -233,6 +236,8 @@
                         <x-ui.form.input
                             name="phone"
                             type="tel"
+                            autocomplete="tel"
+                            inputmode="tel"
                             :label="__('site.contacto.form.phone_label')"
                             :placeholder="__('site.contacto.form.phone_placeholder')"
                             :value="old('phone')"
@@ -255,6 +260,7 @@
 
                     <x-ui.form.textarea
                         name="message"
+                        autocomplete="off"
                         :label="__('site.contacto.form.message_label')"
                         :placeholder="__('site.contacto.form.message_placeholder')"
                         :error="$errors->first('message')"
@@ -316,13 +322,13 @@
                 @if($hasAnyContactInfo)
                     <div class="grid grid-cols-1 gap-4">
                         <x-ui.contact-info-card :icon="$iconPhone" :title="__('site.contacto.info.phone_title')" :has="filled($contactPhone)">
-                            <a href="tel:{{ preg_replace('/\s+/', '', (string) $contactPhone) }}" class="font-medium text-brand-text hover:underline">
+                            <a href="tel:{{ preg_replace('/\s+/', '', (string) $contactPhone) }}" class="inline-flex min-h-11 items-center font-medium text-brand-text hover:underline">
                                 {{ $contactPhone }}
                             </a>
                         </x-ui.contact-info-card>
 
                         <x-ui.contact-info-card :icon="$iconMail" :title="__('site.contacto.info.email_title')" :has="filled($contactEmail)">
-                            <a href="mailto:{{ $contactEmail }}" class="font-medium text-brand-text hover:underline">
+                            <a href="mailto:{{ $contactEmail }}" class="inline-flex min-h-11 items-center font-medium text-brand-text hover:underline">
                                 {{ $contactEmail }}
                             </a>
                         </x-ui.contact-info-card>
@@ -338,16 +344,16 @@
                         <x-ui.contact-info-card :icon="$iconChat" :title="__('site.contacto.info.social_title')" :has="$hasSocial">
                             <div class="mt-1 flex flex-wrap gap-2">
                                 @if(filled($socialInstagram))
-                                    <a href="{{ $socialInstagram }}" target="_blank" rel="noopener noreferrer" aria-label="{{ __('site.contacto.info.social_instagram') }}" class="flex h-9 w-9 items-center justify-center rounded-full bg-brand-50 text-brand-text hover:bg-action hover:text-on-action">{!! $iconInstagram !!}</a>
+                                    <a href="{{ $socialInstagram }}" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 items-center gap-2 rounded-full bg-brand-50 px-4 text-sm font-medium text-brand-text hover:bg-action hover:text-on-action focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus">{!! $iconInstagram !!}{{ __('site.contacto.info.social_instagram') }}</a>
                                 @endif
                                 @if(filled($socialFacebook))
-                                    <a href="{{ $socialFacebook }}" target="_blank" rel="noopener noreferrer" aria-label="{{ __('site.contacto.info.social_facebook') }}" class="flex h-9 w-9 items-center justify-center rounded-full bg-brand-50 text-brand-text hover:bg-action hover:text-on-action">{!! $iconFacebook !!}</a>
+                                    <a href="{{ $socialFacebook }}" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 items-center gap-2 rounded-full bg-brand-50 px-4 text-sm font-medium text-brand-text hover:bg-action hover:text-on-action focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus">{!! $iconFacebook !!}{{ __('site.contacto.info.social_facebook') }}</a>
                                 @endif
                                 @if(filled($socialYoutube))
-                                    <a href="{{ $socialYoutube }}" target="_blank" rel="noopener noreferrer" aria-label="{{ __('site.contacto.info.social_youtube') }}" class="flex h-9 w-9 items-center justify-center rounded-full bg-brand-50 text-brand-text hover:bg-action hover:text-on-action">{!! $iconYoutube !!}</a>
+                                    <a href="{{ $socialYoutube }}" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 items-center gap-2 rounded-full bg-brand-50 px-4 text-sm font-medium text-brand-text hover:bg-action hover:text-on-action focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus">{!! $iconYoutube !!}{{ __('site.contacto.info.social_youtube') }}</a>
                                 @endif
                                 @if(filled($whatsappLink))
-                                    <a href="{{ $whatsappLink }}" target="_blank" rel="noopener noreferrer" aria-label="{{ __('site.contacto.info.social_whatsapp') }}" class="flex h-9 w-9 items-center justify-center rounded-full bg-brand-50 text-brand-text hover:bg-action hover:text-on-action">{!! $iconChatSmall !!}</a>
+                                    <a href="{{ $whatsappLink }}" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 items-center gap-2 rounded-full bg-brand-50 px-4 text-sm font-medium text-brand-text hover:bg-action hover:text-on-action focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus">{!! $iconChatSmall !!}{{ __('site.contacto.info.social_whatsapp') }}</a>
                                 @endif
                             </div>
                         </x-ui.contact-info-card>
@@ -360,7 +366,7 @@
     </section>
 
     {{-- ============ PREGUNTAS FRECUENTES + DÓNDE ESTAMOS ============ --}}
-    <section class="bg-surface">
+    <section id="preguntas" class="bg-surface">
         <div class="shell section grid gap-12 lg:grid-cols-2 lg:gap-14">
             <div>
                 <x-ui.section-title as="h2">{{ __('site.contacto.faq.title') }}</x-ui.section-title>
@@ -402,12 +408,27 @@
                     coordenadas inventadas. Ver docs/lote-1/00-sistema-diseno.md
                     §C3 para qué falta para activar un mapa embebido real.
                 --}}
+                {{-- CRO M-4: mapa real (embed de Google Maps por DIRECCIÓN, nunca por coordenadas
+                     inventadas), cargado en diferido. Sin dirección cargada queda el marcador. --}}
+                @if($mapsUrl)
+                    <div class="aspect-[4/3] w-full overflow-hidden rounded-panel border border-line bg-sand">
+                        <iframe
+                            src="https://www.google.com/maps?q={{ urlencode($contactAddress) }}&output=embed"
+                            title="{{ __('site.contacto.map.title') }}: {{ $contactAddress }}"
+                            class="h-full w-full border-0"
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"
+                            allowfullscreen
+                        ></iframe>
+                    </div>
+                @else
                 <div class="weave flex aspect-[4/3] items-center justify-center rounded-panel border border-dashed border-line bg-sand text-text-muted">
                     <div class="flex flex-col items-center gap-2 px-6 text-center">
                         {!! $iconPinLarge !!}
                         <span class="text-xs">{{ __('site.contacto.map.placeholder_alt') }}</span>
                     </div>
                 </div>
+                @endif
 
                 <div class="mt-4 flex flex-col gap-4 rounded-card border border-line bg-surface p-5 shadow-e1 sm:flex-row sm:items-center sm:justify-between">
                     @if($mapsUrl)

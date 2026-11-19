@@ -55,10 +55,12 @@ class ContactMessageForm
                     ]),
 
                 Section::make('Atención')
+                    ->description('Los datos de arriba no se pueden modificar. Lo único que cambias es el estado, a medida que atiendes a la persona.')
                     ->schema([
                         Select::make('status')
                             ->label('Estado')
                             ->options(ContactMessageStatus::options())
+                            ->helperText('Nuevo = aún no lo atiendes · En proceso = ya estás respondiendo · Atendido = ya quedó resuelto.')
                             ->required(),
                     ]),
             ]);

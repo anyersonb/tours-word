@@ -16,6 +16,8 @@
 --}}
 @php
     $total = count($slides);
+    // CRO C-1: un texto de slide con marcador sin completar no se imprime.
+    $heroText = fn ($s) => \App\Support\Placeholder::visible($s['text'] ?? null);
     // Claves nuevas pendientes en lang/ (programación): mientras no existan, respaldo.
     $tr = fn (string $key, string $fallback) => trans()->has($key) ? __($key) : $fallback;
 @endphp
@@ -27,6 +29,9 @@
     aria-roledescription="{{ $tr('home.hero.roledescription', 'carrusel') }}"
     aria-label="{{ $tr('home.hero.label', __('home.menu.destinations')) }}"
 >
+    {{-- CRO A-5: propuesta de valor FIJA. BUG-10: el H1 es UNO fijo (sr-only, siempre en el DOM: lectores y bots), fuera de los slides que se desvanecen; los títulos visibles de cada slide son texto no-H1. --}}
+    <h1 class="sr-only">{{ $slides[0]['title'] ?? '' }}</h1>
+    <div class="container hero__value-wrap"><p class="hero__value">{{ __('site.whatsapp.hero_value') }}</p></div>
     <div class="hero__slides">
         @foreach ($slides as $i => $s)
             @php $img = $s['image'] ?? null; @endphp
@@ -50,12 +55,8 @@
                 <div class="hero__shade" aria-hidden="true"></div>
                 <div class="container hero__copy">
                     <p class="hero__pill"><span class="hero__dot" aria-hidden="true"></span>{{ $s['badge'] }}</p>
-                    @if ($i === 0)
-                        <h1 class="hero__title">{{ $s['title'] }}</h1>
-                    @else
-                        <p class="hero__title" role="heading" aria-level="2">{{ $s['title'] }}</p>
-                    @endif
-                    <p class="hero__text">{{ $s['text'] }}</p>
+                    <p class="hero__title">{{ $s['title'] }}</p>
+                    @if ($heroText($s))<p class="hero__text">{{ $heroText($s) }}</p>@endif
                     <div class="hero__actions">
                         <a class="btn btn--accent btn--lg" href="{{ $s['url_primary'] ?? route('tours.index') }}" :tabindex="active === {{ $i }} ? 0 : -1" @if ($i !== 0) tabindex="-1" @endif>{{ $s['cta_primary'] }}<x-glyph name="arrow-right" :size="18" /></a>
                         <a class="btn btn--ghost btn--lg" href="{{ $s['url_secondary'] ?? route('destinations.index') }}" :tabindex="active === {{ $i }} ? 0 : -1" @if ($i !== 0) tabindex="-1" @endif>{{ $s['cta_secondary'] }}</a>
@@ -75,7 +76,7 @@
                             class="hero__item {{ $i === 0 ? 'is-active' : '' }}"
                             :class="{ 'is-active': active === {{ $i }} }"
                             @click="go({{ $i }})"
-                            aria-label="{{ $s['badge'] }}"
+                            data-badge="{{ $s['badge'] }}"
                             aria-current="{{ $i === 0 ? 'true' : 'false' }}"
                             :aria-current="active === {{ $i }} ? 'true' : 'false'"
                         >
@@ -106,7 +107,7 @@
                 </button>
                 <button type="button" class="hero__arrow hero__arrow--next" @click="next()" aria-label="{{ __('home.hero.next') }}"><x-glyph name="arrow-right" :size="18" /></button>
             </div>
-            <p class="sr-only" aria-live="polite" x-text="$root.querySelectorAll('.hero__item')[active]?.getAttribute('aria-label') ?? ''"></p>
+            <p class="sr-only" aria-live="polite" x-text="$root.querySelectorAll('.hero__item')[active]?.dataset.badge ?? ''"></p>
         </div>
     </div>
 </section>

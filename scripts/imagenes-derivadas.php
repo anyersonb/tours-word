@@ -51,6 +51,8 @@ $targets = [
     'storage/app/public/destinations' => [400, 800, 1200],
     'storage/app/public/experiences'  => [400, 800, 1200],
     'public/images/site'              => [640, 1024, 1440, 1920],
+    // CRO M-3: fotos provisionales de la home (hero 511 kB en JPG).
+    'public/img/provisional'          => [480, 828, 1200],
 ];
 
 const WEBP_QUALITY = 72;

@@ -1,5 +1,7 @@
 @php
     use App\Support\Html\RichTextSanitizer;
+    use App\Support\Placeholder;
+    use App\Support\WhatsApp;
     use App\Support\PlaceholderImage;
 
     // Objetivo (lote i18n, 2026-09-14): Tour::meta_title/meta_description ya
@@ -16,19 +18,21 @@
     // "· INKA PALACE Travel" encima (duplicado real, medido en produccion:
     // "[MUESTRA] Camino Inca 4 días | INKA PALACE Travel · INKA PALACE Travel"). Cuando cae
     // al respaldo (titulo del tour), x-layout SI compone, igual que antes.
-    $metaTitle = filled($tour['meta_title'] ?? null) ? $tour['meta_title'] : $tour['title'];
+    // CRO C-1: el prefijo "[MUESTRA]" de los datos demo no se muestra.
+    $cleanTitle = Placeholder::title($tour['title']);
+    $metaTitle = Placeholder::title(filled($tour['meta_title'] ?? null) ? $tour['meta_title'] : $tour['title']);
     $titleLiteral = filled($tour['meta_title'] ?? null);
     $metaDescription = filled($tour['meta_description'] ?? null) ? $tour['meta_description'] : $tour['summary'];
 
     $galleryImages = collect($tour['images'])->map(fn ($image) => ['src' => $image['src'], 'alt' => $image['alt']])->all();
     if (empty($galleryImages)) {
-        $galleryImages = [['src' => PlaceholderImage::svg(1200, 800, $tour['title'], '556b52'), 'alt' => $tour['title']]];
+        $galleryImages = [['src' => PlaceholderImage::svg(1200, 800, $cleanTitle, '556b52'), 'alt' => $cleanTitle]];
     }
 
     $breadcrumbItems = [
         ['label' => __('site.tours.index.breadcrumb.home'), 'href' => route('home')],
         ['label' => __('site.tours.show.breadcrumb_index'), 'href' => route('tours.index')],
-        ['label' => $tour['title']],
+        ['label' => $cleanTitle],
     ];
 
     // Íconos: mismo lenguaje visual (stroke-width 2, viewBox 24x24) que el
@@ -83,6 +87,8 @@
     :noindex="$noindex"
     :translated-locales="$translatedLocales"
     :hreflang-urls="$hreflangUrls"
+    :wa-text="__('site.whatsapp.tour_text', ['tour' => $cleanTitle])"
+    :wa-lift="true"
 >
 
     {{-- ============ HERO ============
@@ -140,12 +146,12 @@
             <x-ui.breadcrumbs :items="$breadcrumbItems" tone="dark" class="mb-6" />
 
             @if($tour['destination'])
-                <a href="{{ route('destinations.show', $tour['destination']['slug']) }}" class="inline-flex items-center gap-1.5 text-sm font-medium text-on-dark-2 transition-colors hover:text-white">
+                <a href="{{ route('destinations.show', $tour['destination']['slug']) }}" class="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-on-dark-2 transition-colors hover:text-white">
                     {!! $iconPin !!}{{ $tour['destination']['name'] }}
                 </a>
             @endif
 
-            <h1 class="mt-3 max-w-3xl font-display text-hero font-semibold text-white" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>{{ $tour['title'] }}</h1>
+            <h1 class="mt-3 max-w-3xl font-display text-hero font-semibold text-white" @if($fallbackLangAttr) lang="{{ $fallbackLangAttr }}" @endif>{{ $cleanTitle }}</h1>
 
             @if($tour['duration_label'] || $tour['difficulty'])
                 <div class="mt-5 flex flex-wrap items-center gap-3">
@@ -201,7 +207,7 @@
                  tira de miniaturas (5 x 80px + huecos = 440px) y la ficha
                  desbordaba 96px a 360. Medido con getBoundingClientRect. --}}
             <div class="min-w-0 lg:col-start-1 lg:row-start-1">
-                <x-ui.gallery :images="$galleryImages" :label="__('site.ui.gallery.nav_label', ['title' => $tour['title']])" />
+                <x-ui.gallery :images="$galleryImages" :label="__('site.ui.gallery.nav_label', ['title' => $cleanTitle])" />
 
                 {{-- Objetivo 2 (lote i18n): lang="es" honesto en cada bloque
                      de contenido de catalogo cuando este tour todavia no
@@ -249,36 +255,39 @@
                             {{ __('site.tours.show.cta_reserve_hint') }}
                         </p>
 
+                        {{-- CRO A-2/A-6: canal WhatsApp junto al CTA de reserva (mensaje con el
+                             nombre del tour) y garantías honestas: solo lo que el sitio ya promete. --}}
+                        <a href="{{ WhatsApp::url(__('site.whatsapp.tour_text', ['tour' => $cleanTitle])) }}" target="_blank" rel="noopener" class="mt-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-[6px] border border-line bg-surface px-6 py-3 text-base font-medium text-ink transition-colors hover:bg-brand-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus">
+                            <x-glyph name="whatsapp" :size="18" />{{ __('site.whatsapp.tour_cta') }}
+                        </a>
+                        <ul class="mt-4 flex flex-col gap-2 text-xs text-text-2">
+                            <li class="flex items-center gap-2">{!! $iconCheck !!}{{ __('site.whatsapp.trust_no_charge') }}</li>
+                            <li class="flex items-center gap-2">{!! $iconCheck !!}{{ __('site.whatsapp.trust_fast_reply') }}</li>
+                            <li class="flex items-center gap-2">{!! $iconCheck !!}{{ __('home.featured.flexible_cancellation') }}</li>
+                        </ul>
+
                         @if($tour['duration_label'] || $tour['difficulty'] || $tour['meeting_point'])
                             <dl class="mt-6 flex flex-col gap-4 border-t border-line-soft pt-5 text-sm">
+                                {{-- CRO M-1: <dl> válido (cada grupo = <div> con <dt> y <dd> directos); el icono
+                                     vive dentro del <dt> como decoración. --}}
                                 @if($tour['duration_label'])
-                                    <div class="flex items-start gap-3">
-                                        <span class="mt-0.5 text-brand-text">{!! $iconClock !!}</span>
-                                        <div>
-                                            <dt class="font-medium text-ink">{{ __('site.tours.show.duration_label') }}</dt>
-                                            <dd class="text-text-2">{{ $tour['duration_label'] }}</dd>
-                                        </div>
+                                    <div>
+                                        <dt class="flex items-center gap-3 font-medium text-ink"><span class="text-brand-text" aria-hidden="true">{!! $iconClock !!}</span>{{ __('site.tours.show.duration_label') }}</dt>
+                                        <dd class="pl-7 text-text-2">{{ $tour['duration_label'] }}</dd>
                                     </div>
                                 @endif
                                 @if($tour['difficulty'])
-                                    <div class="flex items-start gap-3">
-                                        <span class="mt-0.5 text-brand-text">{!! $iconGauge !!}</span>
-                                        <div>
-                                            {{-- El valor es App\Enums\TourDifficulty (Tour::$casts),
-                                                 nunca un string: por eso ->value. Ver el comentario
-                                                 largo del lote en el historial de este archivo. --}}
-                                            <dt class="font-medium text-ink">{{ __('site.tours.show.difficulty_label') }}</dt>
-                                            <dd class="text-text-2">{{ __('tours.difficulty.'.$tour['difficulty']->value) }}</dd>
-                                        </div>
+                                    <div>
+                                        {{-- El valor es App\Enums\TourDifficulty (Tour::$casts),
+                                             nunca un string: por eso ->value. --}}
+                                        <dt class="flex items-center gap-3 font-medium text-ink"><span class="text-brand-text" aria-hidden="true">{!! $iconGauge !!}</span>{{ __('site.tours.show.difficulty_label') }}</dt>
+                                        <dd class="pl-7 text-text-2">{{ __('tours.difficulty.'.$tour['difficulty']->value) }}</dd>
                                     </div>
                                 @endif
                                 @if($tour['meeting_point'])
-                                    <div class="flex items-start gap-3">
-                                        <span class="mt-0.5 text-brand-text">{!! $iconPin !!}</span>
-                                        <div>
-                                            <dt class="font-medium text-ink">{{ __('site.tours.show.meeting_point_title') }}</dt>
-                                            <dd class="text-text-2">{{ $tour['meeting_point'] }}</dd>
-                                        </div>
+                                    <div>
+                                        <dt class="flex items-center gap-3 font-medium text-ink"><span class="text-brand-text" aria-hidden="true">{!! $iconPin !!}</span>{{ __('site.tours.show.meeting_point_title') }}</dt>
+                                        <dd class="pl-7 text-text-2">{{ $tour['meeting_point'] }}</dd>
                                     </div>
                                 @endif
                             </dl>

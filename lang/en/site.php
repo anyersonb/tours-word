@@ -2,6 +2,35 @@
 
 return [
 
+    // CRO C-2: página de gracias tras el formulario de contacto.
+    'gracias' => [
+        'title' => 'Thank you! We got your message',
+        'eyebrow' => 'Message sent',
+        'heading' => 'Thank you for writing to us!',
+        'text' => 'We received your request and an INKA PALACE Travel advisor will reply very soon with availability and next steps.',
+        'next' => 'Want a faster answer?',
+        'wa_text' => 'Hello, I just sent the contact form on your website.',
+        'wa_cta' => 'Continue on WhatsApp',
+        'tours_cta' => 'Browse more tours',
+        'home_cta' => 'Back to home',
+    ],
+
+
+    // CRO (docs/rediseno-2026/19-cro-mobile.md): WhatsApp contextual y texto fijo del hero.
+    'whatsapp' => [
+        'default_text' => 'Hello, I would like a quote for a tour with INKA PALACE Travel.',
+        'tour_text' => 'Hello, I would like a quote for the :tour tour.',
+        'price_text' => 'Hello, I would like to know the price of :tour.',
+        'price_text_generic' => 'Hello, I would like to know the price of a tour.',
+        'label' => 'Get a quote on WhatsApp',
+        'price_ask' => 'Ask for price',
+        'tour_cta' => 'Ask on WhatsApp',
+        'trust_no_charge' => 'No charge to request',
+        'trust_fast_reply' => 'Quick reply on WhatsApp',
+        'hero_value' => 'Travel agency with local experts',
+    ],
+
+
     // SEO (lote 1, arreglo A3). Fallback description when a view doesn't pass
     // its own `description` to <x-layout> (today that's contact.blade.php,
     // out of scope for this lote). No figures or regulatory claims: see

@@ -30,9 +30,7 @@
     $contactPhone = Setting::get('contact_phone') ?: config('brand.contact.phone');
     $contactEmail = Setting::get('contact_email') ?: config('brand.contact.email');
     $contactAddress = Setting::get('contact_address') ?: config('brand.contact.address');
-    $waUrl = filled(Setting::get('contact_phone'))
-        ? 'https://wa.me/'.preg_replace('/\D+/', '', (string) $contactPhone)
-        : config('brand.contact.whatsapp_url');
+    $waUrl = \App\Support\WhatsApp::url(__('site.whatsapp.default_text'));
 
     $socials = [
         'tripadvisor' => ['Tripadvisor', config('brand.social.tripadvisor')],
@@ -76,7 +74,7 @@
                 <li><a href="{{ route('tours.index') }}">{{ __('home.footer.link_items.tours') }}</a></li>
                 <li><a href="{{ route('experiences.index') }}">{{ __('home.footer.link_items.experiences') }}</a></li>
                 <li><a href="{{ route('about') }}">{{ __('home.footer.link_items.about') }}</a></li>
-                <li><a href="{{ route('home') }}#faq">{{ __('home.footer.link_items.faq') }}</a></li>
+                <li><a href="{{ route('contact') }}#preguntas">{{ __('home.footer.link_items.faq') }}</a></li>
                 <li><a href="{{ route('contact') }}">{{ __('home.footer.link_items.contact') }}</a></li>
             </ul>
         </nav>
@@ -124,6 +122,8 @@
 
     <div class="container footer__bottom">
         <p>&copy; {{ now()->year }} {{ $companyName ?: config('brand.name') }}. {{ __('home.footer.rights') }} {{ config('brand.contact.instagram_handle') }}</p>
-        <p class="footer__pay">{{ __('home.footer.payments_label') }} <span class="chip-ghost">{{ __('home.footer.payments_placeholder') }}</span></p>
+        @if (\App\Support\Placeholder::visible(__('home.footer.payments_placeholder')))
+            <p class="footer__pay">{{ __('home.footer.payments_label') }} <span class="chip-ghost">{{ __('home.footer.payments_placeholder') }}</span></p>
+        @endif
     </div>
 </footer>

@@ -28,6 +28,8 @@ class TeamMemberResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Nosotros';
 
+    protected static ?int $navigationSort = 1;
+
     public static function form(Schema $schema): Schema
     {
         return TeamMemberForm::configure($schema);

@@ -35,6 +35,10 @@
     // llamador ya decidio el <title> completo. Solo se compone cuando
     // $title es el respaldo (nombre del tour/destino/experiencia).
     'titleLiteral' => false,
+    // CRO A-2: texto prellenado del WhatsApp flotante (null = genérico) y si
+    // debe subir sobre la barra sticky de reserva (ficha de tour, móvil).
+    'waText' => null,
+    'waLift' => false,
 ])
 @php
     /**
@@ -230,5 +234,7 @@
     </main>
 
     <x-site.footer />
+
+    <x-site.whatsapp-float :text="$waText" :lift="$waLift" />
 </body>
 </html>

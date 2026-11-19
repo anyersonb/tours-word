@@ -35,25 +35,29 @@ class TourForm
                     ->schema([
                         Select::make('destination_id')
                             ->label('Destino')
+                            ->helperText('Ciudad o zona donde ocurre el tour. Si no está en la lista, créalo antes en Catálogo > Destinos.')
                             ->relationship('destination', modifyQueryUsing: fn ($query) => $query->orderBy('order'))
                             ->getOptionLabelFromRecordUsing(fn (Destination $record) => $record->name)
                             ->searchable()
                             ->preload(),
                         Select::make('difficulty')
                             ->label('Dificultad')
+                            ->helperText('Nivel de esfuerzo físico que se muestra al visitante.')
                             ->options(TourDifficulty::class),
                         Toggle::make('is_featured')
                             ->label('Destacado')
-                            ->default(false),
+                            ->default(false)
+                            ->helperText('Los tours destacados salen con la etiqueta "Destacado" y en la portada del sitio (se muestran hasta 4).'),
                         Toggle::make('is_published')
                             ->label('Publicado')
                             ->default(false)
-                            ->helperText('Solo un tour publicado queda visible para el catálogo público.'),
+                            ->helperText('Solo un tour publicado se ve en el sitio. Si lo desactivas se oculta, pero no se borra.'),
                         TextInput::make('order')
                             ->label('Orden')
                             ->numeric()
                             ->default(0)
-                            ->required(),
+                            ->required()
+                            ->helperText('Número más bajo = aparece primero. Para reordenar más fácil, arrastra las filas en la lista.'),
                     ]),
 
                 TranslatableTabs::make(fn (string $locale) => [
@@ -82,6 +86,7 @@ class TourForm
                         ->helperText('Cambiarlo aquí guarda el slug anterior en el historial para poder redirigir más adelante.'),
                     Textarea::make("summary.{$locale}")
                         ->label('Resumen')
+                        ->helperText('Una o dos frases para presentar el tour. Máximo 300 caracteres.')
                         ->rows(2)
                         ->maxLength(300),
                     // Defecto 1 (auditoria cliente, 2026-09-14): la toolbar
@@ -105,16 +110,22 @@ class TourForm
                         ->label('Duración')
                         ->placeholder('Ej: 4 días / 3 noches'),
                     TextInput::make("meeting_point.{$locale}")
-                        ->label('Punto de encuentro'),
+                        ->label('Punto de encuentro')
+                        ->placeholder('Ej: Jr. Carabaya 161, Lima')
+                        ->helperText('Dónde se reúne el grupo con el guía.'),
                     // No ->separator(): with one set, TagsInput dehydrates by
                     // *joining* the array into a delimited string (meant for
                     // plain string columns). inclusions/exclusions are
                     // translatable JSON ARRAY columns, so the native array
                     // state must be kept as-is.
                     TagsInput::make("inclusions.{$locale}")
-                        ->label('Qué incluye'),
+                        ->label('Qué incluye')
+                        ->placeholder('Escribe un ítem y presiona Enter')
+                        ->helperText('Un ítem por vez, por ejemplo: Transporte, Almuerzo, Guía.'),
                     TagsInput::make("exclusions.{$locale}")
-                        ->label('Qué no incluye'),
+                        ->label('Qué no incluye')
+                        ->placeholder('Escribe un ítem y presiona Enter')
+                        ->helperText('Un ítem por vez, por ejemplo: Propinas, Entradas.'),
                     // Structured (title + description) unlike
                     // inclusions/exclusions, so it needs a Repeater instead
                     // of a TagsInput -- same translatable-JSON-array dot
@@ -153,9 +164,11 @@ class TourForm
                         ->columns(1),
                     TextInput::make("meta_title.{$locale}")
                         ->label('Título que aparece en Google')
+                        ->helperText('Si se deja vacío, se usa el título del tour.')
                         ->maxLength(160),
                     Textarea::make("meta_description.{$locale}")
                         ->label('Descripción que aparece en Google')
+                        ->helperText('Si se deja vacío, se usa el resumen del tour. Ideal: menos de 160 caracteres.')
                         ->rows(2)
                         ->maxLength(320),
                 ]),
@@ -166,6 +179,7 @@ class TourForm
                         TextInput::make('price_pen_cents')
                             ->label('Precio en soles (PEN)')
                             ->prefix('S/')
+                            ->helperText('Escribe solo números; si hay centavos usa punto, por ejemplo 1250.50.')
                             ->numeric()
                             ->required()
                             ->default(0)
@@ -198,19 +212,23 @@ class TourForm
                     ]),
 
                 Section::make('Experiencias')
+                    ->description('Marca las categorías en las que aparece este tour (por ejemplo, Trekking o Cultura).')
                     ->schema([
                         CheckboxList::make('experiences')
-                            ->label('')
+                            ->label('Experiencias')
+                            ->hiddenLabel()
                             ->relationship('experiences')
                             ->getOptionLabelFromRecordUsing(fn (Experience $record) => $record->name)
                             ->columns(3),
                     ]),
 
                 Section::make('Galería')
+                    ->description('Hasta 20 imágenes (JPG, PNG o WebP, máximo 4 MB cada una). Arrastra para cambiar el orden.')
                     ->schema([
                         Repeater::make('images')
                             ->relationship('images')
-                            ->label('')
+                            ->label('Imágenes')
+                            ->hiddenLabel()
                             ->schema([
                                 // F-2 part 2 (docs/lote-3/seguridad-2026-09-14.md,
                                 // Alto): this used to be its own inline copy

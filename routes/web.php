@@ -5,6 +5,7 @@ use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\DestinationController;
 use App\Http\Controllers\ExperienceController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LlmsController;
 use App\Http\Controllers\RobotsController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\TourController;
@@ -28,6 +29,9 @@ Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 // App\Http\Controllers\RobotsController. public/robots.txt (el archivo
 // estatico que esto reemplaza) se borro.
 Route::get('/robots.txt', RobotsController::class)->name('robots');
+
+// CRO M-5: /llms.txt para descubribilidad por asistentes de IA.
+Route::get('/llms.txt', LlmsController::class)->name('llms');
 
 Route::prefix('{locale}')
     ->where(['locale' => '[A-Za-z-]+'])
@@ -66,6 +70,12 @@ Route::prefix('{locale}')
         Route::post('/contacto', [ContactMessageController::class, 'store'])
             ->middleware('throttle:'.config('contact.rate_limit_attempts').','.config('contact.rate_limit_decay_minutes'))
             ->name('contact.store');
+
+        // CRO C-2: página de gracias tras enviar el formulario (URL medible como
+        // conversión). noindex declarado en la vista.
+        Route::get('/gracias', function () {
+            return view('thanks');
+        })->name('contact.thanks');
 
         // Nosotros (lote 1, etapa D). El header/footer ya apuntaban a
         // route('about') condicionados con Route::has('about'); con este

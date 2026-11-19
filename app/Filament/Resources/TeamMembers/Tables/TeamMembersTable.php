@@ -8,6 +8,7 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
 class TeamMembersTable
@@ -37,14 +38,22 @@ class TeamMembersTable
                     ->sortable(),
             ])
             ->filters([
-                //
+                TernaryFilter::make('is_published')
+                    ->label('Publicado')
+                    ->placeholder('Todos')
+                    ->trueLabel('Solo publicados')
+                    ->falseLabel('Solo ocultos'),
             ])
             ->recordActions([
                 EditAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->modalHeading('¿Eliminar los elementos seleccionados?')
+                        ->modalDescription('Se borrarán para siempre y no se puede deshacer. ' . 'Si solo quieres ocultarlos del sitio, desactiva "Publicado" en cada uno.')
+                        ->modalSubmitActionLabel('Sí, eliminar')
+                        ->modalCancelActionLabel('No, volver'),
                 ]),
             ]);
     }

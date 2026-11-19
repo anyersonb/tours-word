@@ -52,6 +52,9 @@
     'lowAvailability' => false,
 ])
 @php
+    // CRO C-1: sin prefijo "[MUESTRA]" de datos demo.
+    $title = \App\Support\Placeholder::title($title);
+    $imageAlt = \App\Support\Placeholder::title($imageAlt);
     $hl = max(2, min(4, (int) $headingLevel));
     $surfaceClasses = $variant === 'flat'
         ? 'rounded-tile border border-line bg-surface transition-transform duration-300 hover:-translate-y-1 focus-within:-translate-y-1'

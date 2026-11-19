@@ -53,7 +53,7 @@ class TourMetaTagsTest extends TestCase
         $response = $this->get(route('tours.show', ['locale' => 'es', 'slug' => $slug]));
 
         $response->assertOk();
-        $response->assertSee('<title>[MUESTRA] Camino Inca 4 dias | '.config('app.name').'</title>', false);
+        $response->assertSee('<title>Camino Inca 4 dias | '.config('app.name').'</title>', false);
         $response->assertDontSee(config('app.name').' · '.config('app.name'), false);
     }
 

@@ -44,6 +44,10 @@ class Configuracion extends Page implements HasForms
 
     protected static ?string $navigationLabel = 'Configuración';
 
+    protected static string|\UnitEnum|null $navigationGroup = 'Ajustes';
+
+    protected static ?int $navigationSort = 1;
+
     protected static ?string $title = 'Configuración';
 
     /**
@@ -153,7 +157,8 @@ class Configuracion extends Page implements HasForms
                         TextInput::make('complaints_book_url')
                             ->label('Libro de reclamaciones (enlace)')
                             ->url()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->helperText('Enlace completo (empieza con https://).'),
                         TextInput::make('esnna_poster_url')
                             ->label('Afiche ESNNA (enlace)')
                             ->url()
@@ -167,15 +172,17 @@ class Configuracion extends Page implements HasForms
                         TextInput::make('cancellation_policy_url')
                             ->label('Política de cancelación (enlace)')
                             ->url()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->helperText('Enlace completo (empieza con https://).'),
                     ]),
 
                 Section::make('Redes sociales')
+                    ->description('Si dejas un campo vacío, ese ícono no aparece en el sitio.')
                     ->columns(3)
                     ->schema([
-                        TextInput::make('social_instagram_url')->label('Instagram')->url()->maxLength(255),
-                        TextInput::make('social_facebook_url')->label('Facebook')->url()->maxLength(255),
-                        TextInput::make('social_youtube_url')->label('YouTube')->url()->maxLength(255),
+                        TextInput::make('social_instagram_url')->label('Instagram')->url()->maxLength(255)->helperText('Enlace completo, ej: https://www.instagram.com/usuario'),
+                        TextInput::make('social_facebook_url')->label('Facebook')->url()->maxLength(255)->helperText('Enlace completo de tu página.'),
+                        TextInput::make('social_youtube_url')->label('YouTube')->url()->maxLength(255)->helperText('Enlace completo de tu canal.'),
                     ]),
 
                 Section::make('Cifras (Home y Nosotros)')
@@ -189,7 +196,7 @@ class Configuracion extends Page implements HasForms
                     ]),
 
                 Section::make('Moneda')
-                    ->description('Tipo de cambio fijo, editable acá. NUNCA se consulta a una API externa. Todo formateo y conversión en el sitio pasa por App\\Support\\Money, que lee este valor.')
+                    ->description('Tipo de cambio fijo que editas aquí. No se consulta ninguna página externa: los precios del sitio se convierten con este valor.')
                     ->schema([
                         TextInput::make('exchange_rate_pen_usd')
                             ->label('Soles (PEN) por 1 dólar (USD)')

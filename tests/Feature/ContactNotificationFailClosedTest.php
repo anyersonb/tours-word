@@ -62,7 +62,7 @@ class ContactNotificationFailClosedTest extends TestCase
 
         $response = $this->from('/es/contacto')->post('/es/contacto', $this->validPayload());
 
-        $response->assertRedirect('/es/contacto');
+        $response->assertRedirect('/es/gracias');
         $response->assertSessionHas('contact_success', true);
 
         $this->assertDatabaseCount('contact_messages', 1);
@@ -87,7 +87,7 @@ class ContactNotificationFailClosedTest extends TestCase
 
         $response = $this->from('/es/contacto')->post('/es/contacto', $this->validPayload());
 
-        $response->assertRedirect('/es/contacto');
+        $response->assertRedirect('/es/gracias');
 
         $message = ContactMessage::query()->firstOrFail();
         Mail::assertSent(NewContactMessageReceived::class, fn ($mail) => $mail->contactMessage->is($message)

@@ -374,9 +374,103 @@ function setupParallax() {
     sync();
 }
 
+/*
+ * WhatsApp flotante (loop back 1, BUG-01/02): no puede tapar contenido
+ * interactivo. Se esconde (.is-away) mientras su caja se solape con el footer,
+ * el panel de reserva de la ficha, los CTA/lista del hero o un formulario, y
+ * reaparece al salir. Sin JS queda siempre visible (círculo de 48-56px).
+ */
+function setupWaFloat() {
+    const fab = document.querySelector('[data-wa-float]');
+    if (!fab) return;
+    // Solo los elementos con contenido (enlaces, botones, campos, texto del panel),
+    // no los contenedores enteros: en escritorio el círculo cabe en el margen.
+    const AVOID = [
+        'footer',
+        '#panel-reserva a', 'main button', '.btn', '.link-more', '.round-btn',
+        '.hero__item', '.hero__actions .btn', '.hero__arrow', '.hero__pause', '.hero__search',
+        'form input', 'form select', 'form textarea', 'form button', 'form label',
+        '.search__field', '[data-wa-avoid]',
+        'main a', 'main summary', 'main details > summary',
+    ].join(', ');
+    let ticking = false;
+    const check = () => {
+        ticking = false;
+        const r = fab.getBoundingClientRect();
+        const pad = 6;
+        let hit = false;
+        document.querySelectorAll(AVOID).forEach((el) => {
+            if (hit || fab.contains(el)) return;
+            const b = el.getBoundingClientRect();
+            if (b.width === 0 || b.height === 0) return;
+            if (b.right > r.left - pad && b.left < r.right + pad && b.bottom > r.top - pad && b.top < r.bottom + pad) hit = true;
+        });
+        fab.classList.toggle('is-away', hit);
+    };
+    const queue = () => { if (!ticking) { ticking = true; requestAnimationFrame(check); } };
+    window.addEventListener('scroll', queue, { passive: true });
+    window.addEventListener('resize', queue);
+    window.addEventListener('load', queue);
+    document.addEventListener('transitionend', queue);
+    check();
+}
+
+/*
+ * BUG-05: tras un envío inválido el servidor recarga la página arriba; se lleva
+ * al visitante al resumen de errores (role="alert") y al primer campo inválido.
+ */
+function setupFormErrorFocus() {
+    const summary = document.querySelector('[data-form-errors]');
+    if (!summary) return;
+    summary.scrollIntoView({ block: 'start' });
+    const first = document.querySelector('form [aria-invalid="true"]');
+    if (first) first.focus({ preventScroll: true });
+}
+
+/*
+ * BUG-11: indicador (puntos) para los carruseles scroll-snap de la home en
+ * móvil/tablet (.grid-4--snap). Los puntos son botones; en escritorio la
+ * rejilla no desplaza y CSS los oculta.
+ */
+function setupCarouselDots() {
+    document.querySelectorAll('.grid-4--snap').forEach((track) => {
+        const items = [...track.children];
+        if (items.length < 2) return;
+        const nav = document.createElement('div');
+        nav.className = 'snap-dots';
+        const label = track.getAttribute('aria-label') || '';
+        const dots = items.map((item, i) => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'snap-dots__dot';
+            b.setAttribute('aria-label', label + ' ' + (i + 1) + ' / ' + items.length);
+            b.addEventListener('click', () => track.scrollTo({ left: item.offsetLeft - parseFloat(getComputedStyle(track).paddingLeft || 0), behavior: 'smooth' }));
+            nav.appendChild(b);
+            return b;
+        });
+        track.after(nav);
+        const sync = () => {
+            const max = track.scrollWidth - track.clientWidth;
+            let idx = 0;
+            if (max > 0 && track.scrollLeft >= max - 4) idx = items.length - 1;
+            else {
+                const x = track.scrollLeft + parseFloat(getComputedStyle(track).paddingLeft || 0);
+                items.forEach((it, i) => { if (it.offsetLeft - track.offsetLeft <= x + 24) idx = i; });
+            }
+            dots.forEach((d, i) => (i === idx ? d.setAttribute('aria-current', 'true') : d.removeAttribute('aria-current')));
+        };
+        track.addEventListener('scroll', () => requestAnimationFrame(sync), { passive: true });
+        window.addEventListener('resize', sync);
+        sync();
+    });
+}
+
 function initCinematicUI() {
     setupReveal();
     setupParallax();
+    setupWaFloat();
+    setupFormErrorFocus();
+    setupCarouselDots();
 }
 
 if (document.readyState === 'loading') {

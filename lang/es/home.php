@@ -251,7 +251,7 @@ return [
         // Solo la primera respuesta figura en el diseño; el resto queda
         // como marcador hasta que la clienta las entregue.
         'items' => [
-            ['q' => '¿Cómo reservo un tour?', 'a' => 'Elige tu tour, selecciona la fecha y el número de viajeros y confirma en línea. También puedes reservar escribiéndonos por WhatsApp al +51 959 173 246.'],
+            ['q' => '¿Cómo reservo un tour?', 'a' => 'Elige tu tour, selecciona la fecha y el número de viajeros y confirma en línea. También puedes reservar escribiéndonos por WhatsApp al :phone.'],
             ['q' => '¿Puedo cancelar o cambiar mi reserva?', 'a' => '[Respuesta por completar: política de cancelación]'],
             ['q' => '¿El recojo del hotel está incluido?', 'a' => '[Respuesta por completar]'],
             ['q' => '¿En qué idiomas son los tours?', 'a' => '[Respuesta por completar]'],

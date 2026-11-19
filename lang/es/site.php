@@ -2,6 +2,35 @@
 
 return [
 
+    // CRO C-2: página de gracias tras el formulario de contacto.
+    'gracias' => [
+        'title' => '¡Gracias! Recibimos tu mensaje',
+        'eyebrow' => 'Mensaje enviado',
+        'heading' => '¡Gracias por escribirnos!',
+        'text' => 'Recibimos tu solicitud y un asesor de INKA PALACE Travel te responderá muy pronto con disponibilidad y siguientes pasos.',
+        'next' => '¿Quieres una respuesta más rápida?',
+        'wa_text' => 'Hola, acabo de enviar el formulario de contacto en la web.',
+        'wa_cta' => 'Continuar por WhatsApp',
+        'tours_cta' => 'Ver más tours',
+        'home_cta' => 'Volver al inicio',
+    ],
+
+
+    // CRO (docs/rediseno-2026/19-cro-mobile.md): WhatsApp contextual y texto fijo del hero.
+    'whatsapp' => [
+        'default_text' => 'Hola, quiero cotizar un tour con INKA PALACE Travel.',
+        'tour_text' => 'Hola, quiero cotizar el tour :tour.',
+        'price_text' => 'Hola, quiero consultar el precio de :tour.',
+        'price_text_generic' => 'Hola, quiero consultar el precio de un tour.',
+        'label' => 'Cotizar por WhatsApp',
+        'price_ask' => 'Consultar precio',
+        'tour_cta' => 'Consultar por WhatsApp',
+        'trust_no_charge' => 'Sin cargo al solicitar',
+        'trust_fast_reply' => 'Respuesta rápida por WhatsApp',
+        'hero_value' => 'Agencia de turismo con expertos locales',
+    ],
+
+
     // SEO (lote 1, arreglo A3). Descripción de respaldo cuando una vista no
     // pasa su propia `description` a <x-layout> (hoy es el caso de
     // contact.blade.php, fuera de mi alcance en este lote). Sin cifras ni

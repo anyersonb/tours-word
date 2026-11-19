@@ -40,7 +40,7 @@ class ContactMessageSubmissionTest extends TestCase
 
         $response = $this->from('/es/contacto')->post('/es/contacto', $this->validPayload());
 
-        $response->assertRedirect('/es/contacto');
+        $response->assertRedirect('/es/gracias');
         $response->assertSessionHas('contact_success', true);
         $response->assertSessionHasNoErrors();
 
@@ -112,7 +112,7 @@ class ContactMessageSubmissionTest extends TestCase
 
         $response = $this->from('/es/contacto')->post('/es/contacto', $this->validPayload(['website' => 'http://spam.example']));
 
-        $response->assertRedirect('/es/contacto');
+        $response->assertRedirect('/es/gracias');
         $response->assertSessionHas('contact_success', true);
 
         $this->assertDatabaseCount('contact_messages', 0);
@@ -133,7 +133,7 @@ class ContactMessageSubmissionTest extends TestCase
 
         for ($i = 0; $i < $attempts; $i++) {
             $this->from('/es/contacto')->post('/es/contacto', $this->validPayload(['email' => "visitor{$i}@example.com"]))
-                ->assertRedirect('/es/contacto');
+                ->assertRedirect('/es/gracias');
         }
 
         $this->from('/es/contacto')->post('/es/contacto', $this->validPayload(['email' => 'one-too-many@example.com']))
@@ -150,7 +150,7 @@ class ContactMessageSubmissionTest extends TestCase
 
         $response = $this->from('/es/contacto')->post('/es/contacto', $this->validPayload());
 
-        $response->assertRedirect('/es/contacto');
+        $response->assertRedirect('/es/gracias');
         $response->assertSessionHas('contact_success', true);
         $this->assertDatabaseCount('contact_messages', 1);
     }

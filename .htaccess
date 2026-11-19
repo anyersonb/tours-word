@@ -93,7 +93,7 @@ RewriteRule ^storage/app/(?!public/) - [F,L]
 RewriteRule ^storage/(?!app/)(.+)$ storage/app/public/$1 [L]
 
 # (1c) El resto de assets, que si viven en public/ como carpetas reales.
-RewriteRule ^((?:build|images|css|js|fonts)/.+|favicon\.ico|favicon\.svg|robots\.txt)$ public/$1 [L]
+RewriteRule ^((?:build|images|img|css|js|fonts)/.+|favicon\.ico|favicon\.svg|favicon-32\.png|apple-touch-icon\.png|robots\.txt)$ public/$1 [L]
 
 # (2) Deny por DIRECTORIO. Imprescindible: (1) solo mira el nombre del
 #     archivo, no la carpeta que lo contiene.
