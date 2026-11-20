@@ -41,9 +41,18 @@
         'tiktok' => ['TikTok', config('brand.social.tiktok')],
     ];
 
-    // Destinos publicados del CMS (máx. 5), con su URL pública real. Sin
-    // caché: son 5 filas y no hay invalidación automática todavía.
-    $footerDestinations = Destination::query()->published()->ordered()->orderBy('id')->limit(5)->get();
+    // Destinos del pie (PDF s08): lista fija de config('brand.footer_destinations').
+    // Una sola consulta: enlaza a la ficha si el destino está publicado en el CMS y,
+    // si no, al índice. `slug` es traducible (JSON por idioma): se compara la `key`
+    // (slug ES) y se enlaza con el slug del idioma actual.
+    $footerItems = config('brand.footer_destinations', []);
+    $footerKeys = array_column($footerItems, 'key');
+    $footerLocale = \App\Support\Locale::fromSegment(app()->getLocale()) ?? app()->getLocale();
+    $publishedSlugs = $footerItems === []
+        ? collect()
+        : Destination::query()->published()->get(['id', 'slug'])
+            ->mapWithKeys(fn ($d) => [(string) $d->getTranslation('slug', 'es', false) => $d->getTranslation('slug', $footerLocale, false) ?: $d->getTranslation('slug', 'es', false)])
+            ->only($footerKeys);
 @endphp
 
 <x-home.ribbon />
@@ -60,8 +69,8 @@
         <nav class="footer__col" aria-labelledby="f-dest">
             <h2 class="footer__h" id="f-dest">{{ __('home.footer.destinations') }}</h2>
             <ul>
-                @forelse ($footerDestinations as $d)
-                    <li><a href="{{ route('destinations.show', ['slug' => $d->slug]) }}">{{ $d->name }}</a></li>
+                @forelse ($footerItems as $d)
+                    <li><a href="{{ $publishedSlugs->has($d['key']) ? route('destinations.show', ['slug' => $publishedSlugs->get($d['key'])]) : route('destinations.index') }}">{{ $d['name'] }}</a></li>
                 @empty
                     <li><a href="{{ route('destinations.index') }}">{{ __('site.nav.destinations') }}</a></li>
                 @endforelse

@@ -59,7 +59,7 @@ class HomeTest extends TestCase
         $destination = Destination::factory()->create(['name' => ['es' => 'Cusco'], 'slug' => ['es' => 'cusco']]);
 
         foreach (range(1, 5) as $i) {
-            $tour = Tour::factory()->create([
+            $tour = Tour::factory()->withImage()->create([
                 'destination_id' => $destination->id,
                 'is_featured' => true,
                 'order' => $i,
@@ -90,7 +90,7 @@ class HomeTest extends TestCase
 
     public function test_inca_trail_strip_uses_the_same_usd_as_the_4plus_days_card(): void
     {
-        $tour = Tour::factory()->create([
+        $tour = Tour::factory()->withImage()->create([
             'duration_label' => ['es' => '4 días'],
             'price_pen_cents' => 35625,
             'price_usd_cents' => 9500,
@@ -105,7 +105,7 @@ class HomeTest extends TestCase
     public function test_inca_trail_strip_converts_the_card_pen_price_when_tour_has_no_usd(): void
     {
         \App\Models\Setting::set(Money::EXCHANGE_RATE_SETTING_KEY, '3.75');
-        Tour::factory()->create([
+        Tour::factory()->withImage()->create([
             'duration_label' => ['es' => '4 días'],
             'price_pen_cents' => 37500,
             'price_usd_cents' => 0,
@@ -149,10 +149,10 @@ class HomeTest extends TestCase
 
     public function test_plan_tours_are_grouped_by_duration_and_empty_when_not_inferable(): void
     {
-        Tour::factory()->create(['duration_label' => ['es' => 'Medio día'], 'order' => 1]);
-        Tour::factory()->create(['duration_label' => ['es' => '4 horas'], 'order' => 2]);
-        Tour::factory()->create(['duration_label' => ['es' => '2 días / 1 noche'], 'order' => 3]);
-        Tour::factory()->create(['duration_label' => ['es' => '4 días'], 'order' => 4]);
+        Tour::factory()->withImage()->create(['duration_label' => ['es' => 'Medio día'], 'order' => 1]);
+        Tour::factory()->withImage()->create(['duration_label' => ['es' => '4 horas'], 'order' => 2]);
+        Tour::factory()->withImage()->create(['duration_label' => ['es' => '2 días / 1 noche'], 'order' => 3]);
+        Tour::factory()->withImage()->create(['duration_label' => ['es' => '4 días'], 'order' => 4]);
 
         $this->get(route('home', ['locale' => 'es']))->assertViewHas('planTours', function ($tours) {
             return $tours->pluck('bucket')->all() === ['4h', '2-3dias', '4mas'];
@@ -195,7 +195,7 @@ class HomeTest extends TestCase
             'slug' => ['es' => 'cusco', 'en' => 'cusco-city'],
         ]);
         $experience = Experience::factory()->create(['slug' => ['es' => 'trekking', 'en' => 'hiking']]);
-        Tour::factory()->create([
+        Tour::factory()->withImage()->create([
             'destination_id' => $destination->id,
             'is_featured' => true,
             'slug' => ['es' => 'ruta-es', 'en' => 'route-en'],

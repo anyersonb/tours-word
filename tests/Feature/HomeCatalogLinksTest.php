@@ -21,7 +21,7 @@ class HomeCatalogLinksTest extends TestCase
 
     private function seedCatalog(): void
     {
-        $tour = Tour::factory()->create(['is_featured' => true]);
+        $tour = Tour::factory()->withImage()->create(['is_featured' => true]);
         $experience = Experience::factory()->create();
         $tour->experiences()->attach($experience);
 
@@ -52,7 +52,7 @@ class HomeCatalogLinksTest extends TestCase
 
     public function test_the_featured_tour_card_links_to_its_real_tour_page(): void
     {
-        $tour = Tour::factory()->create(['is_featured' => true]);
+        $tour = Tour::factory()->withImage()->create(['is_featured' => true]);
         $slug = $tour->getTranslation('slug', 'es', false);
 
         $response = $this->get(route('home', ['locale' => 'es']));
@@ -63,8 +63,9 @@ class HomeCatalogLinksTest extends TestCase
 
     public function test_the_destination_and_experience_cards_link_to_their_real_pages(): void
     {
-        $destination = Destination::factory()->create();
-        $experience = Experience::factory()->create();
+        // Regla del Home: sin imagen no entra (HomeImageRuleTest). Las del CMS se confían por ruta.
+        $destination = Destination::factory()->create(['cover_image_path' => 'destinations/test.jpg']);
+        $experience = Experience::factory()->create(['cover_image_path' => 'experiences/test.jpg']);
 
         $destinationSlug = $destination->getTranslation('slug', 'es', false);
         $experienceSlug = $experience->getTranslation('slug', 'es', false);
@@ -85,7 +86,7 @@ class HomeCatalogLinksTest extends TestCase
      */
     public function test_the_carousel_branch_links_every_card_to_its_real_tour_page_when_there_are_two_or_more_featured_tours(): void
     {
-        $tours = Tour::factory()->count(2)->create(['is_featured' => true]);
+        $tours = Tour::factory()->withImage()->count(2)->create(['is_featured' => true]);
 
         $response = $this->get(route('home', ['locale' => 'es']));
 

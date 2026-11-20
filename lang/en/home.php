@@ -249,11 +249,11 @@ return [
         'contact_cta' => 'Talk on WhatsApp',
         'items' => [
             ['q' => 'How do I book a tour?', 'a' => 'Pick your tour, choose the date and number of travelers and confirm online. You can also book by messaging us on WhatsApp at :phone.'],
-            ['q' => 'Can I cancel or change my booking?', 'a' => '[Answer pending: cancellation policy]'],
-            ['q' => 'Is hotel pickup included?', 'a' => '[Answer pending]'],
-            ['q' => 'What languages are the tours in?', 'a' => '[Answer pending]'],
-            ['q' => 'Which payment methods do you accept?', 'a' => '[Answer pending]'],
-            ['q' => 'How far ahead should I book the Inca Trail?', 'a' => '[Answer pending]'],
+            ['q' => 'Can I cancel or change my booking?', 'a' => 'It depends on the tour and the date. Before you pay, we confirm the change and cancellation conditions for your booking on WhatsApp, so you can decide with full information. If you need to change your date, write to us as soon as possible and we will look at the options.'],
+            ['q' => 'Is hotel pickup included?', 'a' => 'It depends on the tour. Many tours include hotel pickup and others leave from a meeting point. Each tour states what it includes, and when you book we confirm the exact pickup place and time on WhatsApp.'],
+            ['q' => 'What languages are the tours in?', 'a' => 'We offer tours in Spanish and English. If you need another language or a guide for a specific language, message us on WhatsApp and we will confirm availability for your date.'],
+            ['q' => 'Which payment methods do you accept?', 'a' => 'We tell you the available payment methods when we confirm your booking, always through secure channels. Message us on WhatsApp and we will explain how to pay before you make any payment.'],
+            ['q' => 'How far ahead should I book the Inca Trail?', 'a' => 'The sooner the better. Inca Trail permits are limited per day and sell out, so we recommend booking several months in advance. Write to us with your ideal date and we will check availability.'],
         ],
     ],
 

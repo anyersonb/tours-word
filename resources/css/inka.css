@@ -58,7 +58,7 @@ section[id], footer[id] { scroll-margin-top: 96px; }
 .btn--dark:hover { background: var(--card-dark); }
 .btn--ghost { background: transparent; border-color: #fff; color: #fff; }
 .btn--ghost:hover { background: rgb(255 255 255 / .16); }
-.btn--wa { background: var(--whatsapp-action); color: var(--on-whatsapp); }
+.btn--wa { background: var(--whatsapp-action); color: var(--on-whatsapp-text); font-weight: 700; }
 .btn--wa:hover { filter: brightness(1.08); }
 .btn--block { width: 100%; }
 .btn--off { cursor: default; }
@@ -245,7 +245,7 @@ section[id], footer[id] { scroll-margin-top: 96px; }
 .icon-tile--accent-soft { background: var(--accent-soft); color: var(--accent-text); }
 .icon-tile--forest-soft { background: var(--forest-soft); color: var(--forest); }
 .icon-tile--teal-soft { background: var(--teal-soft); color: var(--teal); }
-.icon-tile--clay-soft { background: var(--clay-soft); color: var(--alert); }
+.icon-tile--clay-soft { background: var(--clay-soft); color: var(--c-ochre); }
 .icon-tile--solid-forest { width: 50px; height: 50px; background: var(--forest); color: var(--on-forest); border-radius: 12px; }
 .icon-tile--solid-accent { width: 50px; height: 50px; background: var(--accent); color: var(--on-action); border-radius: 12px; }
 .icon-tile--solid-teal { width: 50px; height: 50px; background: var(--teal); color: var(--on-teal); border-radius: 12px; }
@@ -374,7 +374,8 @@ section[id], footer[id] { scroll-margin-top: 96px; }
 .ip-chip .icon { color: var(--accent-text); }
 .tour-card__cancel { display: flex; align-items: center; gap: 8px; margin-top: 14px; font-size: 13px; font-weight: 600; color: var(--forest); }
 .tour-card__foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 18px; border-top: 1px dashed var(--border); }
-.tour-card__cancel + .tour-card__foot { margin-top: 17px; }
+.tour-card__cancel { margin-bottom: 17px; }
+.tour-card__title { font-weight: 700; }
 .price { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
 .price__from, .price__per { font-size: 12px; color: var(--text-muted); }
 .price__amount { font-size: 22px; font-weight: 700; letter-spacing: -.01em; white-space: nowrap; }
@@ -440,7 +441,8 @@ section[id], footer[id] { scroll-margin-top: 96px; }
 /* ------------------------------------------------------- banda paisajes */
 .band { position: relative; overflow: hidden; background: var(--bg-dark); color: var(--text-on-dark); isolation: isolate; }
 .band__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
-.band__shade { position: absolute; inset: 0; background: var(--shade-band); z-index: -1; }
+.band__shade { position: absolute; inset: 0; background: var(--shade-band-mobile); z-index: -1; }
+@media (min-width: 1024px) { .band__shade { background: var(--shade-band); } }
 .band__inner { padding-block: 56px; }
 .band__title { margin-top: 12px; font-family: 'Cinzel', serif; font-weight: 700; font-size: clamp(2rem, 8vw, 3.5rem); line-height: 1.12; letter-spacing: .01em; max-width: 12em; text-wrap: balance; overflow-wrap: break-word; }
 .band__text { margin-top: 20px; max-width: 30em; font-size: 16px; line-height: 1.6; color: var(--text-on-dark); }
@@ -471,7 +473,7 @@ section[id], footer[id] { scroll-margin-top: 96px; }
 .plan__media img { width: 100%; height: 100%; object-fit: cover; }
 .plan__body { display: flex; flex-direction: column; flex: 1; padding: 20px 22px 22px; }
 .plan__kicker { font-size: 12px; font-weight: 600; color: var(--accent-on-dark); }
-.plan__title { margin-top: 8px; font-size: 17px; font-weight: 600; line-height: 1.3; min-height: 2.6em; overflow-wrap: break-word; }
+.plan__title { margin-top: 8px; font-size: 17px; font-weight: 700; line-height: 1.3; min-height: 2.6em; overflow-wrap: break-word; }
 .plan__foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; margin-top: auto; padding-top: 14px; border-top: 1px solid var(--border-on-dark); }
 .plan__price { font-size: 14px; }
 .plan__price strong { font-size: 17px; font-weight: 700; }
@@ -758,13 +760,18 @@ picture { display: contents; }
 }
 
 /* ===== Fidelidad con la paleta oficial (2026-11) ===== */
-/* WhatsApp sobre la card Sage del FAQ: anillo ivory para separar los dos verdes */
-.contact-card .btn--wa { box-shadow: 0 0 0 2px var(--ivory); }
-.contact-card .btn--wa:focus-visible { outline-color: var(--ivory); }
+/* Tarjeta FAQ (PDF s07): WhatsApp verde sólido SIN anillo; el relleno ya contrasta con el verde bosque. */
+.contact-card .btn--wa:focus-visible { outline-color: var(--on-forest); }
+.contact-card p { margin-top: 0; }
+.contact-card__head + p { margin-top: 14px; }
+.contact-card p + .btn { margin-top: 14px; }
 /* Encuadres de las fotos provisionales (sin tocar el resto) */
-.city img[src$="/provisional/ica.jpg"] { object-position: 12% 40%; }
+.city img[src$="/provisional/ica.jpg"] { object-position: 92% 62%; } /* oasis, no la persona (PDF) */
 .exp img[src$="/provisional/trekking.jpg"] { object-position: 50% 58%; }
-.plan__media img[src$="/provisional/plan-nazca.jpg"] { object-position: 50% 92%; }
+/* City Tour Lima: el carruaje (parte baja de la foto) debe verse en la tarjeta apaisada y en la de planes */
+/* City Tour Lima: la foto (limpia, 1.4:1) ya trae el carruaje centrado; sin encuadre propio en tour ni en plan */
+/* Humantay en tour destacado: laguna y persona sobre la roca (PDF) */
+.tour-card__media img[src$="/provisional/tour-laguna-humantay.jpg"] { object-position: 50% 80%; }
 /* Titulo de card de planes sin "dias" huerfano */
 .plan__title { text-wrap: balance; }
 /* Topbar y boton de Instagram: wrap limpio */
@@ -773,8 +780,6 @@ picture { display: contents; }
 /* Carrito (deshabilitado): contraste suficiente sobre su fondo ivory */
 .cart { color: var(--text); }
 .cart:disabled { opacity: 1; color: var(--text-2); border-color: var(--text-muted); }
-/* Rol "teal" = espresso: sobre fondos oscuros (Cultura) el icono sólido se invierte a ivory */
-.icon-tile--solid-teal { background: var(--ivory); color: var(--espresso); }
 
 /* =========================================================================
  * CRO mobile (docs/rediseno-2026/19-cro-mobile.md, "Fixes aplicados")
@@ -842,3 +847,73 @@ a.topbar__notice:focus-visible { outline: 3px solid var(--focus-on-dark); outlin
 .thanks__next { margin-top: 32px; font-size: 16px; font-weight: 600; }
 .thanks__actions { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 420px; margin-top: 16px; }
 @media (min-width: 640px) { .thanks__actions { flex-direction: row; flex-wrap: wrap; justify-content: center; width: auto; max-width: none; } }
+
+/* ===== Ronda PDF 2026-11-19 (docs/rediseno-2026/22-*) ===== */
+/* Header blanco: --bg ya es blanco (paleta del PDF). Selector segmentado PEN | ES:
+ * cápsula crema, segmento de moneda en pill blanca; los menús se conservan. */
+.switch .switch__opt .icon { display: none; }
+.switch .switch__opt { min-width: 44px; padding: 0 12px; font-weight: 700; font-size: 12px; color: var(--text-muted); }
+.switch .switch__seg:first-child .switch__opt { background: var(--bg); color: var(--text); box-shadow: 0 1px 3px var(--border); }
+.switch .switch__opt:hover { color: var(--text); }
+
+/* Hero: Lima entera visible. Con pantallas anchas la foto (1.67:1) se recorta
+ * en vertical: anclar abajo deja LIMA sobre el buscador. */
+@media (min-width: 1024px) { .hero__bg { object-position: 50% 100%; } }
+
+/* Burbuja "¿Te ayudamos?" junto al WhatsApp flotante (PDF s01, solo escritorio).
+ * Vive dentro de .wa-float: hereda .is-away (se oculta con el botón). */
+@media (min-width: 1024px) {
+  .wa-float__bubble { display: flex; }
+}
+.wa-float__bubble strong { font-size: 13.5px; font-weight: 700; }
+.wa-float__bubble span { font-size: 12.5px; color: var(--text-muted); }
+
+/* Botones dorados sólidos (PDF): sombra cálida, no deslavada */
+.btn--accent { box-shadow: var(--shadow-btn); }
+
+/* Banda sin fila de cifras (se oculta con < 2 cifras reales): el contenido se centra en
+ * el alto de la banda (PDF 541 px) en vez de quedar pegado arriba con hueco abajo. */
+@media (min-width: 1024px) {
+  .band { display: flex; flex-direction: column; justify-content: center; }
+  .band__inner { padding-block: 72px; }
+  .band:has(.band__stats) .band__inner { padding-block: 56px 60px; }
+}
+
+/* Mosaico móvil: "HUMANTAY" no debe pisar la flecha (tarjetas pequeñas de 2 columnas) */
+@media (max-width: 639px) {
+  .dest:not(.dest--big) .dest__name { font-size: 17px; letter-spacing: 0; }
+  .dest:not(.dest--big) .dest__body { padding-right: 56px; }
+}
+
+/* ===== Vuelta 2 (docs/rediseno-2026/23-ojo y 22-qa) ===== */
+/* R1: encuadre propio por slide del hero (antes un solo 50% 100% cortaba las caras de Machu Picchu).
+ * Lima: anclada abajo (LIMA sobre el buscador). Ica y Machu Picchu: foco en las personas. */
+@media (min-width: 1024px) {
+  .hero__slide:nth-child(2) .hero__bg { object-position: 50% 30%; }
+  .hero__slide:nth-child(3) .hero__bg { object-position: 50% 42%; }
+}
+
+/* M1: la fila de chips (duración/idioma) siempre ocupa su alto: las 4 tarjetas quedan iguales aunque falte el dato */
+.tour-card__meta { min-height: 30px; }
+/* M2: el pie de la tarjeta no parte "Consultar precio" ni "Ver tour" en dos líneas (390) */
+.tour-card__foot .btn, .price-ask { white-space: nowrap; }
+@media (max-width: 479px) {
+  .tour-card__foot { gap: 8px; }
+  .tour-card__foot .btn { padding-inline: 14px; }
+  .price-ask { font-size: 13px; gap: 6px; }
+}
+
+/* M3: a pantallas anchas la banda es más panorámica: anclar arriba conserva las cumbres nevadas */
+@media (min-width: 1600px) { .band__bg { object-position: 50% 30%; } }
+
+/* B3: tarjetas de ciudad más esbeltas (PDF ~295x480 = 0.62) */
+@media (min-width: 1024px) { .grid-4--cities .city { min-height: 0; aspect-ratio: 0.62; } }
+
+/* B-06: en móvil el flotante de WhatsApp es más pequeño (44 px, el mínimo táctil) y se pega al borde
+ * para invadir menos texto; .is-away sigue ocultándolo sobre footer, hero y formularios. */
+@media (max-width: 1023px) {
+  .wa-float { right: 8px; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+  .wa-float__btn { width: 44px; height: 44px; }
+  .wa-float__btn .icon { width: 22px; height: 22px; }
+  .wa-float--lift { bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
+}

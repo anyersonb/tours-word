@@ -160,15 +160,18 @@ class HomeController extends Controller
             ->ordered()
             ->orderBy('id')
             ->with(['destination', 'images'])
-            ->limit(4)
             ->get()
             ->map(fn (Tour $tour): array => $this->tourCard($tour))
+            // Regla del Home: un tour sin foto no entra a la grilla (la vista la
+            // completa con las tarjetas del diseño). Se filtra ANTES del tope.
+            ->filter(fn (array $card): bool => filled($card['image']))
+            ->take(4)
             ->values();
     }
 
     /**
      * Un tour por grupo de duración (máx. 4), solo los que se pueden
-     * clasificar a partir de duration_label. Sin dato, lista vacía.
+     * clasificar a partir de duration_label y tienen foto. Sin dato, lista vacía.
      *
      * @return Collection<int, array<string, mixed>>
      */
@@ -185,13 +188,23 @@ class HomeController extends Controller
             ->each(function (Tour $tour) use (&$byBucket): void {
                 $bucket = $this->durationBucket((string) $tour->duration_label);
 
-                if ($bucket !== null && ! isset($byBucket[$bucket])) {
-                    $byBucket[$bucket] = $this->tourCard($tour) + [
-                        'bucket' => $bucket,
-                        'bucket_label' => __('home.plans.filters.'.$bucket),
-                        'bucket_kicker' => __('home.plans.bucket_kicker.'.$bucket),
-                    ];
+                if ($bucket === null || isset($byBucket[$bucket])) {
+                    return;
                 }
+
+                $card = $this->tourCard($tour);
+
+                // Un tour sin foto NO reserva el grupo de duración: si lo hiciera,
+                // la vista lo descartaría y el grupo quedaría vacío (bug de Planes).
+                if (blank($card['image'])) {
+                    return;
+                }
+
+                $byBucket[$bucket] = $card + [
+                    'bucket' => $bucket,
+                    'bucket_label' => __('home.plans.filters.'.$bucket),
+                    'bucket_kicker' => __('home.plans.bucket_kicker.'.$bucket),
+                ];
             });
 
         return collect(self::PLAN_BUCKETS)

@@ -1,79 +1,90 @@
 /**
  * INKA PALACE Travel — tokens (única fuente de verdad).
  *
- * HOJA DE MARCA OFICIAL (2026-10-12): Espresso #3E2F24, Sage #556B52,
- * Champagne Gold #C9A96A, Ivory #FAF7EE. Esta hoja MANDA sobre los colores
- * inferidos del JPEG del PDF (docs/lote-1/inka-palace/07-integracion-staging-oficial.md).
- * El PDF manda solo en estructura/composición del Home.
+ * DECISIÓN DE ANYERSON (2026-11-19): los colores los manda el PDF de diseño
+ * aprobado (Inka-Palace-1-Home), no la hoja de marca de 2026-10-12 (Champagne
+ * #C9A96A, Sage #556B52, Espresso #3E2F24, Ivory), que quedó apagada frente al
+ * "full llamativo" pedido. Los valores de abajo están MUESTREADOS del JPEG del
+ * PDF a resolución nativa (2880 px) sobre zonas planas:
+ *   café oscuro (topbar, planes, footer, IG)  #291b12
+ *   dorado ámbar (botones, flechas, eyebrows) #e0a63a
+ *   verde bosque (Camino Inca, tarjeta FAQ)   #24483a
+ *   turquesa (icono Cultura, 4 h, franja)     #1c6d82
+ *   rojo (pill topbar, "Últimos cupos")       #9e2b1d
+ *   crema ("Tours por ciudad", razones)       #f7f4ef
+ *   verde WhatsApp                            #1faf5a (PDF) -> #1a9d50 en relleno
+ * Los NOMBRES de token se conservan (contrato con ui/* y el Home): cambia el
+ * VALOR, no el contrato. --sage = verde bosque, --espresso = café del PDF,
+ * --ivory = blanco del PDF (la página es blanca; el crema es --bg-alt/--sand).
  *
- * Se CONSERVAN los nombres de token de la capa anterior (--action,
- * --brand-*, --ink-surface, --accent-*, --forest...) para que ui/* y el
- * Home no se reescriban: cambia el VALOR, no el contrato. Mapeo:
- *   café oscuro del PDF  -> Espresso     verde bosque del PDF -> Sage
- *   dorado del PDF       -> Champagne Gold (relleno) / --gold-deep (texto)
- *   crema del PDF        -> Ivory / arena
- *
- * REGLAS DE CONTRASTE (WCAG 2.1, medidas):
- *  - El dorado #C9A96A mide 2.09:1 sobre ivory: NUNCA como texto ni como
- *    fondo de botón con texto claro sobre claro. Solo relleno, filetes e
- *    íconos decorativos; sobre espresso sí sirve como texto (5.72:1).
- *  - Texto dorado sobre claro: --gold-deep #7A5A1F (5.92:1 ivory, 5.58:1 arena).
- *  - Texto sobre relleno dorado: espresso (5.72:1; 4.65:1 sobre el hover).
- *  - Texto sobre sage: blanco 5.82:1. Sage como texto: --sage-text 7.77:1.
- *  - WhatsApp conserva su verde propio (blanco sobre #158045 = 5.0:1).
+ * REGLAS DE CONTRASTE (WCAG 2.1 AA, medidas):
+ *  - Texto sobre dorado: SIEMPRE café oscuro, como en los botones del PDF
+ *    (#291b12 sobre #e0a63a = 7.69:1; sobre el hover #cf942a = 6.29:1). El
+ *    blanco sobre el dorado da 2.17:1: PROHIBIDO.
+ *  - Dorado como TEXTO sobre claro: --gold-deep #8c5f10 (5.59:1 sobre blanco,
+ *    5.09:1 sobre crema, 4.90:1 sobre --brand-50). El dorado #e0a63a mide 2.17:1 sobre blanco: solo
+ *    relleno, filetes e íconos decorativos. Sobre café sí sirve como texto
+ *    (7.69:1) y sobre el verde bosque (4.69:1, solo texto >= 14px).
+ *  - Texto sobre verde bosque #24483a: blanco 10.18:1.
+ *  - Texto sobre café #291b12: blanco 16:1, --on-dark-2 12.03:1, --on-dark-3 7.57:1.
+ *  - Blanco sobre turquesa #1c6d82 5.90:1; sobre rojo #9e2b1d 7.45:1.
+ *  - WhatsApp: el verde del PDF (#1faf5a) con blanco da 2.74:1, no pasa. El
+ *    relleno baja un punto a #1a9d50 (glifo blanco 3.51:1 >= 3:1 no textual) y
+ *    el TEXTO de los botones WhatsApp va en café (4.75:1), nunca en blanco.
  *
  * REGLA DURA: ningún componente escribe un hexadecimal. Solo tokens
  * semánticos; si falta uno, se crea aquí.
  */
 
+/* Los valores del bloque de abajo están muestreados del PDF (ver cabecera). */
 :root {
-  /* ---- Hoja de marca, tal cual ---- */
-  --espresso: #3e2f24;
-  --sage:     #556b52;
-  --gold:     #c9a96a;
-  --ivory:    #faf7ee;
+  /* ---- Colores del PDF, tal cual ---- */
+  --espresso: #291b12;
+  --sage:     #24483a;
+  --gold:     #e0a63a;
+  --ivory:    #ffffff;
 
   /* Derivadas (contrastes medidos en el encabezado) */
-  --espresso-deep: #2b2019; /* hover sobre espresso: ivory 14.81:1 */
-  --sage-hover:    #475b45; /* blanco 7.37:1 */
-  --sage-text:     #3f5340; /* sage como texto: 7.77:1 sobre ivory */
-  --gold-deep:     #7a5a1f; /* dorado como TEXTO sobre claro */
+  --espresso-deep: #1d130c; /* hover sobre café: blanco 17.6:1 */
+  --sage-hover:    #1b3a2e; /* blanco 12.42:1 */
+  --sage-text:     #24483a; /* verde como texto: 10.18:1 sobre blanco, 8.61:1 sobre su tinte */
+  --gold-deep:     #8c5f10; /* dorado como TEXTO sobre claro: 5.59:1 blanco, 5.09:1 crema, 4.90:1 sobre --brand-50 */
 
   /* ---- Paleta cruda (alias internos; solo se referencian desde esta hoja) ---- */
   --c-coffee-900: var(--espresso);
-  --c-coffee-800: #4f3d30;   /* tarjetas sobre espresso */
-  --c-gold-100:   #f5eddb;   /* fondo de icono dorado (tinte del gold sobre ivory) */
+  --c-coffee-800: #3d2a1c;   /* tarjetas de Planes sobre café (muestreado) */
+  --c-gold-100:   #fbefd5;   /* fondo de icono dorado (muestreado) */
   --c-gold-500:   var(--gold);
-  --c-gold-600:   #b8975a;   /* hover del CTA: espresso encima 4.65:1 */
+  --c-gold-600:   #cf942a;   /* hover del CTA: café encima 6.29:1 */
   --c-gold-700:   var(--gold-deep);
   --c-forest-700: var(--sage);       /* bloque Camino Inca, tarjeta de contacto */
-  --c-forest-100: #eef2ec;
-  --c-teal-700:   var(--espresso);   /* 2.º rol de color: espresso (la hoja no tiene turquesa; un 2.º verde se confundía con Sage) */
-  --c-teal-100:   #f1ead9;   /* tinte cálido (clay) */
-  --c-clay-100:   #f1ead9;
-  --c-terracotta: #ab3a30;           /* alerta (--danger de la hoja): blanco 6.21:1 */
-  --c-ochre:      var(--gold-deep);
-  --c-sage:       var(--sage);
-  --c-cream-100:  #f5f0e3;           /* fondos alternos */
+  --c-forest-100: #e7eee6;
+  --c-teal-700:   #1c6d82;           /* turquesa del PDF: icono Cultura, 4 h, franja */
+  --c-teal-100:   #ddeff3;
+  --c-clay-100:   #f3e9dd;
+  --c-terracotta: #9e2b1d;           /* rojo del PDF: pill del topbar, "Últimos cupos" (blanco 7.45:1) */
+  --c-ochre:      #875e2a;           /* marrón de la franja textil */
+  --c-sage:       #5c7f61;           /* verde claro de la franja textil */
+  --c-cream-100:  #f7f4ef;           /* fondos alternos (Tours por ciudad, razones) */
   --c-white:      #fff;
-  --c-line:       #e3dac8;
-  --c-wa-icon:    #1faf5a;   /* WhatsApp (verde propio por contraste) */
-  --c-wa-action:  #158045;   /* WhatsApp con texto blanco: 5:1 */
+  --c-line:       #e5e0da;
+  --c-wa-icon:    #1faf5a;   /* WhatsApp del PDF (iconos sobre oscuro) */
+  --c-wa-action:  #1a9d50;   /* relleno WhatsApp: blanco 3.51:1 (glifo), café 4.75:1 (texto) */
 
   /* --brand-h/--brand-s ya no generan una rampa HSL: se conservan solo
    * porque otras reglas (p. ej. .weave) los leen para sus motivos. */
-  --brand-h: 24;
+  --brand-h: 36;
   --brand-s: 1;
 
   /* Rampa 50 -> 900, dorado (50-600) a café (700-900). bg-brand-50 =
    * fondo suave dorado de chips/estados; text-brand-text = dorado oscuro. */
   --brand-50:  var(--c-gold-100);
-  --brand-100: #ede3cc;
-  --brand-200: #dfd0ad;
-  --brand-300: #d5be8a;
+  --brand-100: #f7e1b0;
+  --brand-200: #f0cf84;
+  --brand-300: #e9ba5c;
   --brand-400: var(--c-gold-500);
   --brand-500: var(--c-gold-600);
-  --brand-600: #a98a4d;
+  --brand-600: #b88220;
   --brand-700: var(--c-gold-700);
   --brand-800: var(--c-coffee-800);
   --brand-900: var(--c-coffee-900);
@@ -83,31 +94,31 @@
   --surface:   var(--c-white);
   --surface-2: var(--c-cream-100);
   --line:      var(--c-line);
-  --line-soft: #ede6d6;
+  --line-soft: #efebe5;
   --ink:       var(--c-coffee-900);
-  --ink-2:     #5c4b3d; /* 7.75:1 sobre ivory */
-  --ink-3:     #6f5d4e; /* 5.85:1 sobre ivory, 6.27:1 sobre blanco */
+  --ink-2:     #5c4b3d; /* 8.30:1 sobre blanco */
+  --ink-3:     #6f5d4e; /* 6.4:1 sobre blanco, 5.71:1 sobre crema */
 
   /* Semánticos de estado */
   --amber:      var(--gold); /* SOLO decorativo (estrellas), no como texto */
-  --amber-text: var(--gold-deep); /* 6.34:1 sobre blanco */
-  --danger:     #ab3a30; /* 6.21:1 sobre blanco */
-  --info:       #2c6fa8;
+  --amber-text: var(--gold-deep); /* 5.59:1 sobre blanco */
+  --danger:     #9e2b1d; /* 7.45:1 sobre blanco */
+  --info:       #1c6d82;
 
   /* Acentos de catálogo (ui/badge, tour-card): pastilla sólida con texto
    * blanco encima, todas >= 4.5:1. */
-    --accent-green:  var(--sage); /* 5.82:1 con blanco */
+  --accent-green:  var(--sage); /* 10.18:1 con blanco */
   --accent-amber:  var(--amber-text);
-    --on-accent:     #fff;
+  --on-accent:     #fff;
 
   /* Semánticos de marca: lo único que consumen los componentes */
   --action:       var(--c-gold-500);
   --action-hover: var(--c-gold-600);
-  --on-action:    var(--c-coffee-900); /* 8.2:1 sobre --action, 6.5:1 sobre --action-hover */
-  --brand-text:   var(--gold-deep); /* dorado como texto sobre claro: 5.92:1 sobre ivory */
+  --on-action:    var(--c-coffee-900); /* 7.69:1 sobre --action, 6.29:1 sobre --action-hover */
+  --brand-text:   var(--gold-deep); /* dorado como texto sobre claro: 5.59:1 sobre blanco */
   --secondary:       var(--sage);
   --secondary-hover: var(--sage-hover);
-  --on-secondary:    #fff; /* 5.82:1 sobre sage, 7.37:1 sobre hover */
+  --on-secondary:    #fff; /* 10.18:1 sobre el verde, 12.42:1 sobre el hover */
 
   /* Semánticos de superficie y borde */
   --bg:          var(--ground);
@@ -115,7 +126,7 @@
   --card-2:      var(--surface-2);
   --border:      var(--line);
   --border-soft: var(--line-soft);
-  --text:        var(--ink);    /* 11.98:1 sobre ivory */
+  --text:        var(--ink);    /* 16:1 sobre blanco */
   --text-2:      var(--ink-2);
   --text-muted:  var(--ink-3);
 
@@ -131,25 +142,25 @@
  * ========================================================================= */
 :root {
   /* --- Neutro cálido (crema) -------------------------------------------- */
-  --sand:      #f3ecdc;
-  --sand-deep: #eadfc9;
-  --sand-line: #ddd0b6;
+  --sand:      #f7f4ef;
+  --sand-deep: #efe9de;
+  --sand-line: #e5e0da;
 
   /* --- Superficie oscura (café). Medidos sobre espresso #3e2f24:
    *   blanco 16:1 · --on-dark-2 12:1 · --on-dark-3 7.7:1 -------------------- */
   --ink-surface:   var(--c-coffee-900);
-  --ink-surface-2: #4f3d30;
-  --on-dark:       var(--ivory);
-  --on-dark-2:     #e4dac7; /* 9.26:1 sobre espresso */
-  --on-dark-3:     #bbad97; /* 5.83:1 sobre espresso */
-  --on-dark-line:  #66533f;
+  --ink-surface-2: #3d2a1c;
+  --on-dark:       #fff;
+  --on-dark-2:     #e4dac7; /* 12.03:1 sobre el café */
+  --on-dark-3:     #bbad97; /* 7.57:1 sobre el café */
+  --on-dark-line:  #5a4535;
 
   /* --- Tratamiento de imagen (derivados del café) ----------------------- */
-  --scrim-hero:  linear-gradient(180deg, rgb(24 15 12 / .60) 0%, rgb(24 15 12 / .80) 55%, rgb(24 15 12 / .90) 100%);
-  --scrim-hero-h: linear-gradient(90deg, rgb(24 15 12 / .88) 0%, rgb(24 15 12 / .76) 46%, rgb(24 15 12 / .30) 80%, rgb(24 15 12 / .12) 100%);
-  --scrim-band:  linear-gradient(180deg, rgb(24 15 12 / .80) 0%, rgb(24 15 12 / .88) 100%);
-  --scrim-card:  linear-gradient(180deg, rgb(24 15 12 / 0) 30%, rgb(24 15 12 / .42) 58%, rgb(24 15 12 / .86) 100%);
-  --photo-tint:  rgb(62 47 36 / .04);
+  --scrim-hero:  linear-gradient(180deg, rgb(24 14 9 / .60) 0%, rgb(24 14 9 / .80) 55%, rgb(24 14 9 / .90) 100%);
+  --scrim-hero-h: linear-gradient(90deg, rgb(24 14 9 / .88) 0%, rgb(24 14 9 / .76) 46%, rgb(24 14 9 / .30) 80%, rgb(24 14 9 / .12) 100%);
+  --scrim-band:  linear-gradient(180deg, rgb(24 14 9 / .80) 0%, rgb(24 14 9 / .88) 100%);
+  --scrim-card:  linear-gradient(180deg, rgb(24 14 9 / 0) 30%, rgb(24 14 9 / .42) 58%, rgb(24 14 9 / .86) 100%);
+  --photo-tint:  rgb(41 27 18 / .04);
 
   /* --- Escala tipográfica fluida ------------------------------------------
    * Cinzel (display) es más ancha que la Didone anterior; el techo de cada
@@ -174,10 +185,10 @@
   --r-xl: 1.75rem;
 
   /* --- Sombras (teñidas con el café) ------------------------------------ */
-  --elev-1:       0 1px 2px rgb(62 47 36 / .06);
-  --elev-2:       0 4px 14px -3px rgb(62 47 36 / .12), 0 2px 4px -2px rgb(62 47 36 / .07);
-  --elev-3:       0 20px 44px -14px rgb(62 47 36 / .26), 0 4px 10px -4px rgb(62 47 36 / .10);
-  --elev-ring:    inset 0 0 0 1px rgb(62 47 36 / .08);
+  --elev-1:       0 1px 2px rgb(41 27 18 / .06);
+  --elev-2:       0 4px 14px -3px rgb(41 27 18 / .12), 0 2px 4px -2px rgb(41 27 18 / .07);
+  --elev-3:       0 20px 44px -14px rgb(41 27 18 / .26), 0 4px 10px -4px rgb(41 27 18 / .10);
+  --elev-ring:    inset 0 0 0 1px rgb(41 27 18 / .08);
 }
 
 /* ============================================================================
@@ -197,7 +208,7 @@
   --border-on-dark: rgb(255 255 255 / .22);
   --text-on-dark: var(--c-white);
   --text-on-dark-muted: rgb(255 255 255 / .8);
-  --text-on-sage-muted: rgb(255 255 255 / .9); /* sobre sage #556b52: ~5.07:1 (.8 daba 4.41) */
+  --text-on-sage-muted: rgb(255 255 255 / .9); /* sobre el verde #24483a: >= 7:1 */
 
   --accent:        var(--c-gold-500);
   --accent-hover:  var(--c-gold-600);
@@ -216,31 +227,33 @@
   --star:          var(--c-gold-500);
   --whatsapp:        var(--c-wa-action); /* UN solo verde de WhatsApp */
   --whatsapp-action: var(--c-wa-action);
-  --on-whatsapp:     var(--c-white);
+  --on-whatsapp:     var(--c-white);      /* glifo/icono (3.51:1) */
+  --on-whatsapp-text: var(--c-coffee-900); /* texto de botones WhatsApp: 4.75:1 */
 
   /* Cinta andina (decorativa) */
   --ribbon-1: var(--c-terracotta);
   --ribbon-2: var(--c-gold-500);
   --ribbon-3: var(--c-forest-700);
   --ribbon-4: var(--c-coffee-900);
-  --ribbon-5: var(--sage-text);
+  --ribbon-5: var(--c-teal-700);
   --ribbon-6: var(--c-ochre);
   --ribbon-7: var(--c-sage);
 
   /* Sombras / overlays del Home */
-  --shadow-card: 0 18px 40px -18px rgb(62 47 36 / .28), 0 2px 8px rgb(62 47 36 / .06);
-  --shadow-float: 0 22px 50px -20px rgb(62 47 36 / .35);
-  --shadow-search: 0 24px 60px -24px rgb(62 47 36 / .35), 0 2px 10px rgb(62 47 36 / .08);
-  --shadow-btn: 0 10px 22px -10px rgb(201 169 106 / .75);
-  --glow-wa: 0 0 0 6px rgb(21 128 69 / .22), 0 14px 30px -8px rgb(21 128 69 / .55);
+  --shadow-card: 0 18px 40px -18px rgb(41 27 18 / .28), 0 2px 8px rgb(41 27 18 / .06);
+  --shadow-float: 0 22px 50px -20px rgb(41 27 18 / .35);
+  --shadow-search: 0 24px 60px -24px rgb(41 27 18 / .35), 0 2px 10px rgb(41 27 18 / .08);
+  --shadow-btn: 0 10px 22px -10px rgb(224 166 58 / .8);
+  --glow-wa: 0 0 0 6px rgb(31 175 90 / .22), 0 14px 30px -8px rgb(26 157 80 / .6);
   /* Hero: el degradado se limita al lado del texto (izquierda); la derecha
    * queda viva como en el PDF. */
-  --shade-hero: linear-gradient(90deg, rgb(24 15 12 / .7) 0%, rgb(24 15 12 / .58) 28%, rgb(24 15 12 / .46) 44%, rgb(24 15 12 / .24) 52%, rgb(24 15 12 / .08) 58%, rgb(24 15 12 / 0) 62%), linear-gradient(180deg, rgb(24 15 12 / .12) 0%, rgb(24 15 12 / 0) 30%, rgb(24 15 12 / .18) 100%);
-  --shade-hero-mobile: linear-gradient(180deg, rgb(24 15 12 / .55) 0%, rgb(24 15 12 / .7) 100%);
-  --shade-band: linear-gradient(90deg, rgb(24 15 12 / .9) 0%, rgb(24 15 12 / .72) 45%, rgb(24 15 12 / .42) 100%);
-  --shade-card: linear-gradient(180deg, rgb(24 15 12 / 0) 38%, rgb(24 15 12 / .55) 62%, rgb(24 15 12 / .92) 100%);
-  --shade-card-soft: linear-gradient(180deg, rgb(24 15 12 / 0) 55%, rgb(24 15 12 / .75) 100%);
-  --glass:        rgb(62 47 36 / .52);
+  --shade-hero: linear-gradient(90deg, rgb(24 14 9 / .30) 0%, rgb(24 14 9 / .22) 28%, rgb(24 14 9 / .12) 44%, rgb(24 14 9 / .04) 54%, rgb(24 14 9 / 0) 60%), linear-gradient(180deg, rgb(24 14 9 / .10) 0%, rgb(24 14 9 / 0) 30%, rgb(24 14 9 / .12) 100%); /* la foto trae ya el degradado del PDF a la izquierda: aquí solo un refuerzo suave */
+  --shade-hero-mobile: linear-gradient(180deg, rgb(24 14 9 / .55) 0%, rgb(24 14 9 / .7) 100%);
+  --shade-band: linear-gradient(90deg, rgb(24 14 9 / .38) 0%, rgb(24 14 9 / .22) 45%, rgb(24 14 9 / .04) 100%); /* la foto trae ya el velo marrón del PDF: un solo refuerzo suave */
+  --shade-band-mobile: linear-gradient(180deg, rgb(24 14 9 / .55) 0%, rgb(24 14 9 / .65) 100%);
+  --shade-card: linear-gradient(180deg, rgb(24 14 9 / 0) 42%, rgb(24 14 9 / .38) 64%, rgb(24 14 9 / .82) 100%); /* las fotos traen ya el degradado inferior del PDF */
+  --shade-card-soft: linear-gradient(180deg, rgb(24 14 9 / 0) 55%, rgb(24 14 9 / .6) 100%);
+  --glass:        rgb(41 27 18 / .52);
   --glass-light:  rgb(255 255 255 / .14);
-  --glass-chip:   rgb(62 47 36 / .62);
+  --glass-chip:   rgb(41 27 18 / .62);
 }

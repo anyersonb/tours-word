@@ -10,7 +10,11 @@
 @php
     $waText = filled($text) ? $text : __('site.whatsapp.default_text');
     $waLabel = __('site.whatsapp.label');
+    // Burbuja del PDF (s01). Claves nuevas pendientes en lang/ (programación): mientras no existan, respaldo por idioma.
+    $bubbleTitle = trans()->has('site.whatsapp.bubble_title') ? __('site.whatsapp.bubble_title') : (app()->getLocale() === 'en' ? 'Need help?' : '¿Te ayudamos?');
+    $bubbleText = trans()->has('site.whatsapp.bubble_text') ? __('site.whatsapp.bubble_text') : (app()->getLocale() === 'en' ? 'Message us on WhatsApp' : 'Escríbenos por WhatsApp');
 @endphp
 <a class="wa-float {{ $lift ? 'wa-float--lift' : '' }}" href="{{ \App\Support\WhatsApp::url($waText) }}" target="_blank" rel="noopener" aria-label="{{ $waLabel }}" title="{{ $waLabel }}" data-wa-float>
+    <span class="wa-float__bubble" aria-hidden="true"><strong>{{ $bubbleTitle }}</strong><span>{{ $bubbleText }}</span></span>
     <span class="wa-float__btn"><x-glyph name="whatsapp" :size="30" /></span>
 </a>

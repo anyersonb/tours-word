@@ -42,12 +42,11 @@
     <div class="tour-card__body">
         @if ($rating && $reviews)<p class="rating"><span class="rating__stars" aria-hidden="true">@for ($i = 0; $i < 5; $i++)<x-glyph name="star" :size="11" />@endfor</span><strong>{{ $rating }}</strong><span class="rating__n">({{ $reviews }})</span></p>@endif
         <h3 class="tour-card__title">{{ $title }}</h3>
-        @if ($duration || $langs)
-        <ul class="tour-card__meta">
+        {{-- Siempre presente: reserva el alto de la fila de chips para que las 4 tarjetas se alineen (M1). --}}
+        <ul class="tour-card__meta" @if (! $duration && ! $langs) aria-hidden="true" @endif>
             @if ($duration)<li class="ip-chip"><x-glyph name="clock" :size="13" />{{ $duration }}</li>@endif
             @if ($langs)<li class="ip-chip"><x-glyph name="globe" :size="13" />{{ $langs }}</li>@endif
         </ul>
-        @endif
         <p class="tour-card__cancel"><x-glyph name="check" :size="14" />{{ __('home.featured.flexible_cancellation') }}</p>
         <div class="tour-card__foot">
             @if ($pen && $usd || !empty($tour['price']))

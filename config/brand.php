@@ -65,6 +65,20 @@ return [
         'cultura' => 'img/provisional/cultura.jpg',
     ],
 
+    /*
+    | Columna "Destinos" del footer según el PDF (orden fijo). Cada ítem usa la
+    | ficha del CMS si existe un destino publicado con ese slug; si no, enlaza al
+    | listado. El componente footer debe leer esta lista (pendiente de maquetación).
+    */
+    'footer_destinations' => [
+        ['key' => 'lima', 'name' => 'Lima'],
+        ['key' => 'ica', 'name' => 'Ica'],
+        ['key' => 'cusco', 'name' => 'Cusco'],
+        ['key' => 'machu-picchu', 'name' => 'Machu Picchu'],
+        ['key' => 'nazca', 'name' => 'Nazca'],
+        ['key' => 'arequipa', 'name' => 'Arequipa'],
+    ],
+
     // Banner Camino Inca. Monto en céntimos de PEN (350000 = S/ 3,500.00).
     // DATO DEL PDF: confirmar con la clienta antes de publicar.
     'inca_trail' => [

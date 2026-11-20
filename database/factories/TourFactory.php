@@ -50,6 +50,16 @@ class TourFactory extends Factory
     }
 
     /**
+     * Tour con foto: el Home solo muestra (destacados y planes) tours con imagen.
+     */
+    public function withImage(): static
+    {
+        return $this->afterCreating(function (Tour $tour): void {
+            \App\Models\TourImage::factory()->create(['tour_id' => $tour->id]);
+        });
+    }
+
+    /**
      * Marks the tour as sample data, per the project rule that content
      * without a real value from the client must be visibly flagged, never
      * invented as if it were real.

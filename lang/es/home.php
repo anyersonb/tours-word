@@ -248,15 +248,15 @@ return [
         'title' => 'Preguntas frecuentes',
         'text' => '¿No encuentras tu respuesta? Escríbenos y te ayudamos.',
         'contact_cta' => 'Hablar por WhatsApp',
-        // Solo la primera respuesta figura en el diseño; el resto queda
-        // como marcador hasta que la clienta las entregue.
+        // Textos de ejemplo prudentes (sin políticas duras ni cifras):
+        // la clienta debe validarlos o reemplazarlos.
         'items' => [
             ['q' => '¿Cómo reservo un tour?', 'a' => 'Elige tu tour, selecciona la fecha y el número de viajeros y confirma en línea. También puedes reservar escribiéndonos por WhatsApp al :phone.'],
-            ['q' => '¿Puedo cancelar o cambiar mi reserva?', 'a' => '[Respuesta por completar: política de cancelación]'],
-            ['q' => '¿El recojo del hotel está incluido?', 'a' => '[Respuesta por completar]'],
-            ['q' => '¿En qué idiomas son los tours?', 'a' => '[Respuesta por completar]'],
-            ['q' => '¿Qué medios de pago aceptan?', 'a' => '[Respuesta por completar]'],
-            ['q' => '¿Con cuánta anticipación debo reservar el Camino Inca?', 'a' => '[Respuesta por completar]'],
+            ['q' => '¿Puedo cancelar o cambiar mi reserva?', 'a' => 'Depende del tour y de la fecha. Antes de pagar te confirmamos por WhatsApp las condiciones de cambio y cancelación de tu reserva, para que decidas con toda la información. Si necesitas cambiar la fecha, escríbenos cuanto antes y vemos las opciones disponibles.'],
+            ['q' => '¿El recojo del hotel está incluido?', 'a' => 'Depende del tour. Muchos tours incluyen el recojo en tu hotel y otros salen desde un punto de encuentro. En cada tour te indicamos qué incluye, y al reservar te confirmamos por WhatsApp el lugar y la hora exacta de recojo.'],
+            ['q' => '¿En qué idiomas son los tours?', 'a' => 'Atendemos en español e inglés. Si necesitas otro idioma o un guía en un idioma específico, escríbenos por WhatsApp y te confirmamos la disponibilidad para tu fecha.'],
+            ['q' => '¿Qué medios de pago aceptan?', 'a' => 'Te indicamos los medios de pago disponibles al confirmar tu reserva, siempre por canales seguros. Escríbenos por WhatsApp y te explicamos cómo pagar antes de que hagas cualquier pago.'],
+            ['q' => '¿Con cuánta anticipación debo reservar el Camino Inca?', 'a' => 'Cuanto antes mejor. Los permisos del Camino Inca son limitados por día y se agotan, por eso recomendamos reservar con varios meses de anticipación. Escríbenos con tu fecha ideal y revisamos la disponibilidad.'],
         ],
     ],
 
