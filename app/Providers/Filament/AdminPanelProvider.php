@@ -37,21 +37,23 @@ class AdminPanelProvider extends PanelProvider
             ->font('Poppins', url: asset('css/admin-poppins.css'), provider: LocalFontProvider::class)
             ->sidebarCollapsibleOnDesktop()
             ->colors([
-                // Rampas construidas a mano con la paleta oficial (tokens.css).
+                // Rampas construidas a mano con la paleta del PDF (tokens.css;
+                // decisión de Anyerson 2026-11-19: mandan los colores del PDF).
                 // Color::hex() en Filament 4 inventa una rampa saturada que NO
                 // se parece a la marca. Los tonos 500/600 llevan texto blanco
                 // con contraste >= 4.5:1 (AA).
-                // Sage #556b52 (5.82:1 con blanco).
+                // Verde bosque del PDF #24483a (10.18:1 con blanco). El dorado
+                // no sirve de primario: Filament pone texto blanco (2.17:1).
                 'primary' => [
-                    50 => '#f1f5f0', 100 => '#e3ebe2', 200 => '#c9d7c7', 300 => '#a8bda5',
-                    400 => '#84a081', 500 => '#5f785c', 600 => '#556b52', 700 => '#475b45',
-                    800 => '#3f5340', 900 => '#324232', 950 => '#1f2a20',
+                    50 => '#eef4f1', 100 => '#d6e4dc', 200 => '#adc9b9', 300 => '#7fa892',
+                    400 => '#4f8169', 500 => '#2f5c4a', 600 => '#24483a', 700 => '#1b3a2e',
+                    800 => '#163026', 900 => '#11261e', 950 => '#0a1712',
                 ],
-                // Terracota de alerta #ab3a30 (6.21:1 con blanco).
+                // Rojo del PDF #9e2b1d (7.45:1 con blanco).
                 'danger' => [
-                    50 => '#fdf3f1', 100 => '#fbe3df', 200 => '#f6c9c3', 300 => '#eea39a',
-                    400 => '#de756a', 500 => '#c04a3e', 600 => '#ab3a30', 700 => '#8d2f27',
-                    800 => '#732a24', 900 => '#5f2723', 950 => '#34110f',
+                    50 => '#fdf3f1', 100 => '#f9e3df', 200 => '#f2c7c0', 300 => '#e59a8e',
+                    400 => '#d4614f', 500 => '#b8382a', 600 => '#9e2b1d', 700 => '#84241a',
+                    800 => '#6b1f17', 900 => '#561b15', 950 => '#2f0d09',
                 ],
                 // Verde de confirmación #158045 (4.99:1 con blanco).
                 'success' => [
@@ -59,17 +61,17 @@ class AdminPanelProvider extends PanelProvider
                     400 => '#4cb375', 500 => '#158045', 600 => '#0f6a38', 700 => '#0d5a30',
                     800 => '#0b4a28', 900 => '#093d21', 950 => '#04220f',
                 ],
-                // Dorado de marca; tonos de texto en gold-deep #7a5a1f.
+                // Dorado del PDF #e0a63a; tonos de texto en gold-deep #8c5f10 (5.59:1).
                 'warning' => [
-                    50 => '#fbf6ea', 100 => '#f5eddb', 200 => '#e8d6b0', 300 => '#dac08b',
-                    400 => '#c9a96a', 500 => '#8c6a25', 600 => '#7a5a1f', 700 => '#654a19',
-                    800 => '#523c16', 900 => '#3e2f24', 950 => '#2b2019',
+                    50 => '#fdf6e7', 100 => '#faebc8', 200 => '#f3d895', 300 => '#ebc265',
+                    400 => '#e0a63a', 500 => '#a87418', 600 => '#8c5f10', 700 => '#74500f',
+                    800 => '#5e410e', 900 => '#4a340d', 950 => '#2b1d06',
                 ],
-                // Neutros cálidos (ivory / espresso de la marca).
+                // Neutros cálidos del PDF (crema #f7f4ef / café #291b12).
                 'gray' => [
-                    50 => '#faf7ee', 100 => '#f3eee1', 200 => '#e3dac8', 300 => '#d0c4ae',
-                    400 => '#a39683', 500 => '#6f5d4e', 600 => '#5c4b3d', 700 => '#4f3d30',
-                    800 => '#3e2f24', 900 => '#2b2019', 950 => '#1c140f',
+                    50 => '#f7f4ef', 100 => '#efe9e0', 200 => '#ded4c6', 300 => '#c7b9a6',
+                    400 => '#9c8b77', 500 => '#6e5c4c', 600 => '#58483b', 700 => '#45372c',
+                    800 => '#34261b', 900 => '#291b12', 950 => '#1a110b',
                 ],
             ])
             // Orden del menú lateral, en español llano. Lo que más mira la
