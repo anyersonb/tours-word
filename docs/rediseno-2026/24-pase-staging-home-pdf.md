@@ -30,3 +30,8 @@ Subirlos con `twdeploy.py upload` desde esa carpeta. Los 77 nuevos pueden quedar
 
 ## Pendiente de la clienta (bloquea "tal cual PDF" en producción)
 Fotos originales en alta resolución (sobre todo hero Lima/Ica/Machu Picchu), precios, duración/idiomas y rating de los tours, testimonios y ratings reales, cifras de la banda, validar las 5 respuestas de FAQ.
+
+## Adenda 2026-11-20 — panel /admin con la paleta del PDF
+- `4fb9327`: `AdminPanelProvider.php` con rampas del PDF (primario verde bosque #24483a, dorado, rojo #9e2b1d, neutros crema/café). 385 tests en verde.
+- Push a `origin/main` (`4594930..4fb9327`) con autorización de Anyerson ("sube te autorizo").
+- Subido a staging, verificado por hash (1/1). Respaldo: `_rollbacks/tour-word-20261120/servidor-antes-admin/`. Lima prod 200, staging 401.
