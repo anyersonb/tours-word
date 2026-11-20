@@ -13,6 +13,15 @@ namespace App\Support;
  */
 class Placeholder
 {
+    /**
+     * Interruptor único (config brand.show_placeholders / SHOW_PLACEHOLDERS):
+     * encendido = los marcadores se muestran literales como en el PDF de diseño.
+     */
+    public static function enabled(): bool
+    {
+        return (bool) config('brand.show_placeholders', false);
+    }
+
     /** ¿Es un marcador sin completar? (null/vacío NO cuenta: eso es "sin dato"). */
     public static function is(mixed $value): bool
     {
@@ -22,7 +31,11 @@ class Placeholder
     /** El texto, o null si es un marcador o está vacío. */
     public static function visible(mixed $value): ?string
     {
-        if (! is_string($value) || trim($value) === '' || self::is($value)) {
+        if (! is_string($value) || trim($value) === '') {
+            return null;
+        }
+
+        if (self::is($value) && ! self::enabled()) {
             return null;
         }
 
@@ -51,6 +64,10 @@ class Placeholder
      */
     public static function items(iterable $items): array
     {
+        if (self::enabled()) {
+            return array_values(is_array($items) ? $items : iterator_to_array($items, false));
+        }
+
         $kept = [];
 
         foreach ($items as $item) {

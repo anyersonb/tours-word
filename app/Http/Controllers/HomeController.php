@@ -6,6 +6,7 @@ use App\Models\Destination;
 use App\Models\Experience;
 use App\Models\Tour;
 use App\Support\Money;
+use App\Support\Placeholder;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
@@ -37,7 +38,9 @@ class HomeController extends Controller
         $destinations = $this->destinations();
         $planTours = $this->planTours();
         // Franja "Cupos limitados": mismo origen que la tarjeta del grupo 4+ días.
-        $incaCard = $planTours->firstWhere('bucket', '4mas');
+        // Con el interruptor de marcadores encendido (PDF literal) el banner usa el dato del diseño
+        // (S/ 3,500.00), no el precio del CMS.
+        $incaCard = Placeholder::enabled() ? null : $planTours->firstWhere('bucket', '4mas');
 
         return view('home', [
             'hero' => $this->hero($destinations),

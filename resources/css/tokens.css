@@ -229,6 +229,9 @@
   --whatsapp-action: var(--c-wa-action);
   --on-whatsapp:     var(--c-white);      /* glifo/icono (3.51:1) */
   --on-whatsapp-text: var(--c-coffee-900); /* texto de botones WhatsApp: 4.75:1 */
+  /* FIDELIDAD AL PDF (decisión de Anyerson, 2026-11-20): los botones .btn--wa (FAQ y footer) llevan texto e icono
+   * BLANCOS sobre --c-wa-icon (#1faf5a), como el diseño. Contraste blanco/#1faf5a = 3.51:1: pasa solo como texto
+   * grande en negrita (>=18.66 px bold); a 15 px NO cumple AA. Decisión consciente: fidelidad sobre AA. */
 
   /* Cinta andina (decorativa) */
   --ribbon-1: var(--c-terracotta);

@@ -13,6 +13,11 @@ return [
         'title' => 'Esta ruta no está en el mapa',
         'text' => 'La página que buscas no existe o cambió de lugar. Te llevamos de vuelta al camino.',
     ],
+    'whatsapp' => 'Escríbenos por WhatsApp',
+    '429' => [
+        'title' => 'Hiciste varios envíos seguidos',
+        'text' => 'Hiciste varios envíos seguidos; espera unos minutos e inténtalo de nuevo, o escríbenos por WhatsApp y te ayudamos.',
+    ],
     '419' => [
         'title' => 'Tu sesión expiró',
         'text' => 'Pasó demasiado tiempo desde que abriste esta página. Vuelve al inicio e inténtalo de nuevo.',

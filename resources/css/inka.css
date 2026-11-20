@@ -25,9 +25,11 @@ html { scroll-behavior: smooth; scroll-padding-top: 96px; }
 :where(button:not(:disabled), [role='button']) { cursor: pointer; }
 section[id], footer[id] { scroll-margin-top: 96px; }
 
-/* Caja del Home y del chrome: 1440 máx., 20px de margen lateral en móvil y
- * 40px desde 1024 (pedido de Anyerson). Las páginas internas siguen en .shell. */
-.container { width: 100%; max-width: 1440px; margin-inline: auto; padding-inline: 20px; }
+/* Caja del Home y del chrome: contenido de 1200px (max-width 1280 con 40px de margen
+ * lateral) = el PDF de diseño a 1440 (márgenes de 120px, 2026-11-20, pedido de Anyerson:
+ * "posiciones tal cual la referencia"). 20px de margen en móvil y 40px desde 1024.
+ * Las páginas internas siguen en .shell (misma medida, ver app.css). */
+.container { width: 100%; max-width: 1280px; margin-inline: auto; padding-inline: 20px; }
 @media (min-width: 1024px) { .container { padding-inline: 40px; } }
 
 .skip-link { position: absolute; left: 12px; top: -80px; z-index: 100; background: var(--bg-dark); color: var(--text-on-dark); padding: 12px 18px; border-radius: 8px; font-weight: 600; transition: top .2s ease-out; }
@@ -916,4 +918,197 @@ a.topbar__notice:focus-visible { outline: 3px solid var(--focus-on-dark); outlin
   .wa-float__btn { width: 44px; height: 44px; }
   .wa-float__btn .icon { width: 22px; height: 22px; }
   .wa-float--lift { bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
+}
+
+
+/* =========================================================================
+ * PASE 25 (2026-11-20): Home TAL CUAL el PDF de diseño (1440). Pedido de Anyerson:
+ * "posiciones de elementos, imágenes y contenido tal cual la referencia".
+ * Cada regla cita la medida del PDF (px CSS a 1440 = píxel nativo / 2).
+ * ========================================================================= */
+
+/* Topbar 38 px (antes 44 por el área táctil del aviso). El aviso es una píldora de ~26 px como
+ * el PDF; el área táctil de 44 px se conserva con un pseudo-elemento invisible. */
+a.topbar__notice { min-height: 0; padding: 5px 13px; }
+a.topbar__notice::before { content: ''; position: absolute; inset: -9px 0; }
+@media (min-width: 1024px) { .topbar__inner { min-height: 38px; } }
+
+/* Carrito del PDF: círculo con borde suave y contador rojo "1" (el carrito real llega en el lote 4). */
+.cart, .cart:disabled { border-color: var(--border); color: var(--text); opacity: 1; cursor: default; }
+
+/* Hero: sin texto chico encima ni botón de pausa (el autoavance ya se detiene con hover/foco y
+ * respeta prefers-reduced-motion en Alpine.data('heroSlider')). */
+
+@media (min-width: 1024px) {
+  /* Títulos de sección: el subtítulo ocupa hasta ~560 px (PDF: "…la mejor cocina del / continente…"). */
+  .sec-text { max-width: 560px; }
+}
+@media (min-width: 1100px) {
+  /* Header 84 px (PDF 43→127). */
+  .header__inner { min-height: 84px; }
+  .nav__link { min-height: 84px; }
+}
+@media (min-width: 1100px) {
+  .header__logo img { width: 83px; }          /* PDF: logo de 83 px de tinta (antes 96) */
+  .nav { margin-left: 59px; }                 /* PDF: "Inicio" arranca en x=299 */
+  .nav__list { gap: 29.5px; }
+  .switch__opt { min-width: 36px; padding: 0 10px; }
+  .cart { width: 42px; height: 42px; }
+  .header__cta { font-size: 13.5px; }
+}
+.topbar { font-size: 12.7px; }
+a.topbar__notice, .topbar__notice { font-size: 12px; }
+
+/* --- Hero (PDF s00) --- */
+@media (min-width: 1024px) {
+  /* La foto de Lima (recorte del PDF) ya trae el degradado horneado: sin velo extra, como el PDF. */
+  .hero__slide:first-child .hero__shade { background: none; }
+  .hero__actions .btn--lg { padding: 0 27px; }
+  .hero__actions .btn--ghost { padding: 0 29px; }
+  /* Flechas de 42 px y una sola pista de progreso (el activo en dorado), como el PDF. El área táctil de 44 px se conserva. */
+  .hero__arrow { position: relative; width: 42px; height: 42px; }
+  .hero__arrow::before { content: ''; position: absolute; inset: -1px; }
+  .hero__progress { gap: 0; margin-inline: 8px; }
+  .hero__seg { height: 4px; border-radius: 0; background: rgb(255 255 255 / .3); }
+  .hero__seg:first-child { border-radius: 2px 0 0 2px; }
+  .hero__seg:last-child { border-radius: 0 2px 2px 0; }
+  /* Buscador: la etiqueta baja 8 px (PDF: etiqueta a 32 px del borde, valor a 37 px del pie). */
+  .search__label { position: relative; top: 8px; }
+}
+@media (min-width: 1100px) {
+  /* PDF: header blanco de 84 px + hairline de 1 px (el hero arranca en y=128). */
+  .header { box-shadow: none; border-bottom: 1px solid var(--border-soft); }
+}
+
+/* --- Tarjetas foto (PDF s01 / s04 / s05): las fotos provisionales son recortes del PDF y YA traen su degradado
+ * horneado; sin velo extra se ven como el PDF. Las fotos reales del CMS (storage) conservan el velo. --- */
+.dest:has(img[src*="/provisional/"])::before,
+.city:has(img[src*="/provisional/"])::before,
+.exp:has(img[src*="/provisional/"])::before { background: none; }
+@media (min-width: 1024px) {
+  .dest__body { padding-left: 24px; }
+  .dest--big .dest__body { padding-left: 24px; padding-bottom: 23px; }
+  .dest--big .dest__name { font-size: 43px; }
+  .dest--big .dest__tag { max-width: 400px; }
+  .dest--big .dest__count, .dest__count { font-size: 13.5px; }
+  .dest:not(.dest--big) .dest__tag { font-size: 13.5px; }
+  .dest .dest__tag { margin-top: 4px; }
+  .dest .round-btn { width: 44px; height: 44px; right: 24px; bottom: 22px; }
+  /* "Ver todos…": 14.5 px y pegado a la base del texto (PDF: subrayado a 175 px, a ras del subtítulo). */
+  .link-more { font-size: 14.5px; margin-bottom: 0; }
+}
+
+/* --- Tarjetas de tour y de plan: la foto mide 281.5x250 y 281.5x200 en el PDF (tarjeta de 283.5 con borde de 1 px). --- */
+@media (min-width: 1024px) {
+  .tour-card__media { aspect-ratio: 281.5 / 250; }
+  .plan__media { aspect-ratio: 281.5 / 200; }
+}
+
+/* --- Ajustes de detalle contra el PDF (pase 25) --- */
+.dest__tag { color: rgb(255 255 255 / .86); }
+.inca__text, .inca__list { color: rgb(255 255 255 / .8); }
+@media (min-width: 1024px) {
+  /* Experiencias: título+descripción anclados abajo (sin reservar 2 líneas), enlace a 37 px de la descripción. */
+  .exp__body .dest__tag { min-height: 0; }
+  .city .dest__tag { font-size: 13px; margin-top: 3px; }
+  .plan__title { font-size: 15px; }
+  .reason__title { font-size: 15.3px; }
+  .acc__panel { padding-bottom: 0; font-size: 14.5px; }
+  .testi { padding-top: 40px; }
+  .testi__quote { height: 20px; }
+  .testi__stars { margin-top: 0; }
+  .news__title { font-size: 29.5px; }
+  .news__form input { font-size: 14px; }
+  .ig__text { font-size: 13px; }
+  .footer__logo { padding: 11px 12px; }
+}
+@media (min-width: 1024px) {
+  .ig__text { max-width: 16em; }
+  .footer__bottom { font-size: 12.5px; color: rgb(255 255 255 / .55); }
+  .footer__bottom .ip-chip-ghost { color: var(--text-on-dark-muted); }
+}
+
+/* =========================================================================
+ * PASE 25 · VUELTA 2 (docs/rediseno-2026/26-ojo-home-pasada3.md, 27-qa-pase25.md)
+ * ========================================================================= */
+/* #3 Gastronomía: glifo blanco sobre dorado profundo (PDF ~#C8912A). */
+.icon-tile--solid-gold { width: 50px; height: 50px; background: var(--c-gold-600); color: #fff; border-radius: 12px; }
+/* #5 cita casi negra; #19 comilla ~40 px, avatar B del PDF. */
+.testi__text { color: var(--text); }
+.testi__quote { font-size: 40px; }
+.avatar--gold { background: var(--brand-600); }
+/* #6 WhatsApp FIEL AL PDF: texto e icono blancos sobre #1faf5a (3.51:1, ver comentario en tokens.css). */
+.btn--wa { background: var(--c-wa-icon); color: #fff; }
+/* #13 botones fantasma: borde translúcido y radio 10 (el primario grande también se ve de ~10 en el PDF). */
+.btn--ghost { border-color: rgb(255 255 255 / .55); border-radius: 10px; }
+.btn--lg { border-radius: 10px; }
+/* #10 tarjetas inactivas del hero: vidrio esmerilado. */
+.hero__item:not(.is-active) { background: rgb(41 27 18 / .26); backdrop-filter: blur(15px); }
+.hero__sub { font-weight: 400; }
+/* #14 estrellas de 12.5 px (5 estrellas = 71 px como el PDF). */
+.rating__stars { gap: 2.5px; }
+.rating__stars .icon { width: 12.5px; height: 12.5px; }
+.seals { gap: 18px; }
+/* #16 caja de precio del Inca. */
+.inca__price { gap: 6px; padding: 18px; }
+@media (min-width: 1024px) {
+  /* #2 Cusco: el subtítulo corta en 2 líneas y no toca la flecha. */
+  .city .dest__tag { max-width: 160px; }
+  /* #4 aire bajo la respuesta abierta. */
+  .acc__panel { padding-bottom: 22px; }
+  /* #7/#8 planes: 16 px, precio ~18 px y el 4.º título corta "…a Machu / Picchu". */
+  .plan__title { font-size: 16px; text-wrap: wrap; }
+  .plan__price strong { font-size: 18px; }
+  /* #9 razones. */
+  .reason__title { font-size: 16.6px; }
+  /* #12 Instagram: "…cada salida / en vivo". */
+  .ig__text { max-width: 14.5em; }
+  /* #17 título del Inca. */
+  .inca__title { font-size: 37.2px; }
+  /* #18 filtros de planes. */
+  .filter { font-size: 14px; padding: 0 18px; }
+  /* #20 experiencias: 40 px entre título y descripción. */
+  .exp__body .dest__tag { margin-top: 10px; }
+  /* #23 eyebrows más amarillos (4.86:1 sobre blanco). */
+  .ip-eyebrow { color: #96690f; }
+  /* #22 tipos 1 px más chicos. */
+  .contact-card p { font-size: 13.7px; }
+  .pill-link { font-size: 12.3px; }
+  .news__form .btn { font-size: 14.5px; }
+}
+@media (min-width: 1100px) {
+  /* #21 nav (Inicio en x=299) y PEN | ES más compacto (86 px). */
+  .nav { margin-left: 72px; }
+  .switch__opt { min-width: 0; padding: 0 8.5px; }
+}
+
+/* =========================================================================
+ * PASE 25 · VUELTA 3 (docs/rediseno-2026/29-ojo-home-pasada4.md)
+ * ========================================================================= */
+/* #1 regresión: el eyebrow sobre fondo oscuro vuelve al dorado #E0A63A (mayor especificidad que .ip-eyebrow). */
+.ip-eyebrow.ip-eyebrow--dark { color: var(--accent-on-dark); }
+/* #2 vidrio del hero: más oscuro y menos azulado (PDF rgb(116,141,162)); blur sin prefijo para que llegue al build. */
+.hero__item:not(.is-active) { background: rgb(40 30 22 / .5); backdrop-filter: blur(15px) saturate(.55); }
+/* #3 botones fantasma: borde casi pleno de 1.5 px como el PDF. */
+.btn--ghost { border: 1.5px solid rgb(255 255 255 / .85); }
+/* #6 Trekking: montaña de CONTORNO (glyph.blade.php, 'landscape'). */
+.icon-tile .icon path[d^="M14 6l-3.75"] { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
+/* #7 el área táctil de 44 px de los enlaces de la tarjeta de contacto no estira la tarjeta. */
+.contact-card p a { min-height: 0; position: relative; }
+.contact-card p a::before { content: ''; position: absolute; inset: -12px -4px; }
+@media (min-width: 1024px) {
+  /* #4 testimonios: comilla de ~56 px, cuadrada (serif), la tarjeta recupera su alto y la cita va a 15.2 px. */
+  .testi__quote { font-family: Georgia, 'Times New Roman', serif; font-size: 48px; line-height: .8; height: 30px; }
+  .testi__text { font-size: 15.2px; }
+  /* #8 tarjeta de tour: título y precio ~5 px más arriba. */
+  .tour-card__title { margin-top: 7px; }
+  .tour-card__cancel { margin-bottom: 16px; }
+  /* #7 botón WhatsApp del footer ~241 px. */
+  .footer__brand .btn { font-size: 13.7px; padding-inline: 15px; }
+  .contact-card p { min-height: 35px; }
+}
+@media (min-width: 1100px) {
+  /* #5 nav y PEN | ES (86 px). */
+  .nav__list { gap: 28px; }
+  .switch .switch__opt { min-width: 0; padding: 0 10.25px; }
 }

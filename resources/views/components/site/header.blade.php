@@ -43,7 +43,7 @@
         <ul class="topbar__list">
             <li class="topbar__item topbar__item--secure"><x-glyph name="shield-check" :size="15" /><span>{{ __('home.topbar.local_operator') }} <strong>{{ __('home.topbar.secure_booking') }}</strong></span></li>
             <li class="topbar__item topbar__item--resp"><x-glyph name="clock" :size="15" /><span>{{ __('home.topbar.response') }}</span></li>
-            <li class="topbar__item topbar__item--wa"><x-glyph name="message" :size="15" /><span>{{ __('home.topbar.whatsapp') }} <a class="topbar__phone" href="{{ $waUrl }}" target="_blank" rel="noopener">{{ $phone }}</a></span></li>
+            <li class="topbar__item topbar__item--wa"><x-glyph name="whatsapp" :size="15" /><span>{{ __('home.topbar.whatsapp') }} <a class="topbar__phone" href="{{ $waUrl }}" target="_blank" rel="noopener">{{ $phone }}</a></span></li>
         </ul>
         {{-- CRO M-6: el aviso lleva a la sección Camino Inca del Home. --}}
         <a class="topbar__notice" href="{{ route('home') }}#camino-inca">{{ __('home.topbar.notice') }}</a>
@@ -110,12 +110,12 @@
                 <x-header.currency-switcher :currencies="$currencies" />
                 <x-header.locale-switcher :locales="$locales" :current="$currentLocale" :alternate-urls="$localeAlternateUrls" />
             </div>
-            {{-- CRO A-3: el carrito aún no existe (lote 4) y un botón muerto en el header
-                 móvil resta. Mientras tanto, CTA de conversión de 44px: cotizar por WhatsApp.
-                 Cuando exista el carrito, se restituye el <button class="cart">. --}}
-            <a class="cart cart--wa" href="{{ $waUrl }}" target="_blank" rel="noopener" aria-label="{{ __('site.whatsapp.label') }}" title="{{ __('site.whatsapp.label') }}">
-                <x-glyph name="whatsapp" :size="20" />
-            </a>
+            {{-- Pase 25: carrito con badge "1" como el PDF (reemplaza el botón de WhatsApp de CRO A-3).
+                 El carrito real llega en el lote 4: por ahora es decorativo (disabled), el WhatsApp flotante cubre la conversión. --}}
+            <button type="button" class="cart" disabled aria-hidden="true" tabindex="-1">
+                <x-glyph name="cart" :size="20" />
+                <span class="cart__count" aria-hidden="true">1</span>
+            </button>
             <a class="btn btn--dark header__cta" href="{{ route('contact') }}"><x-glyph name="message" :size="16" />{{ __('home.menu.contact_cta') }}</a>
             <button
                 type="button"

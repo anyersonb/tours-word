@@ -130,9 +130,9 @@
     @endif
 
     <div class="container footer__bottom">
-        <p>&copy; {{ now()->year }} {{ $companyName ?: config('brand.name') }}. {{ __('home.footer.rights') }} {{ config('brand.contact.instagram_handle') }}</p>
+        <p>&copy; {{ now()->year }} {{ $companyName ?: __('home.footer.copyright_name') }}. {{ __('home.footer.rights') }} {{ config('brand.contact.instagram_handle') }}</p>
         @if (\App\Support\Placeholder::visible(__('home.footer.payments_placeholder')))
-            <p class="footer__pay">{{ __('home.footer.payments_label') }} <span class="chip-ghost">{{ __('home.footer.payments_placeholder') }}</span></p>
+            <p class="footer__pay">{{ __('home.footer.payments_label') }} <span class="ip-chip-ghost">{{ __('home.footer.payments_placeholder') }}</span></p>
         @endif
     </div>
 </footer>

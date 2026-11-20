@@ -4,7 +4,7 @@
     miniaturas, flechas y barra de progreso. UNA sola implementación del
     comportamiento: Alpine.data('heroSlider') de resources/js/app.js (el mismo
     que ya usaban las fichas): autoavance pausable (hover/foco/pestaña
-    oculta), quieto con prefers-reduced-motion, botón de pausa (WCAG 2.2.2).
+    oculta) y quieto con prefers-reduced-motion (sin botón de pausa visible, como el PDF).
 
     Las fotos de las diapositivas 2+ viven inertes en <template> y
     heroSlider() las clona al primer avance real (cero peticiones antes): la
@@ -16,7 +16,7 @@
 --}}
 @php
     $total = count($slides);
-    // CRO C-1: un texto de slide con marcador sin completar no se imprime.
+    // Un texto de slide con marcador solo se imprime con el interruptor de marcadores encendido.
     $heroText = fn ($s) => \App\Support\Placeholder::visible($s['text'] ?? null);
     // Claves nuevas pendientes en lang/ (programación): mientras no existan, respaldo.
     $tr = fn (string $key, string $fallback) => trans()->has($key) ? __($key) : $fallback;
@@ -29,9 +29,9 @@
     aria-roledescription="{{ $tr('home.hero.roledescription', 'carrusel') }}"
     aria-label="{{ $tr('home.hero.label', __('home.menu.destinations')) }}"
 >
-    {{-- CRO A-5: propuesta de valor FIJA. BUG-10: el H1 es UNO fijo (sr-only, siempre en el DOM: lectores y bots), fuera de los slides que se desvanecen; los títulos visibles de cada slide son texto no-H1. --}}
+    {{-- BUG-10: el H1 es UNO fijo (sr-only, siempre en el DOM: lectores y bots), fuera de los slides que se desvanecen; los títulos visibles de cada slide son texto no-H1.
+         Pase 25: como el PDF, SIN texto chico "Agencia de turismo..." encima (propuesta de valor CRO A-5 revertida por decisión de Anyerson). --}}
     <h1 class="sr-only">{{ $slides[0]['title'] ?? '' }}</h1>
-    <div class="container hero__value-wrap"><p class="hero__value">{{ __('site.whatsapp.hero_value') }}</p></div>
     <div class="hero__slides">
         @foreach ($slides as $i => $s)
             @php $img = $s['image'] ?? null; @endphp
@@ -101,10 +101,6 @@
                         ><span class="hero__fill"></span></span>
                     @endforeach
                 </div>
-                <button type="button" class="hero__pause" @click="toggle()" :aria-pressed="(paused || reducedMotion).toString()" :aria-label="(paused || reducedMotion) ? '{{ $tr('home.hero.play', 'Reanudar carrusel') }}' : '{{ $tr('home.hero.pause', 'Pausar carrusel') }}'" aria-label="{{ $tr('home.hero.pause', 'Pausar carrusel') }}">
-                    <span x-show="!(paused || reducedMotion)"><x-glyph name="pause" :size="14" /></span>
-                    <span x-show="paused || reducedMotion" x-cloak><x-glyph name="play" :size="14" /></span>
-                </button>
                 <button type="button" class="hero__arrow hero__arrow--next" @click="next()" aria-label="{{ __('home.hero.next') }}"><x-glyph name="arrow-right" :size="18" /></button>
             </div>
             <p class="sr-only" aria-live="polite" x-text="$root.querySelectorAll('.hero__item')[active]?.dataset.badge ?? ''"></p>

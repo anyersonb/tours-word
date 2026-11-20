@@ -22,6 +22,10 @@
         $destinations = collect(); $experiences = collect(); $featuredTours = collect(); $planTours = collect();
     }
     $fx = config('brand.fixed_images');
+    // Pase 25: interruptor único de marcadores (config brand.show_placeholders). Encendido = el Home
+    // se pinta TAL CUAL el PDF (marcadores literales, muestras del diseño en cada slot, sin ocultar filas).
+    // Apagado (producción) = comportamiento anterior.
+    $ph = Placeholder::enabled();
     $tr = fn (string $key, string $fallback) => trans()->has($key) ? __($key) : $fallback;
     $samples = [];   // secciones que incluyen muestras
     // CRO C-1: los chips "Muestra" y las notas de muestra SOLO en modo revisión
@@ -42,7 +46,7 @@
         return $url;
     };
     $asset = fn (?string $path): ?string => $path ? asset($path) : null;
-    $countLabel = fn ($n) => ($n ?? 0) > 0 ? trans_choice('home.destinations.tours_count', $n, ['count' => $n]) : Placeholder::visible(__('home.destinations.placeholder_count'));
+    $countLabel = fn ($n) => ($n ?? 0) > 0 && ! $ph ? trans_choice('home.destinations.tours_count', $n, ['count' => $n]) : Placeholder::visible(__('home.destinations.placeholder_count'));
     $short = fn (?string $text, int $n = 120): ?string => filled($text) ? Str::limit(trim(strip_tags($text)), $n) : null;
 
     /* ---- Destinos ---- */
@@ -61,6 +65,15 @@
     // Reales con foto primero; se completan hasta 5 con los del diseño en el orden del PDF
     // (solo los que tengan imagen en disco) y el conjunto se ordena como el PDF.
     $pool = $realDests->values();
+    if ($ph) {
+        // Como el PDF: mismos 5 destinos, misma foto y misma frase; solo se toma del CMS el enlace.
+        $pool = collect($bentoOrder)->map(function ($k) use ($sampleDests, $realDests) {
+            $s = $sampleDests->firstWhere('key', $k);
+            $r = $realDests->firstWhere('key', $k);
+
+            return $s ? array_merge($s, ['url' => $r['url'] ?? null, 'sample' => false]) : null;
+        })->filter(fn ($d) => $d && filled($d['image']))->values();
+    }
     foreach ($bentoOrder as $k) {
         if ($pool->count() >= 5) { break; }
         $s = $sampleDests->firstWhere('key', $k);
@@ -73,23 +86,32 @@
 
     $cityOrder = ['ica', 'cusco', 'lima', 'nazca'];
     $cities = $realDests->filter(fn ($d) => in_array($d['key'], $cityOrder, true))->values();
+    if ($ph) {
+        $cities = collect($cityOrder)->map(function ($k) use ($sampleDests, $realDests) {
+            $s = $sampleDests->firstWhere('key', $k);
+            $r = $realDests->firstWhere('key', $k);
+
+            return $s ? array_merge($s, ['url' => $r['url'] ?? null, 'sample' => false]) : null;
+        })->filter(fn ($d) => $d && filled($d['image']))->values();
+    }
     foreach ($sampleDests as $s) {
         if ($cities->count() >= 4) { break; }
         if (in_array($s['key'], $cityOrder, true) && filled($s['image']) && ! $cities->contains('key', $s['key'])) { $cities->push($s); }
     }
     $cities = $cities->sortBy(fn ($d) => array_search($d['key'], $cityOrder))->values();
     // Pill "N tours": solo si TODAS las tarjetas visibles tienen un conteo real (>0); si no, en ninguna.
-    $showCityCounts = $cities->isNotEmpty() && $cities->every(fn ($c) => ($c['tours_count'] ?? 0) > 0);
+    $showCityCounts = $ph || $cities->isNotEmpty() && $cities->every(fn ($c) => ($c['tours_count'] ?? 0) > 0);
     if ($cities->contains('sample', true)) { $samples[] = 'ciudades'; }
 
     /* ---- Experiencias ---- */
     $exps = collect($experiences ?? [])->take(3)->map(fn ($e) => array_merge($e, ['sample' => false, 'image' => $okImg($e['image'] ?? null), 'description' => $short($e['description'] ?? null, 110)]));
-    if ($exps->isEmpty()) {
+    if ($exps->isEmpty() || $ph) {
+        $realExps = $exps->keyBy('key');
         $samples[] = 'experiencias';
         $exps = collect([['name' => 'Trekking', 'key' => 'trekking'], ['name' => 'Gastronomía', 'key' => 'gastronomia'], ['name' => 'Cultura', 'key' => 'cultura']])
-            ->map(fn ($e) => $e + ['image' => $okImg($asset(config('brand.images.'.$e['key']))), 'description' => __('home.experiences.taglines.'.$e['key']), 'link_label' => __('home.experiences.links.'.$e['key']), 'url' => null, 'sample' => true]);
+            ->map(fn ($e) => $e + ['image' => $okImg($asset(config('brand.images.'.$e['key']))), 'description' => __('home.experiences.taglines.'.$e['key']), 'link_label' => __('home.experiences.links.'.$e['key']), 'url' => $realExps[$e['key']]['url'] ?? null, 'sample' => ! $ph]);
     }
-    $expIcons = ['trekking' => ['mountain', 'forest'], 'gastronomia' => ['utensils', 'accent'], 'cultura' => ['landmark', 'teal']];
+    $expIcons = ['trekking' => ['landscape', 'forest'], 'gastronomia' => ['restaurant', 'gold'], 'cultura' => ['account-balance', 'teal']];
 
     /* ---- Tours destacados (4 tarjetas) ---- */
     $t = $fx['tours'];
@@ -98,12 +120,14 @@
         ->map(fn ($x) => $x + ['sample' => false, 'image' => $okImg($x['image'] ?? null)])
         ->filter(fn ($x) => filled($x['image']))
         ->take(4)->values();
+    $realToursByKey = collect($featuredTours ?? [])->keyBy('key');
     $sampleTours = collect([
         ['key' => 'city-tour-lima', 'title' => 'City Tour Lima', 'destination_name' => 'Lima', 'duration_label' => '[N] horas', 'badge' => 'Recomendado', 'image' => $okImg($asset($t['city-tour-lima']))],
         ['key' => 'laguna-humantay', 'title' => 'Laguna Humantay', 'destination_name' => 'Cusco', 'duration_label' => '1 día', 'badge' => 'Tendencia', 'image' => $okImg($asset($t['laguna-humantay']))],
         ['key' => 'montana-7-colores', 'title' => 'Montaña de 7 Colores', 'destination_name' => 'Cusco', 'duration_label' => '1 día', 'badge' => 'Más vendido', 'image' => $okImg($asset($t['montana-7-colores']))],
         ['key' => 'machu-picchu', 'title' => 'Machu Picchu', 'destination_name' => 'Cusco', 'duration_label' => '[N] días', 'badge' => 'Últimos cupos', 'image' => $okImg($asset($t['machu-picchu']))],
-    ])->map(fn ($x) => $x + ['price' => null, 'url' => null, 'sample' => true])->filter(fn ($x) => filled($x['image']));
+    ])->map(fn ($x) => $x + ['price' => null, 'languages' => 'ES / EN', 'url' => $realToursByKey[$x['key']]['url'] ?? null, 'sample' => ! $ph])->filter(fn ($x) => filled($x['image']));
+    if ($ph) { $tours = collect(); }   // como el PDF: los 4 tours del diseño, en su orden
     foreach ($sampleTours as $s) {
         if ($tours->count() >= 4) { break; }
         if (! $tours->contains('key', $s['key'])) { $tours->push($s); }
@@ -112,19 +136,27 @@
 
     /* ---- Planes por duración (1 por grupo) ---- */
     // Solo tours reales con foto y título publicable (el controller ya no deja que uno sin foto reserve el grupo).
-    $plans = collect($planTours ?? [])
+    $plans = collect($ph ? [] : ($planTours ?? []))
         ->map(fn ($p) => $p + ['sample' => false, 'image' => $okImg($p['image'] ?? null)])
         ->filter(fn ($p) => filled($p['image']) && ! Placeholder::is(Placeholder::title($p['title'])))
         ->values();
     $samplePlans = [
-        '4h' => ['title' => 'City Tour Lima', 'image' => $asset($t['city-tour-lima']), 'price' => null],
-        '1dia' => ['title' => 'Montaña de 7 Colores', 'image' => $asset($t['montana-7-colores']), 'price' => null],
+        '4h' => ['title' => 'City Tour Lima', 'image' => $asset($fx['plans']['city-tour-lima'] ?? $t['city-tour-lima']), 'price' => null],
+        '1dia' => ['title' => 'Montaña de 7 Colores', 'image' => $asset($fx['plans']['montana-7-colores'] ?? $t['montana-7-colores']), 'price' => null],
         '2-3dias' => ['title' => 'Ica y Nazca', 'image' => $asset($fx['plan_nazca']), 'price' => null],
         '4mas' => ['title' => 'Camino Inca a Machu Picchu, 4 días', 'image' => $asset($fx['camino_inca']), 'price' => $incaTrailPrice ?? null, 'price_usd' => $incaTrailPriceUsd ?? null],
     ];
+    if ($ph) {
+        // PDF s05: "Desde S/ [PRECIO]" en las tres primeras, "Desde S/ 3,500" en la última; el 3.º es un marcador de sugerencia.
+        $samplePlans['4h']['price'] = 'S/ [PRECIO]';
+        $samplePlans['1dia']['price'] = 'S/ [PRECIO]';
+        $samplePlans['2-3dias'] = ['title' => '[Tour sugerido: Ica y Nazca]', 'image' => $asset($fx['plan_nazca']), 'price' => 'S/ [PRECIO]'];
+        $samplePlans['4mas']['price'] = 'S/ 3,500';
+        $samplePlans['4mas']['price_usd'] = null;
+    }
     foreach ($samplePlans as $bucket => $sp) {
         if (! $plans->contains('bucket', $bucket)) {
-            $plans->push($sp + ['bucket' => $bucket, 'bucket_label' => __('home.plans.filters.'.$bucket), 'bucket_kicker' => __('home.plans.bucket_kicker.'.$bucket), 'url' => null, 'sample' => true]);
+            $plans->push($sp + ['bucket' => $bucket, 'bucket_label' => __('home.plans.filters.'.$bucket), 'bucket_kicker' => __('home.plans.bucket_kicker.'.$bucket), 'url' => null, 'sample' => ! $ph]);
         }
     }
     $order = ['4h', '1dia', '2-3dias', '4mas'];
@@ -313,7 +345,7 @@
             </div>
             @php $bandStats = Placeholder::items(__('home.landscapes.stats')); @endphp
             {{-- Una sola cifra suelta se ve rota: la fila solo sale con 2 o más cifras reales. --}}
-            @if (count($bandStats) >= 2)
+            @if (count($bandStats) >= 2 || ($ph && count($bandStats) > 0))
             <dl class="band__stats">
                 @foreach ($bandStats as $s)
                     <div><dd>{{ $s['value'] }}</dd><dt>{{ $s['label'] }}</dt></div>

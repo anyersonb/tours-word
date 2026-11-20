@@ -20,6 +20,9 @@
     <php>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_LOCALE" value="es"/>
+        <!-- Los tests de ocultado de marcadores prueban PRODUCCIÓN (interruptor
+             apagado); los del modo "como el PDF" lo encienden con config(). -->
+        <env name="SHOW_PLACEHOLDERS" value="false"/>
         <env name="APP_TIMEZONE" value="America/Lima"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>

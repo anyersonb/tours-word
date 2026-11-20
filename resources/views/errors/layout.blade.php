@@ -56,6 +56,7 @@
         <div class="mt-8 flex flex-col gap-3 sm:flex-row">
             <x-ui.button variant="primary" :href="url('/'.$prefix.'/')">{{ __('errors.home') }}</x-ui.button>
             <x-ui.button variant="secondary" :href="url('/'.$prefix.'/tours')">{{ __('errors.tours') }}</x-ui.button>
+            @yield('extra')
         </div>
     </main>
 </body>

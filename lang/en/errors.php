@@ -5,6 +5,12 @@ return [
     'tours' => 'Browse tours',
     'code_label' => 'Error :code',
 
+    'whatsapp' => 'Message us on WhatsApp',
+    '429' => [
+        'title' => 'You sent several requests in a row',
+        'text' => 'You sent several requests in a row; please wait a few minutes and try again, or message us on WhatsApp and we will help you.',
+    ],
+
     '403' => [
         'title' => 'Access not allowed',
         'text' => 'You do not have permission to view this page. If you think this is a mistake, write to us and we will look into it.',

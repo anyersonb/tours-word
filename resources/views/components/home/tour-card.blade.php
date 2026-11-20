@@ -16,7 +16,7 @@
     $duration = Placeholder::visible($tour['duration_label'] ?? null);
     $langs = Placeholder::visible($tour['languages'] ?? null);
     $showSample = app()->environment('local') && request()->boolean('muestra');
-    $tones = ['Recomendado' => 'forest', 'Tendencia' => 'teal', 'Más vendido' => 'accent', 'Últimos cupos' => 'alert'];
+    $tones = ['Recomendado' => 'teal', 'Tendencia' => 'forest', 'Más vendido' => 'accent', 'Últimos cupos' => 'alert'];
     $tone = $tones[$tour['badge'] ?? ''] ?? 'forest';
     $src = $tour['image'] ?? null;
     $pen = $tour['price_pen_cents'] ?? null;
@@ -58,6 +58,11 @@
                         {{ $tour['price'] }}
                     @endif
                 </strong>
+                <span class="price__per">{{ __('home.featured.per_person') }}</span></p>
+            @elseif (Placeholder::enabled())
+            {{-- Pase 25: marcador literal como el PDF ("Desde S/ [PRECIO] por persona"). --}}
+            <p class="price"><span class="price__from">{{ __('home.featured.from') }}</span>
+                <strong class="price__amount">S/ {{ __('home.featured.price_placeholder') }}</strong>
                 <span class="price__per">{{ __('home.featured.per_person') }}</span></p>
             @else
             {{-- CRO C-1: sin precio cargado no se imprime un marcador; se invita a consultar por WhatsApp. --}}

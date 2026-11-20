@@ -17,6 +17,15 @@ return [
 
     'tagline' => 'Agencia de turismo con expertos locales',
 
+    /*
+    | Interruptor ÚNICO de marcadores ([N], [PRECIO], [4,9]...). Con true se
+    | muestran TAL CUAL el PDF de diseño (revisión con la clienta); con false
+    | (producción) App\Support\Placeholder los oculta. SHOW_PLACEHOLDERS manda;
+    | sin él, hereda IS_STAGING_MIRROR (el espejo de staging lo trae en true).
+    | Sin ninguno de los dos: false.
+    */
+    'show_placeholders' => filter_var(env('SHOW_PLACEHOLDERS', env('IS_STAGING_MIRROR', false)), FILTER_VALIDATE_BOOL),
+
     'logo' => 'images/brand/inka-palace-logo.png',
 
     'contact' => [
@@ -73,8 +82,7 @@ return [
     'footer_destinations' => [
         ['key' => 'lima', 'name' => 'Lima'],
         ['key' => 'ica', 'name' => 'Ica'],
-        ['key' => 'cusco', 'name' => 'Cusco'],
-        ['key' => 'machu-picchu', 'name' => 'Machu Picchu'],
+        ['key' => 'cusco', 'name' => 'Cusco y Machu Picchu'],
         ['key' => 'nazca', 'name' => 'Nazca'],
         ['key' => 'arequipa', 'name' => 'Arequipa'],
     ],
@@ -90,6 +98,11 @@ return [
         'camino_inca' => 'img/provisional/camino-inca.jpg',
         'paisajes' => 'img/provisional/paisajes.jpg',
         'plan_nazca' => 'img/provisional/plan-nazca.jpg',
+        // Fotos de las tarjetas de PLAN (PDF s05, 281.5x200): encuadre propio, distinto al de la tarjeta de tour.
+        'plans' => [
+            'city-tour-lima' => 'img/provisional/plan-city-tour-lima.jpg',
+            'montana-7-colores' => 'img/provisional/plan-montana-7-colores.jpg',
+        ],
         'tours' => [
             'city-tour-lima' => 'img/provisional/tour-city-tour-lima.jpg',
             'laguna-humantay' => 'img/provisional/tour-laguna-humantay.jpg',

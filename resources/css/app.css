@@ -192,7 +192,7 @@
     /* Caja horizontal única del sitio. */
     .shell {
         width: 100%;
-        max-width: 90rem; /* 1440, 20px/40px: igual que .container (header/footer/home) para que los bordes coincidan */
+        max-width: 80rem; /* 1280 = 1200 de contenido + 40px/lado: igual que .container (header/footer/home, PDF a 1440) para que los bordes coincidan */
         margin-inline: auto;
         padding-inline: 20px;
     }

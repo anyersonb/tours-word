@@ -59,7 +59,7 @@ return [
                 'name' => 'Ica',
                 'subtitle' => 'Huacachina y sus dunas',
                 'title' => 'Ica, desierto y oasis',
-                'text' => '[Texto del slide de Ica: por completar]',
+                'text' => 'Navega las dunas de Huacachina en tubular, prueba el sandboard y mira el atardecer sobre el único oasis natural de América.',
                 'cta_primary' => 'Ver tours en Ica',
                 'cta_secondary' => 'Ver destinos',
             ],
@@ -120,7 +120,7 @@ return [
     ],
 
     'featured' => [
-        'eyebrow' => 'Selección INKA PALACE Travel',
+        'eyebrow' => 'Selección Inka Palace Travel',
         'title' => 'Tours destacados',
         'text' => 'Los favoritos de nuestros viajeros, con recojo en tu hotel y guía en español o inglés.',
         'see_all' => 'Ver todos los tours',
@@ -294,6 +294,8 @@ return [
             'faq' => 'Preguntas frecuentes',
             'contact' => 'Contacto',
         ],
+        // Nombre tal cual el PDF ("© 2026 Inka Palace Travel. Todos los derechos reservados. @inkapalacetravel").
+        'copyright_name' => 'Inka Palace Travel',
         'rights' => 'Todos los derechos reservados.',
         'payments_label' => 'Pagos seguros:',
         'payments_placeholder' => '[medios de pago]',
