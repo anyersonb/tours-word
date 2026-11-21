@@ -75,6 +75,15 @@ return [
     ],
 
     /*
+    | Recortes propios para la tarjeta de CIUDAD (PDF s3, 283.5x460): ica y cusco comparten foto con el bento
+    | pero con otra proporcion, asi que cada slot tiene su archivo. Sin clave: se usa 'images'.
+    */
+    'city_images' => [
+        'ica' => 'img/provisional/city-ica.jpg',
+        'cusco' => 'img/provisional/city-cusco.jpg',
+    ],
+
+    /*
     | Columna "Destinos" del footer según el PDF (orden fijo). Cada ítem usa la
     | ficha del CMS si existe un destino publicado con ese slug; si no, enlaza al
     | listado. El componente footer debe leer esta lista (pendiente de maquetación).
@@ -102,6 +111,7 @@ return [
         'plans' => [
             'city-tour-lima' => 'img/provisional/plan-city-tour-lima.jpg',
             'montana-7-colores' => 'img/provisional/plan-montana-7-colores.jpg',
+            'camino-inca' => 'img/provisional/plan-camino-inca.jpg',
         ],
         'tours' => [
             'city-tour-lima' => 'img/provisional/tour-city-tour-lima.jpg',

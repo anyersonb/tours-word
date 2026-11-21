@@ -38,13 +38,15 @@ Alpine.store('currency', {
  * el momento en que la foto hace falta de verdad. La diapositiva 0 nunca
  * pasa por acá: ya llega en el HTML real, eager y fetchpriority="high".
  */
-Alpine.data('heroSlider', (count = 3, intervalMs = 6500) => ({
+// autoplay=false (Home, 2026-11-20): el hero queda fijo en la diapositiva 1
+// como el PDF de referencia; solo cambia con miniaturas, flechas o teclado.
+Alpine.data('heroSlider', (count = 3, intervalMs = 6500, autoplay = true) => ({
     active: 0,
     count,
     paused: false,
     // true mientras el autoavance está detenido por hover/foco/pestaña oculta
     // (la barra de progreso del hero se congela con la misma señal).
-    halted: false,
+    halted: !autoplay,
     reducedMotion: false,
     timer: null,
     loadedSlides: new Set([0]),
@@ -70,7 +72,7 @@ Alpine.data('heroSlider', (count = 3, intervalMs = 6500) => ({
 
         this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        if (!this.reducedMotion) {
+        if (!this.reducedMotion && autoplay) {
             this.play();
         }
 
@@ -101,7 +103,7 @@ Alpine.data('heroSlider', (count = 3, intervalMs = 6500) => ({
     },
 
     play() {
-        if (this.reducedMotion) return;
+        if (this.reducedMotion || !autoplay) return;
         this.stop();
         this.halted = false;
         this.timer = window.setInterval(() => this.next(), intervalMs);

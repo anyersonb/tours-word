@@ -60,7 +60,7 @@
         ['name' => 'Machu Picchu', 'key' => 'machu-picchu'], ['name' => 'Cusco', 'key' => 'cusco'],
         ['name' => 'Valle Sagrado', 'key' => 'valle-sagrado'], ['name' => 'Ica', 'key' => 'ica'],
         ['name' => 'Humantay', 'key' => 'humantay'], ['name' => 'Lima', 'key' => 'lima'], ['name' => 'Nazca', 'key' => 'nazca'],
-    ])->map(fn ($d) => $d + ['slug' => $d['key'], 'image' => $okImg($asset(config('brand.images.'.$d['key']))), 'tagline' => $tr('home.destinations.taglines.'.$d['key'], ''), 'city_tagline' => $tr('home.cities.taglines.'.$d['key'], ''), 'tours_count' => null, 'url' => null, 'sample' => true]);
+    ])->map(fn ($d) => $d + ['slug' => $d['key'], 'image' => $okImg($asset(config('brand.images.'.$d['key']))), 'city_image' => $okImg($asset(config('brand.city_images.'.$d['key']))), 'tagline' => $tr('home.destinations.taglines.'.$d['key'], ''), 'city_tagline' => $tr('home.cities.taglines.'.$d['key'], ''), 'tours_count' => null, 'url' => null, 'sample' => true]);
 
     // Reales con foto primero; se completan hasta 5 con los del diseño en el orden del PDF
     // (solo los que tengan imagen en disco) y el conjunto se ordena como el PDF.
@@ -144,7 +144,7 @@
         '4h' => ['title' => 'City Tour Lima', 'image' => $asset($fx['plans']['city-tour-lima'] ?? $t['city-tour-lima']), 'price' => null],
         '1dia' => ['title' => 'Montaña de 7 Colores', 'image' => $asset($fx['plans']['montana-7-colores'] ?? $t['montana-7-colores']), 'price' => null],
         '2-3dias' => ['title' => 'Ica y Nazca', 'image' => $asset($fx['plan_nazca']), 'price' => null],
-        '4mas' => ['title' => 'Camino Inca a Machu Picchu, 4 días', 'image' => $asset($fx['camino_inca']), 'price' => $incaTrailPrice ?? null, 'price_usd' => $incaTrailPriceUsd ?? null],
+        '4mas' => ['title' => 'Camino Inca a Machu Picchu, 4 días', 'image' => $asset($fx['plans']['camino-inca'] ?? $fx['camino_inca']), 'price' => $incaTrailPrice ?? null, 'price_usd' => $incaTrailPriceUsd ?? null],
     ];
     if ($ph) {
         // PDF s05: "Desde S/ [PRECIO]" en las tres primeras, "Desde S/ 3,500" en la última; el 3.º es un marcador de sugerencia.
@@ -287,7 +287,7 @@
             <div class="grid-4 grid-4--cities grid-4--snap" tabindex="0" role="region" aria-label="{{ __('home.cities.title') }}">
                 @foreach ($cities as $c)
                     <a class="city" href="{{ $c['url'] ?? route('destinations.index') }}">
-                        @if ($c['image'])<x-ui.picture :src="$c['image']" alt="" sizes="(min-width: 1024px) 24vw, (min-width: 640px) 46vw, 100vw" img-class="" />@endif
+                        @if ($c['city_image'] ?? $c['image'])<x-ui.picture :src="$c['city_image'] ?? $c['image']" alt="" sizes="(min-width: 1024px) 24vw, (min-width: 640px) 46vw, 100vw" img-class="" />@endif
                         @if ($showSamples && ! empty($c['sample']))<span class="sample-chip sample-chip--br">{{ $sampleLabel }}</span>@endif
                         @if ($showCityCounts && ($cCount = $countLabel($c['tours_count'] ?? 0)))<span class="count-pill">{{ $cCount }}</span>@endif
                         <span class="city__body">

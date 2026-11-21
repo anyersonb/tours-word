@@ -4,7 +4,8 @@
     miniaturas, flechas y barra de progreso. UNA sola implementación del
     comportamiento: Alpine.data('heroSlider') de resources/js/app.js (el mismo
     que ya usaban las fichas): autoavance pausable (hover/foco/pestaña
-    oculta) y quieto con prefers-reduced-motion (sin botón de pausa visible, como el PDF).
+    oculta). En el Home va SIN autoavance (3er arg false): queda fijo en Lima
+    como el PDF y solo cambia con miniaturas, flechas o teclado.
 
     Las fotos de las diapositivas 2+ viven inertes en <template> y
     heroSlider() las clona al primer avance real (cero peticiones antes): la
@@ -24,7 +25,7 @@
 <section
     class="hero"
     id="hero"
-    x-data="heroSlider({{ $total }}, 6000)"
+    x-data="heroSlider({{ $total }}, 6000, false)"
     :class="{ 'is-paused': halted || paused || reducedMotion }"
     aria-roledescription="{{ $tr('home.hero.roledescription', 'carrusel') }}"
     aria-label="{{ $tr('home.hero.label', __('home.menu.destinations')) }}"

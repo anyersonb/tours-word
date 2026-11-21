@@ -768,8 +768,6 @@ picture { display: contents; }
 .contact-card__head + p { margin-top: 14px; }
 .contact-card p + .btn { margin-top: 14px; }
 /* Encuadres de las fotos provisionales (sin tocar el resto) */
-.city img[src$="/provisional/ica.jpg"] { object-position: 92% 62%; } /* oasis, no la persona (PDF) */
-.exp img[src$="/provisional/trekking.jpg"] { object-position: 50% 58%; }
 /* City Tour Lima: el carruaje (parte baja de la foto) debe verse en la tarjeta apaisada y en la de planes */
 /* City Tour Lima: la foto (limpia, 1.4:1) ya trae el carruaje centrado; sin encuadre propio en tour ni en plan */
 /* Humantay en tour destacado: laguna y persona sobre la roca (PDF) */
