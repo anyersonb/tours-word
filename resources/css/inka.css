@@ -25,11 +25,11 @@ html { scroll-behavior: smooth; scroll-padding-top: 96px; }
 :where(button:not(:disabled), [role='button']) { cursor: pointer; }
 section[id], footer[id] { scroll-margin-top: 96px; }
 
-/* Caja del Home y del chrome: contenido de 1200px (max-width 1280 con 40px de margen
- * lateral) = el PDF de diseño a 1440 (márgenes de 120px, 2026-11-20, pedido de Anyerson:
- * "posiciones tal cual la referencia"). 20px de margen en móvil y 40px desde 1024.
- * Las páginas internas siguen en .shell (misma medida, ver app.css). */
-.container { width: 100%; max-width: 1280px; margin-inline: auto; padding-inline: 20px; }
+/* Caja del Home y del chrome: contenido de 1320px (max-width 1400 con 40px de margen
+ * lateral). El PDF usa 1200 (márgenes de 120px a 1440); el 2026-11-21 Anyerson pidió
+ * "el container más grande" y eligió 1320 (60px de margen a 1440). 20px de margen en
+ * móvil y 40px desde 1024. Las páginas internas siguen en .shell (misma medida, ver app.css). */
+.container { width: 100%; max-width: 1400px; margin-inline: auto; padding-inline: 20px; }
 @media (min-width: 1024px) { .container { padding-inline: 40px; } }
 
 .skip-link { position: absolute; left: 12px; top: -80px; z-index: 100; background: var(--bg-dark); color: var(--text-on-dark); padding: 12px 18px; border-radius: 8px; font-weight: 600; transition: top .2s ease-out; }
@@ -648,7 +648,7 @@ a.pill-link:hover { background: var(--glass-light); }
   .footer__about { margin-top: 25px; }
   .footer__bottom { padding-block: 20px 24px; }
 }
-@media (min-width: 1280px) { .footer__grid { grid-template-columns: 363px 273px 273px 1fr; gap: 0; } }
+@media (min-width: 1280px) { .footer__grid { grid-template-columns: 30.25% 22.75% 22.75% 1fr; gap: 0; } } /* 363/273/273 de 1200 en el PDF, en proporción */
 @media (min-width: 1024px) and (max-width: 1279px) { .plan__foot { flex-wrap: wrap; } .plan__price strong { font-size: 15px; } }
 .ig__handle { overflow-wrap: anywhere; letter-spacing: 0; }
 @media (min-width: 400px) { .ig__handle { letter-spacing: .02em; } }
