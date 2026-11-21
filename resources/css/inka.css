@@ -1169,3 +1169,100 @@ a.topbar__notice, .topbar__notice { font-size: 12px; }
   /* "Ver todos": subrayado 1 px más abajo y texto 3 px más abajo (PDF). */
   .link-more { top: 1px; padding-bottom: 4px; }
 }
+
+/* =========================================================================
+ * PASE 28 · ANCHOS (docs/rediseno-2026/capturas-32): alinear X, ancho y tipografía de cada elemento con el PDF
+ * a 1440. Solo escritorio (>=1100px): no toca mobile ni tablet. Medido borde a borde (PDF contra render) con capturas full-page.
+ * ========================================================================= */
+@media (min-width: 1100px) {
+  /* Header: nav con fuente 14.45 px, CTA 152 px, selector PEN | ES con el segmento activo plano y relleno. */
+  .nav__list { gap: 30.3px; }
+  .nav__link { font-size: 14.45px; }
+  .header__cta { padding-inline: 17.5px; font-size: 13.7px; }
+  .switch { padding: 0; background: var(--bg); }
+  .switch .switch__seg:first-child .switch__opt { width: 48px; min-width: 0; min-height: 34px; padding: 0; border-radius: 999px 0 0 999px; background: var(--bg-alt); box-shadow: none; }
+  .switch .switch__seg:last-child .switch__opt { width: 36.9px; min-width: 0; min-height: 34px; padding: 0; }
+
+  /* Hero: pastilla, flechas, panel y botones (Poppins 700 a 15.5 px). */
+  .hero__pill { padding: 4px 15px 4px 10px; gap: 12px; font-weight: 500; }
+  .hero__controls { padding-inline: 3px; }
+  .hero__progress { margin-inline: 7px; }
+  .hero__name { font-size: 15.6px; }
+  .hero__sub { font-size: 12.8px; }
+  .hero__actions .btn--lg { font-weight: 700; font-size: 15.5px; }
+  .hero__actions .btn--accent { padding-inline: 28.5px; }
+  .inca__actions .btn--lg, .band__actions .btn--lg { font-weight: 700; font-size: 15.5px; }
+
+  /* Tarjetas de tour. */
+  .tour-card__title { font-size: 17.75px; }
+  .tour-card__meta { gap: 6px; }
+  .tour-card__meta .ip-chip { padding-inline: 11px; font-size: 12.25px; }
+  .ip-chip-dark { padding: 0 10px 0 12px; gap: 5px; }
+  .ip-chip-dark svg { width: 11px; height: 11px; }
+  .rating__n { font-size: 12.5px; }
+  .tour-card__cancel { font-size: 12.7px; line-height: 19.8px; gap: 6px; }
+  .tour-card__foot .btn { padding-inline: 17.5px; border-width: 0; }
+  /* Fila de precio: "Desde" 5 px, importe 3 px y "por persona" 2 px más arriba; botón 5 px más abajo (PDF). */
+  .tour-card__foot .price__from { position: relative; top: -5px; }
+  .tour-card__foot .price__amount { position: relative; top: -3px; }
+  .tour-card__foot .price__per { position: relative; top: -2px; }
+  .tour-card__foot .btn { position: relative; top: 5px; }
+
+  /* Planes. */
+  .plan__body { padding-inline: 20px; }
+  .plan__price { font-weight: 300; font-size: 13.5px; }
+  .plan__link { font-size: 13.65px; }
+
+  /* Banda y razones. */
+  .band__stats dd { font-size: 38px; line-height: 44px; }
+  .band__stats dt { font-size: 13.8px; line-height: 21px; }
+  .reason__text { font-size: 14px; line-height: 22.475px; }
+
+  /* Opiniones y sellos. */
+  .testi { padding-left: 30px; }
+  .testi__quote { margin-left: 1px; }
+  .testi__meta { font-size: 12.45px; }
+  .testi__who strong { font-size: 14.3px; }
+
+  /* Formularios y pie. */
+  .search__label { font-size: 12.25px; }
+  .contact-card .btn { font-size: 14.5px; }
+  .news__form .btn { padding-inline: 23.5px; }
+  .footer__h { font-size: 12.2px; }
+  .contact-card__avatar { font-size: 19.4px; }
+  .footer__pay .ip-chip-ghost { padding-inline: 10px; }
+
+  /* Ajuste 2: separaciones y tamaños finos. */
+  .search__btn { font-size: 16.5px; }
+  .guarantee { gap: 12px; }
+  .guarantee__title { font-size: 14.2px; }
+  .ip-eyebrow { font-size: 13.17px; line-height: 18.2px; }
+  .badge { font-size: 12.3px; }
+  .plan__media .badge { padding-inline: 13.5px; }
+  .rating__n { margin-left: -3px; }
+  .count-pill { padding: 0 11px 0 10px; font-size: 12.33px; }
+  .grid-4--cities .round-btn { width: 46px; height: 46px; right: 22px; }
+  .inca__badge { gap: 6px; }
+  .inca__list { column-gap: 18px; }
+  .inca__list li { gap: 9px; }
+  .inca__list li svg { margin-left: 1px; }
+  .inca__actions .btn--lg:first-child { padding-inline: 28.4px; }
+  .inca__actions .btn--lg:last-child { padding-inline: 29.9px; }
+  .band__actions .btn--lg:first-child { padding-inline: 29px; }
+  .plan__foot { column-gap: 8px; }
+  .plan__link { gap: 6px; }
+  .plan__title { font-size: 16.15px; line-height: 20.8px; }
+  .testi__text { font-size: 15.05px; }
+  .seal { padding-inline: 19.8px; font-size: 14.05px; }
+  .acc__btn { font-size: 15.3px; line-height: 20.9px; }
+  .ig__cell .btn { font-size: 13.7px; padding-inline: 17.5px; }
+  .contact-card__head { gap: 14px; }
+  .contact-card p a { font-size: 14px; }
+  .footer__brand .btn { font-size: 13.5px; padding-inline: 16.5px; }
+  .footer__brand .btn svg { width: 16px; height: 16px; }
+  .footer__contact .icon { width: 14px; height: 14px; }
+  .footer__social .pill-link { padding-inline: 13px; }
+
+  /* Compensa la deriva subpíxel (+0.05 px, de las fuentes fraccionarias) de los ajustes de tipografía para que las fotos de Planes caigan en el mismo píxel. */
+  .ip-sec--dark { padding-top: 100.95px; }
+}
