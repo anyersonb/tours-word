@@ -151,20 +151,12 @@ RewriteRule ^ - [F,L]
 # correcto del error, pero conviene saberlo: quien vea la demo necesita la
 # clave. Es exactamente el aviso que dejo security-engineer al cerrar su
 # segunda pasada ("LiteSpeed no es Apache y lo que medi lo medi en Apache").
-<IfModule mod_setenvif.c>
-    SetEnvIf Request_URI "^/tour-word/(admin|livewire)(/|$)" PACHAVIVA_PROTEGIDO=1
-</IfModule>
-<IfModule mod_auth_basic.c>
-    AuthType Basic
-    AuthName "Pacha Viva - demo privada"
-    AuthUserFile /home/limaview/tour-word-data/.htpasswd
-    <IfModule mod_authz_core.c>
-        <RequireAny>
-            Require expr "%{ENV:PACHAVIVA_PROTEGIDO} != '1'"
-            Require valid-user
-        </RequireAny>
-    </IfModule>
-</IfModule>
+#
+# 2026-11-20: Basic Auth RETIRADO por decision de Anyerson ("quitale el usuario
+# y clave"): la demo queda publica. /admin sigue protegido por el login de
+# Filament y todo el subdirectorio sigue fuera del indice (X-Robots-Tag abajo).
+# Para volver a cerrarla: restaurar este bloque desde git (commit anterior a
+# este cambio); el .htpasswd sigue en /home/limaview/tour-word-data/.
 
 # Bloqueo por IP replicado del anfitrion (A-3, hueco senalado por
 # security-engineer en 04-seguridad.md SS8.4 punto 2): el anfitrion SI tiene un
