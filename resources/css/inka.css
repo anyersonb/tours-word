@@ -571,8 +571,8 @@ section[id], footer[id] { scroll-margin-top: 96px; }
 /* ---------------------------------------------------------------- footer */
 .footer { background: var(--bg-dark); color: var(--text-on-dark-muted); font-size: 14px; }
 .footer__grid { display: grid; grid-template-columns: 1fr; gap: 36px; padding-block: 48px 40px; }
-.footer__logo { display: inline-flex; padding: 14px 12px; background: var(--bg); border-radius: 16px; }
-.footer__logo img { width: 108px; height: auto; }
+.footer__logo { display: inline-flex; padding: 19px 15px 13px; background: var(--bg); border-radius: 16px; }
+.footer__logo img { width: 102px; height: auto; }
 .footer__about { margin-top: 20px; max-width: 22em; line-height: 1.5; }
 .footer__brand .btn { margin-top: 22px; }
 .footer__h { font-family: 'Poppins', ui-sans-serif, system-ui, sans-serif; font-size: 12.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-on-dark); }
@@ -644,7 +644,7 @@ a.pill-link:hover { background: var(--glass-light); }
   .acc.is-open .acc__btn { min-height: 56px; }
   .acc__panel { padding-bottom: 17px; }
   .contact-card { margin-top: 27px; padding-block: 30px; }
-  .footer__logo { padding: 7px 12px; }
+  .footer__logo { padding: 10px 15px 8px; }
   .footer__about { margin-top: 25px; }
   .footer__bottom { padding-block: 20px 24px; }
 }
@@ -1018,7 +1018,7 @@ a.topbar__notice, .topbar__notice { font-size: 12px; }
   .news__title { font-size: 29.5px; }
   .news__form input { font-size: 14px; }
   .ig__text { font-size: 13px; }
-  .footer__logo { padding: 11px 12px; }
+  .footer__logo { padding: 15px 15px 11px; }
 }
 @media (min-width: 1024px) {
   .ig__text { max-width: 16em; }
@@ -1266,3 +1266,12 @@ a.topbar__notice, .topbar__notice { font-size: 12px; }
   /* Compensa la deriva subpíxel (+0.05 px, de las fuentes fraccionarias) de los ajustes de tipografía para que las fotos de Planes caigan en el mismo píxel. */
   .ip-sec--dark { padding-top: 100.95px; }
 }
+
+/* =========================================================================
+   PASE 29 · LOGO DEL PIE E ICONOS DIBUJADOS SOBRE EL PDF
+   Logo del pie a 102 px (PDF), con la caja blanca del mismo tamaño que antes.
+   Comilla de opiniones en SVG de trazo (el PDF no usa el carácter “ de la fuente)
+   y banderín de "Operador local" en dorado medio, como en el PDF.
+   ========================================================================= */
+.testi__quote svg { display: block; margin: -1px 0 0 4px; }
+.icon-tile--accent-soft .icon--flag { color: #a87418; }

@@ -60,7 +60,7 @@
     <div class="container footer__grid">
         <div class="footer__brand">
             <a class="footer__logo" href="{{ route('home') }}" aria-label="{{ config('brand.name') }}">
-                <x-brand.mark variant="full" sizes="108px" :eager="false" />
+                <x-brand.mark variant="full" sizes="102px" :eager="false" />
             </a>
             <p class="footer__about">{{ __('home.footer.about') }}</p>
             <a class="btn btn--wa" href="{{ $waUrl }}" target="_blank" rel="noopener"><x-glyph name="whatsapp" :size="18" />{{ __('home.footer.whatsapp_cta') }}</a>

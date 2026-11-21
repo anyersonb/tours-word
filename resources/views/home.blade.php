@@ -423,7 +423,7 @@
                 @php $rIcons = [['flag', 'accent-soft'], ['headset', 'forest-soft'], ['shield-check', 'teal-soft'], ['clock', 'accent-soft']]; @endphp
                 @foreach (__('home.reasons.items') as $i => $r)
                     <li class="reason">
-                        <span class="icon-tile icon-tile--lg icon-tile--{{ $rIcons[$i][1] }}"><x-glyph :name="$rIcons[$i][0]" :size="22" /></span>
+                        <span class="icon-tile icon-tile--lg icon-tile--{{ $rIcons[$i][1] }}"><x-glyph :name="$rIcons[$i][0]" :size="22" class="icon--{{ $rIcons[$i][0] }}" /></span>
                         <h3 class="reason__title">{{ $r['title'] }}</h3>
                         <p class="reason__text">{{ $r['text'] }}</p>
                     </li>
@@ -444,7 +444,7 @@
                 @php $avTone = ['forest', 'gold', 'teal']; @endphp
                 @foreach ($testimonials as $i => $ti)
                     <li class="testi">
-                        <p class="testi__quote" aria-hidden="true">&ldquo;</p>
+                        <p class="testi__quote" aria-hidden="true"><svg width="20" height="15" viewBox="0 0 20 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" focusable="false"><path d="M1.2 8.4H7.1V14H1.2ZM1.2 14V6.8C1.2 3.6 3.8 1.6 7.6 1.2V3.2C5.6 3.6 4.4 4.8 4.2 8.4M12.2 8.4H18.1V14H12.2ZM12.2 14V6.8C12.2 3.6 14.8 1.6 18.6 1.2V3.2C16.6 3.6 15.4 4.8 15.2 8.4"/></svg></p>
                         <p class="rating__stars testi__stars" aria-hidden="true">@for ($k = 0; $k < 5; $k++)<x-glyph name="star" :size="12" />@endfor</p>
                         <blockquote class="testi__text">{{ $ti['text'] }}</blockquote>
                         <div class="testi__who">
